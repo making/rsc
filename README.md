@@ -46,6 +46,10 @@ rsc tcp://localhost:8080 --request --route hello -d Foo --debug
 rsc ws://localhost:8080/rsocket --stream --route hello --debug --take 30
 ```
 
+```
+java -jar rsc.jar wss://rsocket-demo.herokuapp.com:443/ws --stream -d Trump --log
+```
+
 ## Known issues
 
 * Composite Metadata is not supported yet.
