@@ -24,7 +24,8 @@ public class Rsc {
 				return;
 			}
 			if (!args.hasUri()) {
-				System.err.println("URI is required.");
+				System.err.println("Uri is required.");
+				System.err.println();
 				args.printHelp(System.out);
 				return;
 			}

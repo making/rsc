@@ -230,7 +230,8 @@ public class Args {
 
 	public void printHelp(PrintStream stream) {
 		try {
-			stream.println("rsc Uri [Options]");
+			stream.println("usage: rsc Uri [Options]");
+			stream.println();
 			this.parser.printHelpOn(stream);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
