@@ -14,4 +14,4 @@ git commit -m "Release ${VERSION}" pom.xml
 git tag ${VERSION}
 ./build-all-binaries.sh
 set +x
-echo "Run: git push origin ${VERSION}"
+echo "Run: git push origin ${VERSION} && git push origin master"
