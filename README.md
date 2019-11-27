@@ -78,3 +78,6 @@ docker run --rm \
    oracle/graalvm-ce:19.2.1 \
    ./target/classes/rsc-linux-x86_64 --version
 ```
+
+## License
+Licensed under the Apache License, Version 2.0.
