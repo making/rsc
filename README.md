@@ -39,11 +39,11 @@ Download an executable jar or native binary (only for osx-x86_64 or linux-x86_64
 ## Example usages
 
 ```
-rsc tcp://localhost:8080 --request --route /hello -d Foo --debug
+rsc tcp://localhost:8080 --request --route hello -d Foo --debug
 ```
 
 ```
-rsc ws://localhost:8080/rsocket --stream --route /hello --debug --take 30
+rsc ws://localhost:8080/rsocket --stream --route hello --debug --take 30
 ```
 
 ## Known issues
