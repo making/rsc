@@ -111,7 +111,15 @@ public class Args {
 	}
 
 	public int port() {
-		return this.uri.getPort();
+		final int port = this.uri.getPort();
+		if (port < 0) {
+			if (secure()) {
+				return 443;
+			} else {
+				return 80;
+			}
+		}
+		return port;
 	}
 
 	public boolean secure() {

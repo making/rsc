@@ -31,17 +31,37 @@ class ArgsTest {
 		final ClientTransport clientTransport = args.clientTransport();
 		assertThat(clientTransport).isOfAnyClassIn(TcpClientTransport.class);
 	}
+
 	@Test
 	void clientTransportWebsocket() {
-		final Args args = new Args(new String[]{"wss://localhost:8080"});
+		final Args args = new Args(new String[]{"ws://localhost:8080"});
 		final ClientTransport clientTransport = args.clientTransport();
 		assertThat(clientTransport).isOfAnyClassIn(WebsocketClientTransport.class);
 	}
+
 	@Test
 	void clientTransportHttp() {
 		final Args args = new Args(new String[]{"http://localhost:8080"});
 		final IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
 				args::clientTransport);
 		assertThat(exception.getMessage()).isEqualTo("http is unsupported scheme.");
+	}
+
+	@Test
+	void port() {
+		final Args args = new Args(new String[]{"ws://localhost:8080"});
+		assertThat(args.port()).isEqualTo(8080);
+	}
+
+	@Test
+	void portNoSecureDefault() {
+		final Args args = new Args(new String[]{"ws://localhost"});
+		assertThat(args.port()).isEqualTo(80);
+	}
+
+	@Test
+	void portSecureDefault() {
+		final Args args = new Args(new String[]{"wss://localhost"});
+		assertThat(args.port()).isEqualTo(443);
 	}
 }
