@@ -53,8 +53,8 @@ public class Rsc {
 
 	static Flux<?> run(Args args) {
 		if (args.debug()) {
-			LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-			Logger logger = loggerContext.getLogger("io.rsocket.FrameLogger");
+			final LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+			final Logger logger = loggerContext.getLogger("io.rsocket.FrameLogger");
 			logger.setLevel(Level.DEBUG);
 		}
 		final ClientTransport clientTransport = args.clientTransport();
