@@ -119,7 +119,7 @@
                                     package am.ik.rsocket;
                                     public class Version {
                                     public static final String getVersion() {
-                                    return "${project.version}";
+                                    return "{\"version\": \"${project.version}\", \"build\": \"${maven.build.timestamp}\"}";
                                     }
                                     }
                                 </echo>
