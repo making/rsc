@@ -182,8 +182,10 @@ public class Args {
 		Transport transport;
 		if (scheme.startsWith("ws")) {
 			transport = WEBSOCKET;
-		} else {
+		} else if (scheme.startsWith("tcp")) {
 			transport = TCP;
+		} else {
+			throw new IllegalArgumentException(scheme + " is unsupported scheme.");
 		}
 		return transport.clientTransport(this);
 	}
