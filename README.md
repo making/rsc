@@ -24,7 +24,7 @@ Option                       Description
 -m, --metadata [String]      Metaata (default: )                 
 --metadataMimeType [String]  MimeType for metadata (default:     
                                text/plain)                       
--r, --route [String]         Route                               
+-r, --route [String]         Routing Metadata Extension                               
 --request                    Shortcut of --im REQUEST_RESPONSE   
 --stream                     Shortcut of --im REQUEST_STREAM     
 --take [Integer]             Enable take(n)                      
@@ -48,8 +48,10 @@ rsc ws://localhost:8080/rsocket --stream --route hello --debug --take 30
 
 ## Known issues
 
+* Composite Metadata is not supported yet.
 * Request Channel is not implemented yet
 * Secure protocols (`wss`, `tcp+tls`) don't work with native binaries (the executable jar will work)
+* Client side responder will not be supported.
 
 ## Build
 
