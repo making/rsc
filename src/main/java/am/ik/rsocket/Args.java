@@ -79,7 +79,8 @@ public class Args {
 	private final OptionSpec<String> metadata = parser.acceptsAll(Arrays.asList("m", "metadata"), "Metaata")
 			.withOptionalArg().defaultsTo("");
 
-	private final OptionSpec<String> route = parser.acceptsAll(Arrays.asList("route", "r"), "Route").withOptionalArg();
+	private final OptionSpec<String> route = parser
+			.acceptsAll(Arrays.asList("route", "r"), "Routing Metadata Extension").withOptionalArg();
 
 	private final OptionSpec<String> log = parser.acceptsAll(Arrays.asList("log"), "Enable log()").withOptionalArg();
 
