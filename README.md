@@ -34,7 +34,7 @@ Option                       Description
 
 ## Download
 
-Download an executable jar or native binary (only for osx-x86_64 or linux-x86_64)from [Releases](https://github.com/making/rsc/releases).
+Download an executable jar or native binary (only for osx-x86_64 or linux-x86_64) from [Releases](https://github.com/making/rsc/releases).
 
 ## Example usages
 
