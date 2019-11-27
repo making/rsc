@@ -76,7 +76,7 @@ public class Args {
 	private final OptionSpec<String> data = parser.acceptsAll(Arrays.asList("d", "data"), "Data").withOptionalArg()
 			.defaultsTo("");
 
-	private final OptionSpec<String> metadata = parser.acceptsAll(Arrays.asList("m", "metadata"), "Metaata")
+	private final OptionSpec<String> metadata = parser.acceptsAll(Arrays.asList("m", "metadata"), "Metadata")
 			.withOptionalArg().defaultsTo("");
 
 	private final OptionSpec<String> route = parser

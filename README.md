@@ -21,7 +21,7 @@ Option                       Description
   [InteractionModel]           REQUEST_RESPONSE)                 
 --limitRate [Integer]        Enable limitRate(rate)              
 --log [String]               Enable log()                        
--m, --metadata [String]      Metaata (default: )                 
+-m, --metadata [String]      Metadata (default: )                 
 --metadataMimeType [String]  MimeType for metadata (default:     
                                text/plain)                       
 -r, --route [String]         Routing Metadata Extension                               
