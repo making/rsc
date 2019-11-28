@@ -50,6 +50,10 @@ rsc ws://localhost:8080/rsocket --stream --route hello --debug --take 30
 ```
 
 ```
+rsc ws://rsocket-demo.herokuapp.com:80/ws --stream -d Trump
+```
+
+```
 java -jar rsc.jar wss://rsocket-demo.herokuapp.com:443/ws --stream -d Trump
 ```
 (secure protocols only work with the executable jar for now)
