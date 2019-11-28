@@ -245,6 +245,7 @@ aardwolf
 Aaron
 Aaronic
 2019-11-28 14:21:36.326  INFO --- [     parallel-4] rsc             : request(6)
+...
 ```
 
 > The sample server application can be started with the following command:
