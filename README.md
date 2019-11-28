@@ -144,6 +144,114 @@ $ rsc tcp://localhost:7000 -r greeting.foo --wiretap -q
 2019-11-28 13:02:28.387 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xa0202801, L:/127.0.0.1:54245 - R:localhost/127.0.0.1:7000] READ COMPLETE
 ```
 
+## Backpressure
+
+The `onNext` output can be delayed with the `--delayElements` (milli seconds) option.　Accordingly, the number of `request` will be automatically adjusted.
+
+```
+$ rsc tcp://localhost:8765 --stream --delayElements 100 --log
+2019-11-28 14:17:25.479  INFO --- [actor-tcp-nio-1] rsc             : onSubscribe(FluxMap.MapSubscriber)
+2019-11-28 14:17:25.479  INFO --- [actor-tcp-nio-1] rsc             : request(32)
+2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(A)
+2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(a)
+2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(aa)
+2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(aal)
+2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(aalii)
+2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(aam)
+2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aani)
+2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(aardvark)
+2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(aardwolf)
+2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaron)
+2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaronic)
+2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaronical)
+2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaronite)
+2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaronitic)
+2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaru)
+2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(Ab)
+2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(aba)
+2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(Ababdeh)
+2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(Ababua)
+2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abac)
+2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abaca)
+2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abacate)
+2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abacay)
+2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abacinate)
+2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abacination)
+2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abaciscus)
+2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abacist)
+2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(aback)
+2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abactinal)
+2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abactinally)
+2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abaction)
+2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abactor)
+A
+a
+aa
+aal
+aalii
+aam
+Aani
+aardvark
+aardwolf
+Aaron
+Aaronic
+Aaronical
+Aaronite
+Aaronitic
+Aaru
+Ab
+aba
+Ababdeh
+Ababua
+abac
+abaca
+abacate
+abacay
+2019-11-28 14:17:27.841  INFO --- [     parallel-8] rsc             : request(24)
+2019-11-28 14:17:27.856  INFO --- [actor-tcp-nio-1] rsc             : onNext(abaculus)
+...
+```
+
+You can also limit the number of `request` with `--limitRate` option.
+
+```
+$ rsc tcp://localhost:8765 --stream --delayElements 100 --limitRate 8 --log
+2019-11-28 14:21:35.175  INFO --- [actor-tcp-nio-1] rsc             : onSubscribe(FluxMap.MapSubscriber)
+2019-11-28 14:21:35.175  INFO --- [actor-tcp-nio-1] rsc             : request(8)
+2019-11-28 14:21:35.187  INFO --- [actor-tcp-nio-1] rsc             : onNext(A)
+2019-11-28 14:21:35.188  INFO --- [actor-tcp-nio-1] rsc             : onNext(a)
+2019-11-28 14:21:35.188  INFO --- [actor-tcp-nio-1] rsc             : onNext(aa)
+2019-11-28 14:21:35.188  INFO --- [actor-tcp-nio-1] rsc             : onNext(aal)
+2019-11-28 14:21:35.188  INFO --- [actor-tcp-nio-1] rsc             : onNext(aalii)
+2019-11-28 14:21:35.188  INFO --- [actor-tcp-nio-1] rsc             : onNext(aam)
+2019-11-28 14:21:35.188  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aani)
+2019-11-28 14:21:35.188  INFO --- [actor-tcp-nio-1] rsc             : onNext(aardvark)
+A
+a
+aa
+aal
+aalii
+2019-11-28 14:21:35.702  INFO --- [     parallel-6] rsc             : request(6)
+2019-11-28 14:21:35.714  INFO --- [actor-tcp-nio-1] rsc             : onNext(aardwolf)
+2019-11-28 14:21:35.714  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaron)
+2019-11-28 14:21:35.714  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaronic)
+2019-11-28 14:21:35.714  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaronical)
+2019-11-28 14:21:35.714  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaronite)
+2019-11-28 14:21:35.714  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaronitic)
+aam
+Aani
+aardvark
+aardwolf
+Aaron
+Aaronic
+2019-11-28 14:21:36.326  INFO --- [     parallel-4] rsc             : request(6)
+```
+
+> The sample server application can be started with the following command:
+> ```
+> rsocket-cli --debug -i=@/usr/share/dict/words --server tcp://localhost:8765
+> ```
+
 ## Known issues
 
 * Composite Metadata is not supported yet.
