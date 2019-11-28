@@ -21,7 +21,6 @@ import ch.qos.logback.classic.LoggerContext;
 import io.rsocket.RSocketFactory;
 import io.rsocket.frame.decoder.PayloadDecoder;
 import io.rsocket.transport.ClientTransport;
-import joptsimple.OptionException;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 
@@ -45,8 +44,14 @@ public class Rsc {
 				return;
 			}
 			run(args).blockLast();
-		} catch (OptionException | IllegalArgumentException e) {
-			System.err.println(e.getMessage());
+		} catch (RuntimeException e) {
+			if (args.stacktrace()) {
+				e.printStackTrace();
+			} else {
+				System.err.println("Error: " + e.getMessage());
+				System.err.println();
+				System.err.println("Use --stacktrace option for details.");
+			}
 			System.exit(1);
 		}
 	}

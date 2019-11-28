@@ -96,6 +96,9 @@ public class Args {
 			.acceptsAll(Arrays.asList("delayElements"), "Enable delayElements(delay) in milli seconds")
 			.withOptionalArg().ofType(Long.class);
 
+	private final OptionSpec<Void> stacktrace = parser.acceptsAll(Arrays.asList("stacktrace"),
+			"Show Stacktrace when an exception happens");
+
 	private final OptionSet options;
 
 	public Args(String[] args) {
@@ -218,6 +221,10 @@ public class Args {
 
 	public boolean quiet() {
 		return this.options.has(this.quiet);
+	}
+
+	public boolean stacktrace() {
+		return this.options.has(this.stacktrace);
 	}
 
 	public Optional<Integer> limitRate() {
