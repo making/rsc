@@ -1,5 +1,7 @@
 # RSocket Client CLI (RSC)
 
+> Aiming to be a curl for RSocket
+
 ```
 usage: rsc Uri [Options]
 
