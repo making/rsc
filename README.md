@@ -50,6 +50,10 @@ rsc ws://localhost:8080/rsocket --stream --route hello --debug --take 30
 ```
 
 ```
+rsc ws://rsocket-demo.herokuapp.com:80/ws --request -d 'Hello World!' --debug
+```
+
+```
 rsc ws://rsocket-demo.herokuapp.com:80/ws --stream -d Trump
 ```
 
