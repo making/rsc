@@ -21,15 +21,16 @@ Option                       Description
   [InteractionModel]           REQUEST_RESPONSE)                 
 --limitRate [Integer]        Enable limitRate(rate)              
 --log [String]               Enable log()                        
--m, --metadata [String]      Metadata (default: )                 
+-m, --metadata [String]      Metadata (default: )                
 --metadataMimeType [String]  MimeType for metadata (default:     
                                text/plain)                       
--r, --route [String]         Routing Metadata Extension                               
+-q, --quiet                  Disable the output on next          
+-r, --route [String]         Routing Metadata Extension          
 --request                    Shortcut of --im REQUEST_RESPONSE   
 --stream                     Shortcut of --im REQUEST_STREAM     
 --take [Integer]             Enable take(n)                      
 -v, --version                Print version                       
--w, --wiretap                Enable wiretap  
+-w, --wiretap                Enable wiretap 
 ```
 
 ## Download

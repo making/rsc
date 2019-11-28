@@ -48,6 +48,8 @@ public class Args {
 
 	private final OptionSpec<Void> debug = parser.acceptsAll(Arrays.asList("debug"), "Enable FrameLogger");
 
+	private final OptionSpec<Void> quiet = parser.acceptsAll(Arrays.asList("q", "quiet"), "Disable the output on next");
+
 	private final OptionSpec<InteractionModel> interactionModel = parser
 			.acceptsAll(Arrays.asList("im", "interactionModel"), "InteractionModel").withOptionalArg()
 			.ofType(InteractionModel.class).defaultsTo(InteractionModel.REQUEST_RESPONSE);
@@ -212,6 +214,10 @@ public class Args {
 
 	public boolean debug() {
 		return this.options.has(this.debug);
+	}
+
+	public boolean quiet() {
+		return this.options.has(this.quiet);
 	}
 
 	public Optional<Integer> limitRate() {

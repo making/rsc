@@ -26,7 +26,9 @@ public enum InteractionModel {
 		@Override
 		Publisher<?> request(RSocket rsocket, Args args) {
 			return rsocket.requestResponse(DefaultPayload.create(args.data(), args.metadata()))
-					.map(Payload::getDataUtf8).transform(s -> args.log().map(s::log).orElse(s));
+					.map(Payload::getDataUtf8) //
+					.transform(s -> args.log().map(s::log).orElse(s))
+					.transform(s -> args.quiet() ? s : s.doOnNext(System.out::println));
 		}
 	},
 	REQUEST_STREAM {
@@ -36,7 +38,8 @@ public enum InteractionModel {
 					.transform(s -> args.log().map(s::log).orElse(s))
 					.transform(s -> args.limitRate().map(s::limitRate).orElse(s))
 					.transform(s -> args.take().map(s::take).orElse(s))
-					.transform(s -> args.delayElements().map(s::delayElements).orElse(s));
+					.transform(s -> args.delayElements().map(s::delayElements).orElse(s))
+					.transform(s -> args.quiet() ? s : s.doOnNext(System.out::println));
 		}
 	},
 	REQUEST_CHANNEL, FIRE_AND_FORGET {
