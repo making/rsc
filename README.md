@@ -256,6 +256,8 @@ Aaronic
 ...
 ```
 
+**Tip**: Using `--limitRate 1 --delayElements 1000 --debug` is a convenient way to trace a stream.
+
 > The sample server application can be started with the following command:
 > ```
 > rsocket-cli --debug -i=@/usr/share/dict/words --server tcp://localhost:8765
