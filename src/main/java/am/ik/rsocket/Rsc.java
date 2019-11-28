@@ -15,11 +15,14 @@
  */
 package am.ik.rsocket;
 
+import java.time.Duration;
+
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import io.rsocket.RSocketFactory;
 import io.rsocket.frame.decoder.PayloadDecoder;
+import io.rsocket.resume.PeriodicResumeStrategy;
 import io.rsocket.transport.ClientTransport;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
@@ -62,7 +65,10 @@ public class Rsc {
 		}
 		args.log().ifPresent(Rsc::configureDebugLevel);
 		final ClientTransport clientTransport = args.clientTransport();
-		return RSocketFactory.connect() //
+		final RSocketFactory.ClientRSocketFactory factory = RSocketFactory.connect();
+		args.resume().ifPresent(duration -> factory.resume().resumeSessionDuration(duration)
+				.resumeStrategy(() -> new PeriodicResumeStrategy(Duration.ofSeconds(5))));
+		return factory //
 				.frameDecoder(PayloadDecoder.ZERO_COPY) //
 				.metadataMimeType(args.metadataMimeType()) //
 				.dataMimeType(args.dataMimeType()) //

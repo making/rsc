@@ -65,6 +65,10 @@ public class Args {
 	private final OptionSpec<Void> channel = parser.acceptsAll(Arrays.asList("channel"),
 			"Shortcut of --im REQUEST_CHANNEL");
 
+	private final OptionSpec<Integer> resume = parser.acceptsAll(Arrays.asList("resume"),
+			"Enable resume. Resume session duration can be configured in seconds. Unless the duration is specified, the default value (2min) is used.")
+			.withOptionalArg().ofType(Integer.class);
+
 	private final URI uri;
 
 	private final OptionSpec<String> dataMimeType = parser
@@ -225,6 +229,15 @@ public class Args {
 
 	public boolean stacktrace() {
 		return this.options.has(this.stacktrace);
+	}
+
+	public Optional<Duration> resume() {
+		if (this.options.has(this.resume)) {
+			final Integer duration = this.options.valueOf(this.resume);
+			return Optional.of(duration == null ? Duration.ofMinutes(2) : Duration.ofSeconds(duration));
+		} else {
+			return Optional.empty();
+		}
 	}
 
 	public Optional<Integer> limitRate() {

@@ -15,6 +15,8 @@
  */
 package am.ik.rsocket;
 
+import java.time.Duration;
+
 import io.rsocket.transport.ClientTransport;
 import io.rsocket.transport.netty.client.TcpClientTransport;
 import io.rsocket.transport.netty.client.WebsocketClientTransport;
@@ -63,5 +65,25 @@ class ArgsTest {
 	void portSecureDefault() {
 		final Args args = new Args(new String[]{"wss://localhost"});
 		assertThat(args.port()).isEqualTo(443);
+	}
+
+	@Test
+	void resumeDisabled() {
+		final Args args = new Args(new String[]{"tcp://localhost:8080"});
+		assertThat(args.resume().isPresent()).isFalse();
+	}
+
+	@Test
+	void resumeEnabled() {
+		final Args args = new Args(new String[]{"tcp://localhost:8080", "--resume"});
+		assertThat(args.resume().isPresent()).isTrue();
+		assertThat(args.resume().get()).isEqualTo(Duration.ofMinutes(2));
+	}
+
+	@Test
+	void resumeEnabledWithDuration() {
+		final Args args = new Args(new String[]{"tcp://localhost:8080", "--resume", "600"});
+		assertThat(args.resume().isPresent()).isTrue();
+		assertThat(args.resume().get()).isEqualTo(Duration.ofSeconds(600));
 	}
 }
