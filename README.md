@@ -52,7 +52,7 @@ java -jar rsc.jar wss://rsocket-demo.herokuapp.com:443/ws --stream -d Trump
 ```
 (secure protocols only work with the executable jar for now)
 
-## How to change the output
+## Log options
 
 ### Default
 
