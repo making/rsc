@@ -16,13 +16,18 @@
 package am.ik.rsocket;
 
 import java.time.Duration;
+import java.util.List;
 
+import io.netty.buffer.ByteBuf;
 import io.rsocket.transport.ClientTransport;
 import io.rsocket.transport.netty.client.TcpClientTransport;
 import io.rsocket.transport.netty.client.WebsocketClientTransport;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import reactor.util.function.Tuple2;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ArgsTest {
@@ -85,5 +90,95 @@ class ArgsTest {
 		final Args args = new Args(new String[]{"tcp://localhost:8080", "--resume", "600"});
 		assertThat(args.resume().isPresent()).isTrue();
 		assertThat(args.resume().get()).isEqualTo(Duration.ofSeconds(600));
+	}
+
+	@Test
+	void route() {
+		final Args args = new Args(new String[]{"tcp://localhost:8080", "-r", "locate.aircrafts.for"});
+		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
+		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.routing.v0");
+		assertThat(metadata.getT2()).isEqualTo(Args.routingMetadata("locate.aircrafts.for"));
+	}
+
+	@Test
+	void metadataDefault() {
+		final Args args = new Args(new String[]{"tcp://localhost:8080"});
+		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
+		assertThat(metadata.getT1()).isEqualTo("text/plain");
+		assertThat(metadata.getT2().toString(UTF_8)).isEqualTo("");
+	}
+
+	@Test
+	void metadataSingle() {
+		final Args args = new Args(new String[]{"tcp://localhost:8080", "--metadataMimeType",
+				"application/vnd.spring.rsocket.metadata+json", "-m", "{\"route\":\"locate.aircrafts.for\"}"});
+		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
+		assertThat(metadata.getT1()).isEqualTo("application/vnd.spring.rsocket.metadata+json");
+		assertThat(metadata.getT2().toString(UTF_8)).isEqualTo("{\"route\":\"locate.aircrafts.for\"}");
+	}
+
+	@Test
+	void metadataComposite() {
+		final Args args = new Args(new String[]{"tcp://localhost:8080", //
+				"--metadataMimeType", "application/json", //
+				"-m", "{\"hello\":\"world\"}", //
+				"--metadataMimeType", "text/plain", //
+				"-m", "bar"});
+		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
+		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.composite-metadata.v0");
+		assertThat(metadata.getT2().toString(UTF_8)).doesNotContain("application/json");
+		assertThat(metadata.getT2().toString(UTF_8)).contains("{\"hello\":\"world\"}");
+		assertThat(metadata.getT2().toString(UTF_8)).doesNotContain("text/plain");
+		assertThat(metadata.getT2().toString(UTF_8)).contains("bar");
+		final List<ByteBuf> metadataList = args.metadata();
+		final List<String> metadataMimeTypeList = args.metadataMimeType();
+		assertThat(metadataList.stream().map(x -> x.toString(UTF_8)).collect(toList()))
+				.containsExactly("{\"hello\":\"world\"}", "bar");
+		assertThat(metadataMimeTypeList).containsExactly("application/json", "text/plain");
+	}
+
+	@Test
+	void metadataCompositeWithRoute() {
+		final Args args = new Args(new String[]{"tcp://localhost:8080", //
+				"--metadataMimeType", "application/json", //
+				"-m", "{\"hello\":\"world\"}", //
+				"--metadataMimeType", "text/plain", //
+				"-m", "bar", //
+				"--route", "greeting"});
+		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
+		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.composite-metadata.v0");
+		assertThat(metadata.getT2().toString(UTF_8)).doesNotContain("application/json");
+		assertThat(metadata.getT2().toString(UTF_8)).contains("{\"hello\":\"world\"}");
+		assertThat(metadata.getT2().toString(UTF_8)).doesNotContain("text/plain");
+		assertThat(metadata.getT2().toString(UTF_8)).contains("bar");
+		assertThat(metadata.getT2().toString(UTF_8)).doesNotContain("message/x.rsocket.routing.v0");
+		assertThat(metadata.getT2().toString(UTF_8)).contains(Args.routingMetadata("greeting").toString(UTF_8));
+		final List<ByteBuf> metadataList = args.metadata();
+		final List<String> metadataMimeTypeList = args.metadataMimeType();
+		assertThat(metadataList.stream().map(x -> x.toString(UTF_8)).collect(toList()))
+				.containsExactly(Args.routingMetadata("greeting").toString(UTF_8), "{\"hello\":\"world\"}", "bar");
+		assertThat(metadataMimeTypeList).containsExactly("message/x.rsocket.routing.v0", "application/json",
+				"text/plain");
+	}
+
+	@Test
+	void metadataCompositeWithUnknownMimeType() {
+		final Args args = new Args(new String[]{"tcp://localhost:8080", //
+				"--metadataMimeType", "application/vnd.spring.rsocket.metadata+json", //
+				"-m", "{}", //
+				"--route", "greeting"});
+		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
+		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.composite-metadata.v0");
+		// Unknown mime type should present as a US-ASCII string
+		assertThat(metadata.getT2().toString(UTF_8)).contains("application/vnd.spring.rsocket.metadata+json");
+		assertThat(metadata.getT2().toString(UTF_8)).contains("{}");
+		assertThat(metadata.getT2().toString(UTF_8)).doesNotContain("message/x.rsocket.routing.v0");
+		assertThat(metadata.getT2().toString(UTF_8)).contains(Args.routingMetadata("greeting").toString(UTF_8));
+		final List<ByteBuf> metadataList = args.metadata();
+		final List<String> metadataMimeTypeList = args.metadataMimeType();
+		assertThat(metadataList.stream().map(x -> x.toString(UTF_8)).collect(toList()))
+				.containsExactly(Args.routingMetadata("greeting").toString(UTF_8), "{}");
+		assertThat(metadataMimeTypeList).containsExactly("message/x.rsocket.routing.v0",
+				"application/vnd.spring.rsocket.metadata+json");
 	}
 }

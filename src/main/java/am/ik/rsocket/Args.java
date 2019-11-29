@@ -19,22 +19,32 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UncheckedIOException;
 import java.net.URI;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.CompositeByteBuf;
+import io.netty.buffer.Unpooled;
+import io.rsocket.metadata.CompositeMetadataFlyweight;
 import io.rsocket.metadata.WellKnownMimeType;
 import io.rsocket.transport.ClientTransport;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 import reactor.netty.tcp.TcpClient;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 import static am.ik.rsocket.Transport.TCP;
 import static am.ik.rsocket.Transport.WEBSOCKET;
+import static java.util.stream.Collectors.toList;
 
 public class Args {
 
@@ -72,18 +82,18 @@ public class Args {
 	private final URI uri;
 
 	private final OptionSpec<String> dataMimeType = parser
-			.acceptsAll(Arrays.asList("dataMimeType"), "MimeType for data").withOptionalArg()
+			.acceptsAll(Arrays.asList("dataMimeType", "dmt"), "MimeType for data").withOptionalArg()
 			.defaultsTo(WellKnownMimeType.APPLICATION_JSON.getString());
 
 	private final OptionSpec<String> metadataMimeType = parser
-			.acceptsAll(Arrays.asList("metadataMimeType"), "MimeType for metadata").withOptionalArg()
-			.defaultsTo(WellKnownMimeType.TEXT_PLAIN.getString());
+			.acceptsAll(Arrays.asList("metadataMimeType", "mmt"), "MimeType for metadata (default: text/plain)")
+			.withOptionalArg();
 
 	private final OptionSpec<String> data = parser.acceptsAll(Arrays.asList("d", "data"), "Data").withOptionalArg()
 			.defaultsTo("");
 
-	private final OptionSpec<String> metadata = parser.acceptsAll(Arrays.asList("m", "metadata"), "Metadata")
-			.withOptionalArg().defaultsTo("");
+	private final OptionSpec<String> metadata = parser
+			.acceptsAll(Arrays.asList("m", "metadata"), "Metadata (default: )").withOptionalArg();
 
 	private final OptionSpec<String> route = parser
 			.acceptsAll(Arrays.asList("route", "r"), "Routing Metadata Extension").withOptionalArg();
@@ -104,6 +114,8 @@ public class Args {
 			"Show Stacktrace when an exception happens");
 
 	private final OptionSet options;
+
+	private Tuple2<String, ByteBuf> composedMetadata = null;
 
 	public Args(String[] args) {
 		final OptionSpec<String> uri = parser.nonOptions().describedAs("Uri");
@@ -156,20 +168,12 @@ public class Args {
 		return this.options.valueOf(this.interactionModel);
 	}
 
-	public ByteBuffer data() {
-		return ByteBuffer.wrap(this.options.valueOf(this.data).getBytes(StandardCharsets.UTF_8));
+	public ByteBuf data() {
+		return Unpooled.wrappedBuffer(this.options.valueOf(this.data).getBytes(StandardCharsets.UTF_8));
 	}
 
 	public String route() {
 		return this.options.valueOf(this.route);
-	}
-
-	public ByteBuffer metadata() {
-		if (this.options.has(this.route)) {
-			// TODO composite-metadata
-			return routingMetadata(this.route());
-		}
-		return ByteBuffer.wrap(this.options.valueOf(this.metadata).getBytes(StandardCharsets.UTF_8));
 	}
 
 	public String dataMimeType() {
@@ -181,17 +185,69 @@ public class Args {
 		}
 	}
 
-	public String metadataMimeType() {
+	/**
+	 * https://github.com/rsocket/rsocket/blob/master/Extensions/CompositeMetadata.md
+	 */
+	public Tuple2<String, ByteBuf> composeMetadata() {
+		if (this.composedMetadata != null) {
+			return this.composedMetadata;
+		}
+		final List<String> mimeTypeList = this.metadataMimeType();
+		final List<ByteBuf> metadataList = this.metadata();
+		if (metadataList.size() != mimeTypeList.size()) {
+			throw new IllegalArgumentException(
+					String.format("The size of metadata(%d) and metadataMimeType(%d) don't match!", metadataList.size(),
+							mimeTypeList.size()));
+		}
+		if (metadataList.isEmpty()) {
+			return Tuples.of(WellKnownMimeType.TEXT_PLAIN.getString(), Unpooled.buffer());
+		}
+		if (metadataList.size() == 1) {
+			return Tuples.of(mimeTypeList.get(0), metadataList.get(0));
+		}
+		final CompositeByteBuf compositeByteBuf = Unpooled.compositeBuffer();
+		final ByteBufAllocator allocator = ByteBufAllocator.DEFAULT;
+		final Iterator<String> mimeTypeIterator = mimeTypeList.iterator();
+		final Iterator<ByteBuf> metadataIterator = metadataList.iterator();
+		while (mimeTypeIterator.hasNext()) {
+			final String mimeType = mimeTypeIterator.next();
+			final ByteBuf metadata = metadataIterator.next();
+			final WellKnownMimeType wellKnownMimeType = WellKnownMimeType.fromString(mimeType);
+			if (wellKnownMimeType != WellKnownMimeType.UNPARSEABLE_MIME_TYPE) {
+				CompositeMetadataFlyweight.encodeAndAddMetadata(compositeByteBuf, allocator, wellKnownMimeType,
+						metadata);
+			} else {
+				CompositeMetadataFlyweight.encodeAndAddMetadata(compositeByteBuf, allocator, mimeType, metadata);
+			}
+		}
+		this.composedMetadata = Tuples.of(WellKnownMimeType.MESSAGE_RSOCKET_COMPOSITE_METADATA.getString(),
+				compositeByteBuf);
+		return this.composedMetadata;
+	}
+
+	List<ByteBuf> metadata() {
+		List<ByteBuf> list = new ArrayList<>();
 		if (this.options.has(this.route)) {
-			// TODO composite-metadata
-			return WellKnownMimeType.MESSAGE_RSOCKET_ROUTING.getString();
+			list.add(routingMetadata(this.route()));
 		}
-		final String mimeType = this.options.valueOf(this.metadataMimeType);
-		try {
-			return WellKnownMimeType.valueOf(mimeType).getString();
-		} catch (IllegalArgumentException ignored) {
-			return mimeType;
+		list.addAll(this.options.valuesOf(this.metadata).stream()
+				.map(metadata -> Unpooled.wrappedBuffer(metadata.getBytes(StandardCharsets.UTF_8))).collect(toList()));
+		return list;
+	}
+
+	List<String> metadataMimeType() {
+		List<String> list = new ArrayList<>();
+		if (this.options.has(this.route)) {
+			list.add(WellKnownMimeType.MESSAGE_RSOCKET_ROUTING.getString());
 		}
+		list.addAll(this.options.valuesOf(this.metadataMimeType).stream().map(mimeType -> {
+			try {
+				return WellKnownMimeType.valueOf(mimeType).getString();
+			} catch (IllegalArgumentException ignored) {
+				return mimeType;
+			}
+		}).collect(toList()));
+		return list;
 	}
 
 	public ClientTransport clientTransport() {
@@ -293,12 +349,11 @@ public class Args {
 	/**
 	 * https://github.com/rsocket/rsocket/blob/master/Extensions/Routing.md
 	 */
-	static ByteBuffer routingMetadata(String tag) {
+	static ByteBuf routingMetadata(String tag) {
 		final byte[] bytes = tag.getBytes(StandardCharsets.UTF_8);
-		final ByteBuffer buffer = ByteBuffer.allocate(1 + bytes.length);
-		buffer.put((byte) bytes.length);
-		buffer.put(bytes);
-		buffer.flip();
-		return buffer;
+		final ByteBuf buf = Unpooled.buffer();
+		buf.writeByte(bytes.length);
+		buf.writeBytes(bytes);
+		return buf;
 	}
 }

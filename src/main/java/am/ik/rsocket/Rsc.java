@@ -70,7 +70,7 @@ public class Rsc {
 				.resumeStrategy(() -> new PeriodicResumeStrategy(Duration.ofSeconds(5))));
 		return factory //
 				.frameDecoder(PayloadDecoder.ZERO_COPY) //
-				.metadataMimeType(args.metadataMimeType()) //
+				.metadataMimeType(args.composeMetadata().getT1()) //
 				.dataMimeType(args.dataMimeType()) //
 				.transport(clientTransport) //
 				.start() //
