@@ -8,31 +8,37 @@ usage: rsc Uri [Options]
 Non-option arguments:
 [String: Uri]        
 
-Option                       Description                         
-------                       -----------                         
---channel                    Shortcut of --im REQUEST_CHANNEL    
--d, --data [String]          Data (default: )                    
---dataMimeType [String]      MimeType for data (default:         
-                               application/json)                 
---debug                      Enable FrameLogger                  
---delayElements [Long]       Enable delayElements(delay) in milli
-                               seconds                           
---fnf                        Shortcut of --im FIRE_AND_FORGET    
---help                       Print help                          
---im, --interactionModel     InteractionModel (default:          
-  [InteractionModel]           REQUEST_RESPONSE)                 
---limitRate [Integer]        Enable limitRate(rate)              
---log [String]               Enable log()                        
--m, --metadata [String]      Metadata (default: )                
---metadataMimeType [String]  MimeType for metadata (default:     
-                               text/plain)                       
--q, --quiet                  Disable the output on next          
--r, --route [String]         Routing Metadata Extension          
---request                    Shortcut of --im REQUEST_RESPONSE   
---stream                     Shortcut of --im REQUEST_STREAM     
---take [Integer]             Enable take(n)                      
--v, --version                Print version                       
--w, --wiretap                Enable wiretap 
+Option                              Description                           
+------                              -----------                           
+--channel                           Shortcut of --im REQUEST_CHANNEL      
+-d, --data [String]                 Data (default: )                      
+--dataMimeType, --dmt [String]      MimeType for data (default:           
+                                      application/json)                   
+--debug                             Enable FrameLogger                    
+--delayElements [Long]              Enable delayElements(delay) in milli  
+                                      seconds                             
+--fnf                               Shortcut of --im FIRE_AND_FORGET      
+--help                              Print help                            
+--im, --interactionModel            InteractionModel (default:            
+  [InteractionModel]                  REQUEST_RESPONSE)                   
+--limitRate [Integer]               Enable limitRate(rate)                
+--log [String]                      Enable log()                          
+-m, --metadata [String]             Metadata (default: )                  
+--metadataMimeType, --mmt [String]  MimeType for metadata (default:       
+                                      text/plain)                         
+-q, --quiet                         Disable the output on next            
+-r, --route [String]                Routing Metadata Extension            
+--request                           Shortcut of --im REQUEST_RESPONSE     
+--resume [Integer]                  Enable resume. Resume session duration
+                                      can be configured in seconds. Unless
+                                      the duration is specified, the      
+                                      default value (2min) is used.       
+--stacktrace                        Show Stacktrace when an exception     
+                                      happens                             
+--stream                            Shortcut of --im REQUEST_STREAM       
+--take [Integer]                    Enable take(n)                        
+-v, --version                       Print version                         
+-w, --wiretap                       Enable wiretap   
 ```
 
 ## Download
@@ -152,6 +158,71 @@ $ rsc tcp://localhost:7000 -r greeting.foo --wiretap -q
 2019-11-28 13:02:28.387 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xa0202801, L:/127.0.0.1:54245 - R:localhost/127.0.0.1:7000] READ COMPLETE
 ```
 
+## Composite Metadata
+
+`rsc` supports [Composite Metadata Extension](https://github.com/rsocket/rsocket/blob/master/Extensions/CompositeMetadata.md) sice 0.3.0.
+
+If multiple metadataMimeTypes are specified, they are automatically composed (the order matters).
+
+```
+$ rsc tcp://localhost:7000 --metadataMimeType text/plain -m hello --metadataMimeType text/json -m '{"hello":"world"}' --wiretap
+2019-11-29 13:39:54.696 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76] REGISTERED
+2019-11-29 13:39:54.696 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76] CONNECT: localhost/127.0.0.1:7000
+2019-11-29 13:39:54.697 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76, L:/127.0.0.1:62738 - R:localhost/127.0.0.1:7000] ACTIVE
+2019-11-29 13:39:54.706 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76, L:/127.0.0.1:62738 - R:localhost/127.0.0.1:7000] WRITE: 78B
+         +-------------------------------------------------+
+         |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
++--------+-------------------------------------------------+----------------+
+|00000000| 00 00 4b 00 00 00 00 04 00 00 01 00 00 00 00 4e |..K............N|
+|00000010| 20 00 01 5f 90 27 6d 65 73 73 61 67 65 2f 78 2e | .._.'message/x.|
+|00000020| 72 73 6f 63 6b 65 74 2e 63 6f 6d 70 6f 73 69 74 |rsocket.composit|
+|00000030| 65 2d 6d 65 74 61 64 61 74 61 2e 76 30 10 61 70 |e-metadata.v0.ap|
+|00000040| 70 6c 69 63 61 74 69 6f 6e 2f 6a 73 6f 6e       |plication/json  |
++--------+-------------------------------------------------+----------------+
+2019-11-29 13:39:54.715 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76, L:/127.0.0.1:62738 - R:localhost/127.0.0.1:7000] FLUSH
+2019-11-29 13:39:54.715 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76, L:/127.0.0.1:62738 - R:localhost/127.0.0.1:7000] WRITE: 51B
+         +-------------------------------------------------+
+         |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
++--------+-------------------------------------------------+----------------+
+|00000000| 00 00 30 00 00 00 01 11 00 00 00 27 a1 00 00 05 |..0........'....|
+|00000010| 68 65 6c 6c 6f 08 74 65 78 74 2f 6a 73 6f 6e 00 |hello.text/json.|
+|00000020| 00 11 7b 22 68 65 6c 6c 6f 22 3a 22 77 6f 72 6c |..{"hello":"worl|
+|00000030| 64 22 7d                                        |d"}             |
++--------+-------------------------------------------------+----------------+
+2019-11-29 13:39:54.716 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76, L:/127.0.0.1:62738 - R:localhost/127.0.0.1:7000] FLUSH
+...
+```
+
+`--route` option is still respected.
+
+```
+$ rsc tcp://localhost:7000 --metadataMimeType text/plain -m hello --route greeting.foo --wiretap
+2019-11-29 13:41:54.916 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76] REGISTERED
+2019-11-29 13:41:54.917 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76] CONNECT: localhost/127.0.0.1:7000
+2019-11-29 13:41:54.917 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76, L:/127.0.0.1:62751 - R:localhost/127.0.0.1:7000] ACTIVE
+2019-11-29 13:41:54.928 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76, L:/127.0.0.1:62751 - R:localhost/127.0.0.1:7000] WRITE: 78B
+         +-------------------------------------------------+
+         |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
++--------+-------------------------------------------------+----------------+
+|00000000| 00 00 4b 00 00 00 00 04 00 00 01 00 00 00 00 4e |..K............N|
+|00000010| 20 00 01 5f 90 27 6d 65 73 73 61 67 65 2f 78 2e | .._.'message/x.|
+|00000020| 72 73 6f 63 6b 65 74 2e 63 6f 6d 70 6f 73 69 74 |rsocket.composit|
+|00000030| 65 2d 6d 65 74 61 64 61 74 61 2e 76 30 10 61 70 |e-metadata.v0.ap|
+|00000040| 70 6c 69 63 61 74 69 6f 6e 2f 6a 73 6f 6e       |plication/json  |
++--------+-------------------------------------------------+----------------+
+2019-11-29 13:41:54.938 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76, L:/127.0.0.1:62751 - R:localhost/127.0.0.1:7000] FLUSH
+2019-11-29 13:41:54.938 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76, L:/127.0.0.1:62751 - R:localhost/127.0.0.1:7000] WRITE: 38B
+         +-------------------------------------------------+
+         |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
++--------+-------------------------------------------------+----------------+
+|00000000| 00 00 23 00 00 00 01 11 00 00 00 1a fe 00 00 0d |..#.............|
+|00000010| 0c 67 72 65 65 74 69 6e 67 2e 66 6f 6f a1 00 00 |.greeting.foo...|
+|00000020| 05 68 65 6c 6c 6f                               |.hello          |
++--------+-------------------------------------------------+----------------+
+2019-11-29 13:41:54.938 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76, L:/127.0.0.1:62751 - R:localhost/127.0.0.1:7000] FLUSH
+...
+```
+
 ## Backpressure
 
 The `onNext` output can be delayed with the `--delayElements` (milli seconds) option.　Accordingly, the number of `request` will be automatically adjusted.
@@ -263,10 +334,17 @@ Aaronic
 > rsocket-cli --debug -i=@/usr/share/dict/words --server tcp://localhost:8765
 > ```
 
+## TODOs
+
+- [x] Support resuming (0.3.0)
+- [x] Support Composite Metadata (0.3.0)
+- [ ] Setup
+- [ ] Request Channel
+- [ ] Input from a file
+- [ ] Input from STDIN
+
 ## Known issues
 
-* Composite Metadata is not supported yet.
-* Request Channel is not implemented yet
 * Secure protocols (`wss`, `tcp+tls`) don't work with native binaries (the executable jar will work)
 * Client side responder will not be supported.
 
