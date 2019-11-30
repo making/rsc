@@ -58,18 +58,18 @@ rsc ws://localhost:8080/rsocket --stream --route hello --debug --take 30
 ```
 
 ```
-rsc ws://rsocket-demo.herokuapp.com:80/ws --request -d 'Hello World!' --debug
+rsc ws://rsocket-demo.herokuapp.com/ws --request -d 'Hello World!' --debug
 ```
 
 ```
-rsc ws://rsocket-demo.herokuapp.com:80/ws --stream -d Trump
+rsc ws://rsocket-demo.herokuapp.com/ws --stream -d Trump
 ```
 
 ```
-rsc wss://rsocket-demo.herokuapp.com:443/ws --stream -d Trump
+rsc wss://rsocket-demo.herokuapp.com/ws --stream -d Trump
 ```
 
-> To get `wss` work, environment variable `JAVA_HOME` must be set. (since 0.4.0)
+> To get `wss` work, environment variable `JAVA_HOME` must be set. (since 0.4.0)<br>
 > If `JAVA_HOME` is set, system property `-Djava.library.path=${JAVA_HOME}/jre/lib` is automatically added.
 
 ## Log options
