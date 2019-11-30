@@ -70,7 +70,7 @@ rsc wss://rsocket-demo.herokuapp.com/ws --stream -d Trump
 ```
 
 > To get `wss` work, environment variable `JAVA_HOME` must be set. (since 0.4.0)<br>
-> If `JAVA_HOME` is set, system property `-Djava.library.path=${JAVA_HOME}/jre/lib` is automatically added.
+> If `JAVA_HOME` is set, system property `-Djava.library.path=${JAVA_HOME}/jre/lib/<platform>` is automatically added.
 
 ## Log options
 

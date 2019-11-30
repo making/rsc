@@ -15,7 +15,9 @@
  */
 package am.ik.rsocket;
 
+import java.io.File;
 import java.time.Duration;
+import java.util.Optional;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -48,7 +50,9 @@ public class Rsc {
 				return;
 			}
 			if (args.secure() && System.getenv("JAVA_HOME") != null) {
-				System.setProperty("java.library.path", System.getenv("JAVA_HOME") + "/jre/lib");
+				findLibsunec(new File(System.getenv("JAVA_HOME") + "/jre/lib"))
+						.map(f -> f.getParentFile().getAbsolutePath())
+						.ifPresent(p -> System.setProperty("java.library.path", p));
 			}
 			run(args).blockLast();
 		} catch (RuntimeException e) {
@@ -91,5 +95,23 @@ public class Rsc {
 	static void printVersion() {
 		// Version class will be generated during Maven's generated-sources phase
 		System.out.println(Version.getVersion());
+	}
+
+	static Optional<File> findLibsunec(File dir) {
+		final File[] files = dir.listFiles();
+		if (files != null) {
+			for (File file : files) {
+				if (file.isDirectory()) {
+					final Optional<File> found = findLibsunec(file);
+					if (found.isPresent()) {
+						return found;
+					}
+				}
+				if (file.getName().startsWith("libsunec")) {
+					return Optional.of(file);
+				}
+			}
+		}
+		return Optional.empty();
 	}
 }
