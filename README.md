@@ -11,7 +11,8 @@ Non-option arguments:
 Option                              Description                           
 ------                              -----------                           
 --channel                           Shortcut of --im REQUEST_CHANNEL      
--d, --data [String]                 Data (default: )                      
+-d, --data [String]                 Data. Use '-' to read data from       
+                                      standard input. (default: )         
 --dataMimeType, --dmt [String]      MimeType for data (default:           
                                       application/json)                   
 --debug                             Enable FrameLogger                    
@@ -33,12 +34,13 @@ Option                              Description
                                       can be configured in seconds. Unless
                                       the duration is specified, the      
                                       default value (2min) is used.       
+-s, --setup [String]                Setup payload                         
 --stacktrace                        Show Stacktrace when an exception     
                                       happens                             
 --stream                            Shortcut of --im REQUEST_STREAM       
 --take [Integer]                    Enable take(n)                        
 -v, --version                       Print version                         
--w, --wiretap                       Enable wiretap   
+-w, --wiretap                       Enable wiretap    
 ```
 
 ## Download
@@ -340,10 +342,10 @@ Aaronic
 
 - [x] Support resuming (0.3.0)
 - [x] Support Composite Metadata (0.3.0)
-- [ ] Setup
-- [ ] Request Channel
+- [x] Setup (0.4.0)
+- [x] Request Channel (0.4.0)
 - [ ] Input from a file
-- [ ] Input from STDIN
+- [x] Input from STDIN (0.4.0)
 
 ## Known issues
 

@@ -96,6 +96,9 @@ public class Args {
 	private final OptionSpec<String> metadata = parser
 			.acceptsAll(Arrays.asList("m", "metadata"), "Metadata (default: )").withOptionalArg();
 
+	private final OptionSpec<String> setup = parser.acceptsAll(Arrays.asList("s", "setup"), "Setup payload")
+			.withOptionalArg();
+
 	private final OptionSpec<String> route = parser
 			.acceptsAll(Arrays.asList("route", "r"), "Routing Metadata Extension").withOptionalArg();
 
@@ -187,6 +190,15 @@ public class Args {
 			return WellKnownMimeType.valueOf(mimeType).getString();
 		} catch (IllegalArgumentException ignored) {
 			return mimeType;
+		}
+	}
+
+	public Optional<ByteBuf> setup() {
+		if (this.options.has(this.setup) && this.options.valueOf(this.setup) != null) {
+			return Optional
+					.of(Unpooled.wrappedBuffer(this.options.valueOf(this.setup).getBytes(StandardCharsets.UTF_8)));
+		} else {
+			return Optional.empty();
 		}
 	}
 

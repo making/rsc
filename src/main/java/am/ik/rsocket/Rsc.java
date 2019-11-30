@@ -24,6 +24,7 @@ import io.rsocket.RSocketFactory;
 import io.rsocket.frame.decoder.PayloadDecoder;
 import io.rsocket.resume.PeriodicResumeStrategy;
 import io.rsocket.transport.ClientTransport;
+import io.rsocket.util.DefaultPayload;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 
@@ -71,6 +72,7 @@ public class Rsc {
 		final RSocketFactory.ClientRSocketFactory factory = RSocketFactory.connect();
 		args.resume().ifPresent(duration -> factory.resume().resumeSessionDuration(duration)
 				.resumeStrategy(() -> new PeriodicResumeStrategy(Duration.ofSeconds(5))));
+		args.setup().map(DefaultPayload::create).ifPresent(factory::setupPayload);
 		return factory //
 				.frameDecoder(PayloadDecoder.ZERO_COPY) //
 				.metadataMimeType(args.composeMetadata().getT1()) //
