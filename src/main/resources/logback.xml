@@ -23,5 +23,6 @@ limitations under the License.
         <appender-ref ref="STDOUT"/>
     </root>
     <logger name="reactor.netty.tcp.TcpClient" level="DEBUG"/>
+    <logger name="input" level="DEBUG"/>
     <!--    <logger name="io.rsocket.FrameLogger" level="DEBUG"/>-->
 </configuration>

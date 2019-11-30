@@ -89,7 +89,8 @@ public class Args {
 			.acceptsAll(Arrays.asList("metadataMimeType", "mmt"), "MimeType for metadata (default: text/plain)")
 			.withOptionalArg();
 
-	private final OptionSpec<String> data = parser.acceptsAll(Arrays.asList("d", "data"), "Data").withOptionalArg()
+	private final OptionSpec<String> data = parser
+			.acceptsAll(Arrays.asList("d", "data"), "Data. Use '-' to read data from standard input.").withOptionalArg()
 			.defaultsTo("");
 
 	private final OptionSpec<String> metadata = parser
@@ -170,6 +171,10 @@ public class Args {
 
 	public ByteBuf data() {
 		return Unpooled.wrappedBuffer(this.options.valueOf(this.data).getBytes(StandardCharsets.UTF_8));
+	}
+
+	public boolean readFromStdin() {
+		return "-".equals(this.options.valueOf(this.data));
 	}
 
 	public String route() {
