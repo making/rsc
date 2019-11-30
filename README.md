@@ -64,9 +64,11 @@ rsc ws://rsocket-demo.herokuapp.com:80/ws --stream -d Trump
 ```
 
 ```
-java -jar rsc.jar wss://rsocket-demo.herokuapp.com:443/ws --stream -d Trump
+rsc wss://rsocket-demo.herokuapp.com:443/ws --stream -d Trump
 ```
-(secure protocols only work with the executable jar for now)
+
+> To get `wss` work, environment variable `JAVA_HOME` must be set. (since 0.4.0)
+> If `JAVA_HOME` is set, system property `-Djava.library.path=${JAVA_HOME}/jre/lib` is automatically added.
 
 ## Log options
 
@@ -345,7 +347,7 @@ Aaronic
 
 ## Known issues
 
-* Secure protocols (`wss`, `tcp+tls`) don't work with native binaries (the executable jar will work)
+* ~Secure protocols (`wss`, `tcp+tls`) don't work with native binaries (the executable jar will work)~ (Supported in 0.4.0)
 * Client side responder will not be supported.
 
 ## Build

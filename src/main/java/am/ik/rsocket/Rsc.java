@@ -46,6 +46,9 @@ public class Rsc {
 				args.printHelp(System.out);
 				return;
 			}
+			if (args.secure() && System.getenv("JAVA_HOME") != null) {
+				System.setProperty("java.library.path", System.getenv("JAVA_HOME") + "/jre/lib");
+			}
 			run(args).blockLast();
 		} catch (RuntimeException e) {
 			if (args.stacktrace()) {
