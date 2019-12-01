@@ -18,6 +18,7 @@ package am.ik.rsocket;
 import java.io.File;
 import java.time.Duration;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -53,6 +54,10 @@ public class Rsc {
 				findLibsunec(new File(System.getenv("JAVA_HOME") + "/jre/lib"))
 						.map(f -> f.getParentFile().getAbsolutePath())
 						.ifPresent(p -> System.setProperty("java.library.path", p));
+			}
+			if (args.showSystemProperties()) {
+				printSystemProperties();
+				return;
 			}
 			run(args).blockLast();
 		} catch (RuntimeException e) {
@@ -95,6 +100,10 @@ public class Rsc {
 	static void printVersion() {
 		// Version class will be generated during Maven's generated-sources phase
 		System.out.println(Version.getVersion());
+	}
+
+	static void printSystemProperties() {
+		new TreeMap<>(System.getProperties()).forEach((k, v) -> System.out.println(k + "\t=\t" + v));
 	}
 
 	static Optional<File> findLibsunec(File dir) {

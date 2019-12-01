@@ -117,6 +117,9 @@ public class Args {
 	private final OptionSpec<Void> stacktrace = parser.acceptsAll(Arrays.asList("stacktrace"),
 			"Show Stacktrace when an exception happens");
 
+	private final OptionSpec<Void> showSystemProperties = parser.acceptsAll(Arrays.asList("show-system-properties"),
+			"Show SystemProperties for troubleshoot");
+
 	private final OptionSet options;
 
 	private Tuple2<String, ByteBuf> composedMetadata = null;
@@ -361,6 +364,10 @@ public class Args {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
+
+	public boolean showSystemProperties() {
+		return this.options.has(this.showSystemProperties);
 	}
 
 	/**
