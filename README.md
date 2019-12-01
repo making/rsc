@@ -35,12 +35,13 @@ Option                              Description
                                       the duration is specified, the      
                                       default value (2min) is used.       
 -s, --setup [String]                Setup payload                         
+--show-system-properties            Show SystemProperties for troubleshoot
 --stacktrace                        Show Stacktrace when an exception     
                                       happens                             
 --stream                            Shortcut of --im REQUEST_STREAM       
 --take [Integer]                    Enable take(n)                        
 -v, --version                       Print version                         
--w, --wiretap                       Enable wiretap    
+-w, --wiretap                       Enable wiretap   
 ```
 
 ## Download
@@ -343,6 +344,8 @@ Aaronic
 - [x] Support resuming (0.3.0)
 - [x] Support Composite Metadata (0.3.0)
 - [x] Setup (0.4.0)
+- [x] Setup Metadata
+- [ ] RSocket Security
 - [x] Request Channel (0.4.0)
 - [ ] Input from a file
 - [x] Input from STDIN (0.4.0)
