@@ -113,7 +113,7 @@ public class Rsc {
 	}
 
 	static void printSystemProperties() {
-		new TreeMap<>(System.getProperties()).forEach((k, v) -> System.out.println(k + "\t=\t" + v));
+		new TreeMap<>(System.getProperties()).forEach((k, v) -> System.out.println(k + "\t= " + v));
 	}
 
 	static Optional<File> findFile(File dir, Predicate<File> predicate) {
