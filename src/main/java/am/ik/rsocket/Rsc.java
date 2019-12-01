@@ -19,6 +19,7 @@ import java.io.File;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -51,9 +52,18 @@ public class Rsc {
 				return;
 			}
 			if (args.secure() && System.getenv("JAVA_HOME") != null) {
-				findLibsunec(new File(System.getenv("JAVA_HOME") + "/jre/lib"))
-						.map(f -> f.getParentFile().getAbsolutePath())
-						.ifPresent(p -> System.setProperty("java.library.path", p));
+				final File javaHome = new File(System.getenv("JAVA_HOME"));
+				if (System.getProperty("java.library.path") == null
+						|| System.getProperty("java.library.path").isEmpty()) {
+					findFile(javaHome, file -> file.getName().startsWith("libsunec."))
+							.map(f -> f.getParentFile().getAbsolutePath())
+							.ifPresent(p -> System.setProperty("java.library.path", p));
+				}
+				if (System.getProperty("javax.net.ssl.trustStore") == null
+						|| System.getProperty("javax.net.ssl.trustStore").isEmpty()) {
+					findFile(javaHome, file -> file.getName().equals("cacerts"))
+							.ifPresent(f -> System.setProperty("javax.net.ssl.trustStore", f.getAbsolutePath()));
+				}
 			}
 			if (args.showSystemProperties()) {
 				printSystemProperties();
@@ -106,17 +116,17 @@ public class Rsc {
 		new TreeMap<>(System.getProperties()).forEach((k, v) -> System.out.println(k + "\t=\t" + v));
 	}
 
-	static Optional<File> findLibsunec(File dir) {
+	static Optional<File> findFile(File dir, Predicate<File> predicate) {
 		final File[] files = dir.listFiles();
 		if (files != null) {
 			for (File file : files) {
 				if (file.isDirectory()) {
-					final Optional<File> found = findLibsunec(file);
+					final Optional<File> found = findFile(file, predicate);
 					if (found.isPresent()) {
 						return found;
 					}
 				}
-				if (file.getName().startsWith("libsunec")) {
+				if (predicate.test(file)) {
 					return Optional.of(file);
 				}
 			}
