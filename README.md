@@ -343,8 +343,8 @@ Aaronic
 
 - [x] Support resuming (0.3.0)
 - [x] Support Composite Metadata (0.3.0)
-- [x] Setup (0.4.0)
-- [x] Setup Metadata
+- [x] Setup data (0.4.0)
+- [ ] Setup Metadata
 - [ ] RSocket Security
 - [x] Request Channel (0.4.0)
 - [ ] Input from a file
