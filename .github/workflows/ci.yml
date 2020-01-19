@@ -19,7 +19,19 @@ jobs:
     - uses: DeLaGuardo/setup-graalvm@1.0
       with:
         graalvm-version: '19.2.1'
+    - uses: actions/cache@v1
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
     - name: native-image
       run: |
         gu install native-image
         ./mvnw package -Pgraal
+    - name: native-image
+      run: |
+        gu install native-image
+        ./mvnw package -Pgraal
+        mv target/classes/rsc* ./rsc
+        rsc --version
