@@ -34,4 +34,6 @@ jobs:
         gu install native-image
         ./mvnw package -Pgraal
         mv target/classes/rsc* ./rsc
-        rsc --version
+        ./rsc --version
+        ./rsc ws://rsocket-demo.herokuapp.com/ws --request -d 'Hello World!' --debug
+        ./rsc wss://rsocket-demo.herokuapp.com/ws --request -d 'Hello World!' --debug
