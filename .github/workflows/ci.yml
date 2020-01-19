@@ -1,0 +1,25 @@
+name: CI
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+        - ubuntu-latest
+        - macos-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: DeLaGuardo/setup-graalvm@1.0
+      with:
+        graalvm-version: '19.2.1'
+    - name: native-image
+      run: |
+        gu install native-image
+        ./mvnw package -Pgraal
