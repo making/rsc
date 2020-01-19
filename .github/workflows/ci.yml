@@ -29,10 +29,6 @@ jobs:
       run: |
         gu install native-image
         ./mvnw package -Pgraal
-    - name: native-image
-      run: |
-        gu install native-image
-        ./mvnw package -Pgraal
         mv target/classes/rsc* ./rsc
         ./rsc --version
         ./rsc ws://rsocket-demo.herokuapp.com/ws --request -d 'Hello World!' --debug
