@@ -35,6 +35,7 @@ jobs:
         ./rsc --version
         ./rsc ws://rsocket-demo.herokuapp.com/ws --request -d 'Hello World!' --debug
         ./rsc wss://rsocket-demo.herokuapp.com/ws --request -d 'Hello World!' --debug --show-system-properties
+        ./rsc wss://rsocket-demo.herokuapp.com/ws --request -d 'Hello World!' --debug
   build-on-win:
     runs-on: windows-latest
     name: build-on-win
