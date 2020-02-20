@@ -44,5 +44,4 @@ jobs:
       with:
         graalvm-version: '19.2.1'
     - run: |
-        ./mvnw -V
-        #./mvnw package -Pgraal
+        dir C:\hostedtoolcache\windows\GraalVM\19.2.1
