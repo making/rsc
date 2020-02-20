@@ -51,4 +51,3 @@ jobs:
           ${{ runner.os }}-maven-
     - run: |
         ./mvnw dependency:copy-dependencies -DoutputDirectory=lib -DskipTests=true package -Plib
-        native-image.cmd -cp "lib/*;target/*"  -H:Class=am.ik.rsocket.Rsc -H:Name=rsc-windows-x86_64
