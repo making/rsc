@@ -44,4 +44,4 @@ jobs:
       with:
         graalvm-version: '19.2.1'
     - run: |
-        dir C:\hostedtoolcache\windows\GraalVM\19.2.1
+        dir C:\hostedtoolcache\windows\GraalVM\19.2.1\x64
