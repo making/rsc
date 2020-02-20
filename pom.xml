@@ -218,5 +218,8 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>lib</id>
+        </profile>                 
     </profiles>
 </project>
