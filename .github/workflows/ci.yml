@@ -33,9 +33,8 @@ jobs:
     - name: check-cli
       run: |        
         ./rsc --version
-        ./rsc --show-system-properties
         ./rsc ws://rsocket-demo.herokuapp.com/ws --request -d 'Hello World!' --debug
-        ./rsc wss://rsocket-demo.herokuapp.com/ws --request -d 'Hello World!' --debug
+        ./rsc wss://rsocket-demo.herokuapp.com/ws --request -d 'Hello World!' --debug --show-system-properties
   build-on-win:
     runs-on: windows-latest
     name: build-on-win
