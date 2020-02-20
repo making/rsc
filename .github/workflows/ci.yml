@@ -44,5 +44,5 @@ jobs:
       with:
         graalvm-version: '19.2.1'
     - run: |
-        native-image.cmd
-        C:\hostedtoolcache\windows\GraalVM\19.2.1\x64\bin\native-image.cmd
+        ./mvnw dependency:copy-dependencies -DoutputDirectory=lib package -Plib -Dmaven.test.skip=true
+        native-image.cmd -cp "lib/*;target/*"  -H:Class=am.ik.rsocket.Rsc -H:Name=rsc-windows-x86_64
