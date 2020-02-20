@@ -44,4 +44,5 @@ jobs:
       with:
         graalvm-version: '19.2.1'
     - run: |
-        ./mvnw package -Pgraal
+        ./mvnw -V
+        #./mvnw package -Pgraal
