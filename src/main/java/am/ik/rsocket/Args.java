@@ -21,12 +21,9 @@ import java.io.UncheckedIOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
@@ -89,6 +86,7 @@ public class Args {
 			.acceptsAll(Arrays.asList("metadataMimeType", "mmt"), "MimeType for metadata (default: text/plain)")
 			.withOptionalArg();
 
+
 	private final OptionSpec<String> data = parser
 			.acceptsAll(Arrays.asList("d", "data"), "Data. Use '-' to read data from standard input.").withOptionalArg()
 			.defaultsTo("");
@@ -119,6 +117,10 @@ public class Args {
 
 	private final OptionSpec<Void> showSystemProperties = parser.acceptsAll(Arrays.asList("show-system-properties"),
 			"Show SystemProperties for troubleshoot");
+
+	private final OptionSpec<String> header = parser.acceptsAll(Arrays.asList("h", "header"), "Header for web socket connection")
+			.withOptionalArg();
+
 
 	private final OptionSet options;
 
@@ -269,6 +271,25 @@ public class Args {
 		}).collect(toList()));
 		return list;
 	}
+
+	Supplier<Map<String, String>> headers() {
+		return() -> {
+			Map<String, Set<String>> headerSet = new HashMap<>();
+			this.options.valuesOf(header).stream().forEach(header -> {
+				String[] nameValue = header.split(":", 2);
+				if (nameValue != null && nameValue.length == 2) {
+					headerSet.computeIfAbsent(nameValue[0], k -> new HashSet<>()).add(nameValue[1]);
+				}
+			});
+
+			HashMap<String, String> headers = new HashMap<>();
+			headerSet.entrySet().forEach(entry -> {
+				headers.put(entry.getKey(), entry.getValue().stream().collect(Collectors.joining(";")));
+			});
+			return headers;
+		};
+	}
+
 
 	public ClientTransport clientTransport() {
 		final String scheme = this.uri.getScheme();
