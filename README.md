@@ -19,7 +19,8 @@ Option                              Description
 --delayElements [Long]              Enable delayElements(delay) in milli  
                                       seconds                             
 --fnf                               Shortcut of --im FIRE_AND_FORGET      
---help                              Print help                            
+--help                              Print help    
+-h, --header                        Add Header
 --im, --interactionModel            InteractionModel (default:            
   [InteractionModel]                  REQUEST_RESPONSE)                   
 --limitRate [Integer]               Enable limitRate(rate)                
@@ -41,7 +42,7 @@ Option                              Description
 --stream                            Shortcut of --im REQUEST_STREAM       
 --take [Integer]                    Enable take(n)                        
 -v, --version                       Print version                         
--w, --wiretap                       Enable wiretap   
+-w, --wiretap                       Enable wiretap
 ```
 
 ## Download
