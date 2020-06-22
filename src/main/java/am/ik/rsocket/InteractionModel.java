@@ -66,7 +66,8 @@ public enum InteractionModel {
 		@Override
 		Publisher<?> request(RSocket rsocket, Args args) {
 			final Mono<Payload> payload = payloadMono(args);
-			return payload.flatMap(p -> rsocket.fireAndForget(p).transform(s -> args.log().map(s::log).orElse(s)));
+			return payload.flatMap(p -> rsocket.fireAndForget(p).transform(s -> args.log().map(s::log).orElse(s)))
+					.subscribeOn(Schedulers.single());
 		}
 	};
 
