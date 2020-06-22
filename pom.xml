@@ -5,7 +5,7 @@
 
     <groupId>am.ik.rsocket</groupId>
     <artifactId>rsc</artifactId>
-    <version>0.4.2-SNAPSHOT</version>
+    <version>0.4.2</version>
     <packaging>jar</packaging>
 
     <name>rsc</name>
