@@ -32,8 +32,7 @@ jobs:
         cp target/classes/rsc* ./rsc
         ./mvnw package -Dversion.generate.skip=true -DskipTests
         mkdir dist
-        cp target/classes/rsc* ./dist
-        rm -f ./dist/*.original
+        cp target/rsc*.jar ./dist
     - name: check-cli
       run: |        
         ./rsc --version
