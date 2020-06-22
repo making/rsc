@@ -27,12 +27,13 @@ jobs:
           ${{ runner.os }}-maven-
     - name: native-image
       run: |
+        mkdir dist
         gu install native-image
         ./mvnw package -Pgraal
         cp target/classes/rsc* ./rsc
+        cp target/classes/rsc* ./dist/
         ./mvnw package -Dversion.generate.skip=true -DskipTests
-        mkdir dist
-        cp target/rsc*.jar ./dist
+        cp target/rsc*.jar ./dist/
     - name: check-cli
       run: |        
         ./rsc --version
