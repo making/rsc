@@ -30,6 +30,7 @@ jobs:
         mkdir dist
         gu install native-image
         ./mvnw package -Pgraal
+        chmod +x target/classes/rsc*
         cp target/classes/rsc* ./rsc
         cp target/classes/rsc* ./dist/
         ./mvnw package -Dversion.generate.skip=true -DskipTests
