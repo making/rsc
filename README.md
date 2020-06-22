@@ -59,15 +59,7 @@ rsc ws://localhost:8080/rsocket --stream --route hello --debug --take 30
 ```
 
 ```
-rsc ws://rsocket-demo.herokuapp.com/ws --request -d 'Hello World!' --debug
-```
-
-```
-rsc ws://rsocket-demo.herokuapp.com/ws --stream -d Trump
-```
-
-```
-rsc wss://rsocket-demo.herokuapp.com/ws --stream -d Trump
+rsc wss://rsocket-demo.herokuapp.com/rsocket --stream --route searchTweets -d Trump
 ```
 
 > To get `wss` work, environment variable `JAVA_HOME` must be set. (since 0.4.0)<br>
