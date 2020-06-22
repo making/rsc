@@ -29,9 +29,18 @@ jobs:
       run: |
         gu install native-image
         ./mvnw package -Pgraal
-        mv target/classes/rsc* ./rsc
+        cp target/classes/rsc* ./rsc
+        ./mvnw package -Dversion.generate.skip=true -DskipTests
+        mkdir dist
+        cp target/classes/rsc* ./dist
+        rm -f ./dist/*.original
     - name: check-cli
       run: |        
         ./rsc --version
         ./rsc ws://rsocket-demo.herokuapp.com/rsocket --route searchTweets --stream -d Trump --take 3 --debug
         ./rsc wss://rsocket-demo.herokuapp.com/rsocket --route searchTweets --stream -d Trump --take 3 --debug
+    - name: upload-dist
+      uses: actions/upload-artifact@v1
+      with:
+        name: dist
+        path: dist
