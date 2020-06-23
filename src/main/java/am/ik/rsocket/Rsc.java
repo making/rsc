@@ -70,6 +70,10 @@ public class Rsc {
 				return;
 			}
 			run(args).blockLast();
+			if (args.interactionModel() == InteractionModel.FIRE_AND_FORGET) {
+				// Workaround for https://github.com/making/rsc/issues/18
+				Thread.sleep(10);
+			}
 		} catch (RuntimeException e) {
 			if (args.stacktrace()) {
 				e.printStackTrace();
