@@ -24,9 +24,13 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
@@ -89,6 +93,7 @@ public class Args {
 			.acceptsAll(Arrays.asList("metadataMimeType", "mmt"), "MimeType for metadata (default: text/plain)")
 			.withOptionalArg();
 
+
 	private final OptionSpec<String> data = parser
 			.acceptsAll(Arrays.asList("d", "data"), "Data. Use '-' to read data from standard input.").withOptionalArg()
 			.defaultsTo("");
@@ -119,6 +124,10 @@ public class Args {
 
 	private final OptionSpec<Void> showSystemProperties = parser.acceptsAll(Arrays.asList("show-system-properties"),
 			"Show SystemProperties for troubleshoot");
+
+	private final OptionSpec<String> wsHeader = parser.acceptsAll(Arrays.asList("wsh", "wsHeader"), "Header for web socket connection")
+			.withOptionalArg();
+
 
 	private final OptionSet options;
 
@@ -269,6 +278,21 @@ public class Args {
 		}).collect(toList()));
 		return list;
 	}
+
+	Map<String, String> wsHeaders() {
+		Map<String, Set<String>> headerSet = new LinkedHashMap<>();
+		this.options.valuesOf(wsHeader).forEach(header -> {
+			String[] nameValue = header.split(":", 2);
+			if (nameValue.length == 2) {
+				headerSet.computeIfAbsent(nameValue[0], k -> new LinkedHashSet<>()).add(nameValue[1]);
+			}
+		});
+
+		Map<String, String> headers = new LinkedHashMap<>();
+		headerSet.forEach((key, value) -> headers.put(key, String.join(";", value)));
+		return headers;
+	}
+
 
 	public ClientTransport clientTransport() {
 		final String scheme = this.uri.getScheme();

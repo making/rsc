@@ -41,7 +41,8 @@ Option                              Description
 --stream                            Shortcut of --im REQUEST_STREAM       
 --take [Integer]                    Enable take(n)                        
 -v, --version                       Print version                         
--w, --wiretap                       Enable wiretap   
+-w, --wiretap                       Enable wiretap                        
+--wsHeader, --wsh [String]          Header for web socket connection      
 ```
 
 ## Download
