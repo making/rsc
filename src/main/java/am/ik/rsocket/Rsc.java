@@ -24,13 +24,14 @@ import java.util.function.Predicate;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
-import io.rsocket.RSocketFactory;
+import io.rsocket.core.RSocketConnector;
+import io.rsocket.core.Resume;
 import io.rsocket.frame.decoder.PayloadDecoder;
-import io.rsocket.resume.PeriodicResumeStrategy;
 import io.rsocket.transport.ClientTransport;
 import io.rsocket.util.DefaultPayload;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
+import reactor.util.retry.Retry;
 
 public class Rsc {
 
@@ -74,10 +75,12 @@ public class Rsc {
 				// Workaround for https://github.com/making/rsc/issues/18
 				Thread.sleep(10);
 			}
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			if (args.stacktrace()) {
 				e.printStackTrace();
-			} else {
+			}
+			else {
 				System.err.println("Error: " + e.getMessage());
 				System.err.println();
 				System.err.println("Use --stacktrace option for details.");
@@ -92,16 +95,16 @@ public class Rsc {
 		}
 		args.log().ifPresent(Rsc::configureDebugLevel);
 		final ClientTransport clientTransport = args.clientTransport();
-		final RSocketFactory.ClientRSocketFactory factory = RSocketFactory.connect();
-		args.resume().ifPresent(duration -> factory.resume().resumeSessionDuration(duration)
-				.resumeStrategy(() -> new PeriodicResumeStrategy(Duration.ofSeconds(5))));
-		args.setup().map(DefaultPayload::create).ifPresent(factory::setupPayload);
-		return factory //
-				.frameDecoder(PayloadDecoder.ZERO_COPY) //
-				.metadataMimeType(args.composeMetadata().getT1()) //
-				.dataMimeType(args.dataMimeType()) //
-				.transport(clientTransport) //
-				.start() //
+		final RSocketConnector connector = RSocketConnector.create();
+		args.resume().ifPresent(duration -> connector.resume(new Resume()
+				.sessionDuration(duration)
+				.retry(Retry.fixedDelay(10, Duration.ofSeconds(5)))));
+		args.setup().map(DefaultPayload::create).ifPresent(connector::setupPayload);
+		connector
+				.payloadDecoder(PayloadDecoder.ZERO_COPY)
+				.metadataMimeType(args.composeMetadata().getT1())
+				.dataMimeType(args.dataMimeType());
+		return connector.connect(clientTransport)
 				.flatMapMany(rsocket -> args.interactionModel().request(rsocket, args));
 	}
 
