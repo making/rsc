@@ -100,11 +100,11 @@ public class Rsc {
 				.sessionDuration(duration)
 				.retry(Retry.fixedDelay(10, Duration.ofSeconds(5)))));
 		args.setup().map(DefaultPayload::create).ifPresent(connector::setupPayload);
-		connector
+		return connector
 				.payloadDecoder(PayloadDecoder.ZERO_COPY)
 				.metadataMimeType(args.composeMetadata().getT1())
-				.dataMimeType(args.dataMimeType());
-		return connector.connect(clientTransport)
+				.dataMimeType(args.dataMimeType())
+				.connect(clientTransport)
 				.flatMapMany(rsocket -> args.interactionModel().request(rsocket, args));
 	}
 
