@@ -122,7 +122,7 @@ public class Args {
 	private final OptionSpec<Void> stacktrace = parser.acceptsAll(Arrays.asList("stacktrace"),
 			"Show Stacktrace when an exception happens");
 
-	private final OptionSpec<Void> showSystemProperties = parser.acceptsAll(Arrays.asList("show-system-properties"),
+	private final OptionSpec<Void> showSystemProperties = parser.acceptsAll(Arrays.asList("showSystemProperties", "show-system-properties"),
 			"Show SystemProperties for troubleshoot");
 
 	private final OptionSpec<String> wsHeader = parser.acceptsAll(Arrays.asList("wsh", "wsHeader"), "Header for web socket connection")
@@ -152,7 +152,8 @@ public class Args {
 		if (port < 0) {
 			if (secure()) {
 				return 443;
-			} else {
+			}
+			else {
 				return 80;
 			}
 		}
@@ -200,7 +201,8 @@ public class Args {
 		final String mimeType = this.options.valueOf(this.dataMimeType);
 		try {
 			return WellKnownMimeType.valueOf(mimeType).getString();
-		} catch (IllegalArgumentException ignored) {
+		}
+		catch (IllegalArgumentException ignored) {
 			return mimeType;
 		}
 	}
@@ -209,7 +211,8 @@ public class Args {
 		if (this.options.has(this.setup) && this.options.valueOf(this.setup) != null) {
 			return Optional
 					.of(Unpooled.wrappedBuffer(this.options.valueOf(this.setup).getBytes(StandardCharsets.UTF_8)));
-		} else {
+		}
+		else {
 			return Optional.empty();
 		}
 	}
@@ -245,7 +248,8 @@ public class Args {
 			if (wellKnownMimeType != WellKnownMimeType.UNPARSEABLE_MIME_TYPE) {
 				CompositeMetadataFlyweight.encodeAndAddMetadata(compositeByteBuf, allocator, wellKnownMimeType,
 						metadata);
-			} else {
+			}
+			else {
 				CompositeMetadataFlyweight.encodeAndAddMetadata(compositeByteBuf, allocator, mimeType, metadata);
 			}
 		}
@@ -272,7 +276,8 @@ public class Args {
 		list.addAll(this.options.valuesOf(this.metadataMimeType).stream().map(mimeType -> {
 			try {
 				return WellKnownMimeType.valueOf(mimeType).getString();
-			} catch (IllegalArgumentException ignored) {
+			}
+			catch (IllegalArgumentException ignored) {
 				return mimeType;
 			}
 		}).collect(toList()));
@@ -299,9 +304,11 @@ public class Args {
 		Transport transport;
 		if (scheme.startsWith("ws")) {
 			transport = WEBSOCKET;
-		} else if (scheme.startsWith("tcp")) {
+		}
+		else if (scheme.startsWith("tcp")) {
 			transport = TCP;
-		} else {
+		}
+		else {
 			throw new IllegalArgumentException(scheme + " is unsupported scheme.");
 		}
 		return transport.clientTransport(this);
@@ -335,7 +342,8 @@ public class Args {
 		if (this.options.has(this.resume)) {
 			final Integer duration = this.options.valueOf(this.resume);
 			return Optional.of(duration == null ? Duration.ofMinutes(2) : Duration.ofSeconds(duration));
-		} else {
+		}
+		else {
 			return Optional.empty();
 		}
 	}
@@ -343,7 +351,8 @@ public class Args {
 	public Optional<Integer> limitRate() {
 		if (this.options.has(this.limitRate)) {
 			return Optional.ofNullable(this.options.valueOf(this.limitRate));
-		} else {
+		}
+		else {
 			return Optional.empty();
 		}
 	}
@@ -351,7 +360,8 @@ public class Args {
 	public Optional<Integer> take() {
 		if (this.options.has(this.take)) {
 			return Optional.ofNullable(this.options.valueOf(this.take));
-		} else {
+		}
+		else {
 			return Optional.empty();
 		}
 	}
@@ -359,7 +369,8 @@ public class Args {
 	public Optional<Duration> delayElements() {
 		if (this.options.has(this.delayElements)) {
 			return Optional.of(Duration.ofMillis(this.options.valueOf(this.delayElements)));
-		} else {
+		}
+		else {
 			return Optional.empty();
 		}
 	}
@@ -367,7 +378,8 @@ public class Args {
 	public Optional<String> log() {
 		if (this.options.has(this.log)) {
 			return Optional.of(Objects.toString(this.options.valueOf(this.log), "rsc"));
-		} else {
+		}
+		else {
 			return Optional.empty();
 		}
 	}
@@ -385,7 +397,8 @@ public class Args {
 			stream.println("usage: rsc Uri [Options]");
 			stream.println();
 			this.parser.printHelpOn(stream);
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}

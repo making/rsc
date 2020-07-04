@@ -40,6 +40,7 @@ jobs:
     - name: check-cli
       run: |        
         ./rsc --version
+        ./rsc --showSystemProperties
         ./rsc ws://rsocket-demo.herokuapp.com/rsocket --route searchTweets --stream -d Trump --take 3 --debug
         ./rsc wss://rsocket-demo.herokuapp.com/rsocket --route searchTweets --stream -d Trump --take 3 --debug
     - name: upload-dist

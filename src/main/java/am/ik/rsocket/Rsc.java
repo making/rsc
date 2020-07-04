@@ -46,6 +46,10 @@ public class Rsc {
 				printVersion();
 				return;
 			}
+			if (args.showSystemProperties()) {
+				printSystemProperties();
+				return;
+			}
 			if (!args.hasUri()) {
 				System.err.println("Uri is required.");
 				System.err.println();
@@ -65,10 +69,6 @@ public class Rsc {
 					findFile(javaHome, file -> file.getName().equals("cacerts"))
 							.ifPresent(f -> System.setProperty("javax.net.ssl.trustStore", f.getAbsolutePath()));
 				}
-			}
-			if (args.showSystemProperties()) {
-				printSystemProperties();
-				return;
 			}
 			run(args).blockLast();
 			if (args.interactionModel() == InteractionModel.FIRE_AND_FORGET) {

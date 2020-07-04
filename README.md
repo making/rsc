@@ -35,7 +35,8 @@ Option                              Description
                                       the duration is specified, the      
                                       default value (2min) is used.       
 -s, --setup [String]                Setup payload                         
---show-system-properties            Show SystemProperties for troubleshoot
+--show-system-properties, --        Show SystemProperties for troubleshoot
+  showSystemProperties                                                    
 --stacktrace                        Show Stacktrace when an exception     
                                       happens                             
 --stream                            Shortcut of --im REQUEST_STREAM       
