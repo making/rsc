@@ -17,14 +17,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.rsocket.metadata.TracingMetadataCodec;
 import io.rsocket.metadata.TracingMetadataCodec.Flags;
-import io.rsocket.metadata.WellKnownMimeType;
 
 
 public class Tracing {
-	public static void main(String[] args) {
-		System.out.println(WellKnownMimeType.fromString(WellKnownMimeType.MESSAGE_RSOCKET_TRACING_ZIPKIN.getString()));
-	}
-
 	public static ByteBuf zipkinMetadata(Flags flags) {
 		final long traceIdHigh = nextTraceIdHigh();
 		final long traceId = randomLong();
