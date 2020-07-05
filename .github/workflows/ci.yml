@@ -38,7 +38,8 @@ jobs:
         ./mvnw package -Dversion.generate.skip=true -DskipTests
         cp target/rsc*.jar ./dist/
     - name: check-cli
-      run: |        
+      run: |
+        set -ex
         ./rsc --version
         ./rsc --showSystemProperties
         ./rsc ws://rsocket-demo.herokuapp.com/rsocket --route searchTweets --stream -d Trump --take 3 --debug
