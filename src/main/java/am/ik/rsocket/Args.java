@@ -37,6 +37,7 @@ import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.CompositeByteBuf;
 import io.netty.buffer.Unpooled;
 import io.rsocket.metadata.CompositeMetadataCodec;
+import io.rsocket.metadata.TracingMetadataCodec.Flags;
 import io.rsocket.metadata.WellKnownMimeType;
 import io.rsocket.transport.ClientTransport;
 import joptsimple.OptionParser;
@@ -108,7 +109,11 @@ public class Args {
 			.withOptionalArg();
 
 	private final OptionSpec<String> route = parser
-			.acceptsAll(Arrays.asList("route", "r"), "Routing Metadata Extension").withOptionalArg();
+			.acceptsAll(Arrays.asList("route", "r"), "Enable Routing Metadata Extension").withOptionalArg();
+
+	private final OptionSpec<Flags> zipkin = parser
+			.acceptsAll(Arrays.asList("zipkin"), "Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used by default.")
+			.withOptionalArg().ofType(Flags.class);
 
 	private final OptionSpec<String> log = parser.acceptsAll(Arrays.asList("log"), "Enable log()").withOptionalArg();
 
@@ -266,6 +271,10 @@ public class Args {
 		if (this.options.has(this.route)) {
 			list.add(routingMetadata(this.route()));
 		}
+		if (this.options.has(this.zipkin)) {
+			final Flags flags = this.options.valueOf(this.zipkin);
+			list.add(Tracing.zipkinMetadata(flags == null ? Flags.DEBUG : flags));
+		}
 		list.addAll(this.options.valuesOf(this.metadata).stream()
 				.map(metadata -> Unpooled.wrappedBuffer(metadata.getBytes(StandardCharsets.UTF_8))).collect(toList()));
 		return list;
@@ -275,6 +284,9 @@ public class Args {
 		List<String> list = new ArrayList<>();
 		if (this.options.has(this.route)) {
 			list.add(WellKnownMimeType.MESSAGE_RSOCKET_ROUTING.getString());
+		}
+		if (this.options.has(this.zipkin)) {
+			list.add(WellKnownMimeType.MESSAGE_RSOCKET_TRACING_ZIPKIN.getString());
 		}
 		list.addAll(this.options.valuesOf(this.metadataMimeType).stream().map(mimeType -> {
 			try {
