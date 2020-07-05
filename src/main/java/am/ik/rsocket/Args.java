@@ -36,7 +36,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.CompositeByteBuf;
 import io.netty.buffer.Unpooled;
-import io.rsocket.metadata.CompositeMetadataFlyweight;
+import io.rsocket.metadata.CompositeMetadataCodec;
 import io.rsocket.metadata.WellKnownMimeType;
 import io.rsocket.transport.ClientTransport;
 import joptsimple.OptionParser;
@@ -249,11 +249,11 @@ public class Args {
 			final ByteBuf metadata = metadataIterator.next();
 			final WellKnownMimeType wellKnownMimeType = WellKnownMimeType.fromString(mimeType);
 			if (wellKnownMimeType != WellKnownMimeType.UNPARSEABLE_MIME_TYPE) {
-				CompositeMetadataFlyweight.encodeAndAddMetadata(compositeByteBuf, allocator, wellKnownMimeType,
+				CompositeMetadataCodec.encodeAndAddMetadata(compositeByteBuf, allocator, wellKnownMimeType,
 						metadata);
 			}
 			else {
-				CompositeMetadataFlyweight.encodeAndAddMetadata(compositeByteBuf, allocator, mimeType, metadata);
+				CompositeMetadataCodec.encodeAndAddMetadata(compositeByteBuf, allocator, mimeType, metadata);
 			}
 		}
 		this.composedMetadata = Tuples.of(WellKnownMimeType.MESSAGE_RSOCKET_COMPOSITE_METADATA.getString(),
