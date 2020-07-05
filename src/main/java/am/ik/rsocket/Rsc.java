@@ -30,6 +30,7 @@ import io.rsocket.frame.decoder.PayloadDecoder;
 import io.rsocket.transport.ClientTransport;
 import io.rsocket.util.DefaultPayload;
 import org.slf4j.LoggerFactory;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.util.retry.Retry;
 
@@ -50,11 +51,16 @@ public class Rsc {
 				printSystemProperties();
 				return;
 			}
+			if (args.resume().isPresent() && args.retry().isPresent()) {
+				System.err.println("--resume and --retry are mutually exclusive.");
+				System.err.println();
+				System.exit(2);
+			}
 			if (!args.hasUri()) {
 				System.err.println("Uri is required.");
 				System.err.println();
 				args.printHelp(System.out);
-				return;
+				System.exit(2);
 			}
 			if (args.secure() && System.getenv("JAVA_HOME") != null) {
 				final File javaHome = new File(System.getenv("JAVA_HOME"));
@@ -99,13 +105,22 @@ public class Rsc {
 		args.resume().ifPresent(duration -> connector.resume(new Resume()
 				.sessionDuration(duration)
 				.retry(Retry.fixedDelay(10, Duration.ofSeconds(5)))));
+		args.retry().ifPresent(maxAttempts -> connector
+				.reconnect(retry(maxAttempts)));
 		args.setup().map(DefaultPayload::create).ifPresent(connector::setupPayload);
 		return connector
 				.payloadDecoder(PayloadDecoder.ZERO_COPY)
 				.metadataMimeType(args.composeMetadata().getT1())
 				.dataMimeType(args.dataMimeType())
 				.connect(clientTransport)
-				.flatMapMany(rsocket -> args.interactionModel().request(rsocket, args));
+				.flatMapMany(rsocket -> args.interactionModel().request(rsocket, args))
+				.transform(s -> args.retry().map(maxAttempts -> s.retryWhen(retry(maxAttempts))).orElse(s));
+	}
+
+	static Retry retry(int maxAttempts) {
+		return Retry.fixedDelay(maxAttempts, Duration.ofSeconds(1))
+				.filter(e -> !Exceptions.isRetryExhausted(e))
+				.doBeforeRetry(System.err::println);
 	}
 
 	static void configureDebugLevel(String loggerName) {

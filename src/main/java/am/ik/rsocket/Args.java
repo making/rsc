@@ -83,6 +83,9 @@ public class Args {
 			"Enable resume. Resume session duration can be configured in seconds. Unless the duration is specified, the default value (2min) is used.")
 			.withOptionalArg().ofType(Integer.class);
 
+	private final OptionSpec<Integer> retry = parser.acceptsAll(Arrays.asList("retry"), "Enable retry. Retry every 1 second with the given max attempts.")
+			.withOptionalArg().ofType(Integer.class);
+
 	private final URI uri;
 
 	private final OptionSpec<String> dataMimeType = parser
@@ -342,6 +345,15 @@ public class Args {
 		if (this.options.has(this.resume)) {
 			final Integer duration = this.options.valueOf(this.resume);
 			return Optional.of(duration == null ? Duration.ofMinutes(2) : Duration.ofSeconds(duration));
+		}
+		else {
+			return Optional.empty();
+		}
+	}
+
+	public Optional<Integer> retry() {
+		if (this.options.has(this.retry)) {
+			return Optional.ofNullable(this.options.valueOf(this.retry));
 		}
 		else {
 			return Optional.empty();

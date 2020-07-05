@@ -28,7 +28,7 @@ public class RscTest {
 
 	@Test
 	void test(CapturedOutput capture) throws Exception {
-		Rsc.main(new String[]{});
+		Rsc.main(new String[] { "-h" });
 		assertThat(capture.toString()).isNotEmpty();
 	}
 }
