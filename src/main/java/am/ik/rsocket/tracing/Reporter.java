@@ -26,7 +26,6 @@ public final class Reporter {
 	public static void report(String url, RscSpan span, String rsocketName, long duratin) {
 		try {
 			final String content = "[" + span.toJsonString(rsocketName, duratin) + "]";
-			System.out.println(content);
 			final HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
 			conn.setRequestMethod("POST");
 			conn.setRequestProperty("Content-Type", "application/json");
