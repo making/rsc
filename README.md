@@ -8,49 +8,50 @@ usage: rsc Uri [Options]
 Non-option arguments:
 [String: Uri]        
 
-Option                                 Description                           
-------                                 -----------                           
---channel                              Shortcut of --im REQUEST_CHANNEL      
--d, --data [String]                    Data. Use '-' to read data from       
-                                         standard input. (default: )         
---dataMimeType, --dmt [String]         MimeType for data (default:           
-                                         application/json)                   
---debug                                Enable FrameLogger                    
---delayElements [Long]                 Enable delayElements(delay) in milli  
-                                         seconds                             
---fnf                                  Shortcut of --im FIRE_AND_FORGET      
---help                                 Print help                            
---im, --interactionModel               InteractionModel (default:            
-  [InteractionModel]                     REQUEST_RESPONSE)                   
---limitRate [Integer]                  Enable limitRate(rate)                
---log [String]                         Enable log()                          
--m, --metadata [String]                Metadata (default: )                  
---metadataMimeType, --mmt [String]     MimeType for metadata (default:       
-                                         text/plain)                         
--q, --quiet                            Disable the output on next            
--r, --route [String]                   Enable Routing Metadata Extension     
---request                              Shortcut of --im REQUEST_RESPONSE     
---resume [Integer]                     Enable resume. Resume session duration
-                                         can be configured in seconds. Unless
-                                         the duration is specified, the      
-                                         default value (2min) is used.       
---retry [Integer]                      Enable retry. Retry every 1 second    
-                                         with the given max attempts.        
--s, --setup [String]                   Setup payload                         
---show-system-properties, --           Show SystemProperties for troubleshoot
-  showSystemProperties                                                       
---stacktrace                           Show Stacktrace when an exception     
-                                         happens                             
---stream                               Shortcut of --im REQUEST_STREAM       
---take [Integer]                       Enable take(n)                        
--v, --version                          Print version                         
--w, --wiretap                          Enable wiretap                        
---wsHeader, --wsh [String]             Header for web socket connection      
---zipkin [TracingMetadataCodec$Flags]  Enable Tracing (Zipkin) Metadata      
-                                         Extension. Unless sampling state    
-                                         (UNDECIDED, NOT_SAMPLE, SAMPLE,     
-                                         DEBUG) is specified, DEBUG is used  
-                                         by default.   
+Option                                Description                           
+------                                -----------                           
+--channel                             Shortcut of --im REQUEST_CHANNEL      
+-d, --data [String]                   Data. Use '-' to read data from       
+                                        standard input. (default: )         
+--dataMimeType, --dmt [String]        MimeType for data (default:           
+                                        application/json)                   
+--debug                               Enable FrameLogger                    
+--delayElements [Long]                Enable delayElements(delay) in milli  
+                                        seconds                             
+--fnf                                 Shortcut of --im FIRE_AND_FORGET      
+--help                                Print help                            
+--im, --interactionModel              InteractionModel (default:            
+  [InteractionModel]                    REQUEST_RESPONSE)                   
+--limitRate [Integer]                 Enable limitRate(rate)                
+--log [String]                        Enable log()                          
+-m, --metadata [String]               Metadata (default: )                  
+--metadataMimeType, --mmt [String]    MimeType for metadata (default:       
+                                        text/plain)                         
+--printB3                             Print B3 propagation info             
+-q, --quiet                           Disable the output on next            
+-r, --route [String]                  Enable Routing Metadata Extension     
+--request                             Shortcut of --im REQUEST_RESPONSE     
+--resume [Integer]                    Enable resume. Resume session duration
+                                        can be configured in seconds. Unless
+                                        the duration is specified, the      
+                                        default value (2min) is used.       
+--retry [Integer]                     Enable retry. Retry every 1 second    
+                                        with the given max attempts.        
+-s, --setup [String]                  Setup payload                         
+--show-system-properties, --          Show SystemProperties for troubleshoot
+  showSystemProperties                                                      
+--stacktrace                          Show Stacktrace when an exception     
+                                        happens                             
+--stream                              Shortcut of --im REQUEST_STREAM       
+--take [Integer]                      Enable take(n)                        
+--trace [TracingMetadataCodec$Flags]  Enable Tracing (Zipkin) Metadata      
+                                        Extension. Unless sampling state    
+                                        (UNDECIDED, NOT_SAMPLE, SAMPLE,     
+                                        DEBUG) is specified, DEBUG is used  
+                                        by default.                         
+-v, --version                         Print version                         
+-w, --wiretap                         Enable wiretap                        
+--wsHeader, --wsh [String]            Header for web socket connection    
 ```
 
 ## Download

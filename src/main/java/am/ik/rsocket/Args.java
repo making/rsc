@@ -111,9 +111,11 @@ public class Args {
 	private final OptionSpec<String> route = parser
 			.acceptsAll(Arrays.asList("route", "r"), "Enable Routing Metadata Extension").withOptionalArg();
 
-	private final OptionSpec<Flags> zipkin = parser
-			.acceptsAll(Arrays.asList("zipkin"), "Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used by default.")
+	private final OptionSpec<Flags> trace = parser
+			.acceptsAll(Arrays.asList("trace"), "Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used by default.")
 			.withOptionalArg().ofType(Flags.class);
+
+	private final OptionSpec<Void> printB3 = parser.acceptsAll(Arrays.asList("printB3"), "Print B3 propagation info");
 
 	private final OptionSpec<String> log = parser.acceptsAll(Arrays.asList("log"), "Enable log()").withOptionalArg();
 
@@ -271,9 +273,9 @@ public class Args {
 		if (this.options.has(this.route)) {
 			list.add(routingMetadata(this.route()));
 		}
-		if (this.options.has(this.zipkin)) {
-			final Flags flags = this.options.valueOf(this.zipkin);
-			list.add(Tracing.zipkinMetadata(flags == null ? Flags.DEBUG : flags));
+		if (this.options.has(this.trace)) {
+			final Flags flags = this.options.valueOf(this.trace);
+			list.add(Tracing.zipkinMetadata(flags == null ? Flags.DEBUG : flags, this.options.has(this.printB3)));
 		}
 		list.addAll(this.options.valuesOf(this.metadata).stream()
 				.map(metadata -> Unpooled.wrappedBuffer(metadata.getBytes(StandardCharsets.UTF_8))).collect(toList()));
@@ -285,7 +287,7 @@ public class Args {
 		if (this.options.has(this.route)) {
 			list.add(WellKnownMimeType.MESSAGE_RSOCKET_ROUTING.getString());
 		}
-		if (this.options.has(this.zipkin)) {
+		if (this.options.has(this.trace)) {
 			list.add(WellKnownMimeType.MESSAGE_RSOCKET_TRACING_ZIPKIN.getString());
 		}
 		list.addAll(this.options.valuesOf(this.metadataMimeType).stream().map(mimeType -> {

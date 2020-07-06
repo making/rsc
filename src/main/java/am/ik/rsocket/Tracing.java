@@ -20,11 +20,30 @@ import io.rsocket.metadata.TracingMetadataCodec.Flags;
 
 
 public class Tracing {
-	public static ByteBuf zipkinMetadata(Flags flags) {
-		final long traceIdHigh = nextTraceIdHigh();
-		final long traceId = randomLong();
+	public static ByteBuf zipkinMetadata(Flags flags, boolean printB3) {
 		final long spanId = randomLong();
+		final long traceIdHigh = nextTraceIdHigh();
+		final long traceId = spanId;
+		if (printB3) {
+			System.err.println("b3=" + b3SingleHeaderFormat(traceIdHigh, traceId, spanId, flags));
+		}
 		return TracingMetadataCodec.encode128(ByteBufAllocator.DEFAULT, traceIdHigh, traceId, spanId, flags);
+	}
+
+	private static String b3SingleHeaderFormat(long traceIdHigh, long traceId, long spanId, Flags flags) {
+		final String b3 = String.format("%s%s-%s", Long.toHexString(traceIdHigh), Long.toHexString(traceId), Long.toHexString(spanId));
+		if (flags == Flags.DEBUG) {
+			return b3 + "-d";
+		}
+		else if (flags == Flags.SAMPLE) {
+			return b3 + "-1";
+		}
+		else if (flags == Flags.NOT_SAMPLE) {
+			return b3 + "-0";
+		}
+		else {
+			return b3;
+		}
 	}
 
 	/**
