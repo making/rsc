@@ -369,7 +369,8 @@ public class Args {
 
 	public Optional<Flags> trace() {
 		if (this.options.has(this.trace)) {
-			return Optional.ofNullable(this.options.valueOf(this.trace));
+			final Flags flags = this.options.valueOf(this.trace);
+			return Optional.of(flags == null ? Flags.DEBUG : flags);
 		}
 		else {
 			return Optional.empty();
