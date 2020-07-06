@@ -27,7 +27,8 @@ Option                                Description
 -m, --metadata [String]               Metadata (default: )                  
 --metadataMimeType, --mmt [String]    MimeType for metadata (default:       
                                         text/plain)                         
---printB3                             Print B3 propagation info             
+--printB3                             Print B3 propagation info. Ignored    
+                                        unless --trace is set.              
 -q, --quiet                           Disable the output on next            
 -r, --route [String]                  Enable Routing Metadata Extension     
 --request                             Shortcut of --im REQUEST_RESPONSE     
@@ -51,7 +52,10 @@ Option                                Description
                                         by default.                         
 -v, --version                         Print version                         
 -w, --wiretap                         Enable wiretap                        
---wsHeader, --wsh [String]            Header for web socket connection    
+--wsHeader, --wsh [String]            Header for web socket connection      
+--zipkinUrl [String]                  Zipkin URL to send a span (ex. http:  
+                                        //localhost:9411). Ignored unless --
+                                        trace is set.    
 ```
 
 ## Download

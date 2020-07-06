@@ -32,6 +32,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import am.ik.rsocket.tracing.RscSpan;
+import am.ik.rsocket.tracing.Tracing;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.CompositeByteBuf;
@@ -115,7 +117,10 @@ public class Args {
 			.acceptsAll(Arrays.asList("trace"), "Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used by default.")
 			.withOptionalArg().ofType(Flags.class);
 
-	private final OptionSpec<Void> printB3 = parser.acceptsAll(Arrays.asList("printB3"), "Print B3 propagation info");
+	private final OptionSpec<String> zipkinUrl = parser
+			.acceptsAll(Arrays.asList("zipkinUrl"), "Zipkin URL to send a span (ex. http://localhost:9411). Ignored unless --trace is set.").withOptionalArg();
+
+	private final OptionSpec<Void> printB3 = parser.acceptsAll(Arrays.asList("printB3"), "Print B3 propagation info. Ignored unless --trace is set.");
 
 	private final OptionSpec<String> log = parser.acceptsAll(Arrays.asList("log"), "Enable log()").withOptionalArg();
 
@@ -142,6 +147,8 @@ public class Args {
 	private final OptionSet options;
 
 	private Tuple2<String, ByteBuf> composedMetadata = null;
+
+	private RscSpan span;
 
 	public Args(String[] args) {
 		final OptionSpec<String> uri = parser.nonOptions().describedAs("Uri");
@@ -268,14 +275,19 @@ public class Args {
 		return this.composedMetadata;
 	}
 
+	public Optional<RscSpan> span() {
+		return Optional.ofNullable(this.span);
+	}
+
 	List<ByteBuf> metadata() {
 		List<ByteBuf> list = new ArrayList<>();
 		if (this.options.has(this.route)) {
 			list.add(routingMetadata(this.route()));
 		}
 		if (this.options.has(this.trace)) {
-			final Flags flags = this.options.valueOf(this.trace);
-			list.add(Tracing.zipkinMetadata(flags == null ? Flags.DEBUG : flags, this.options.has(this.printB3)));
+			final Flags flags = Optional.ofNullable(this.options.valueOf(this.trace)).orElse(Flags.DEBUG);
+			this.span = Tracing.createSpan(flags);
+			list.add(this.span.toMetadata(ByteBufAllocator.DEFAULT));
 		}
 		list.addAll(this.options.valuesOf(this.metadata).stream()
 				.map(metadata -> Unpooled.wrappedBuffer(metadata.getBytes(StandardCharsets.UTF_8))).collect(toList()));
@@ -353,6 +365,23 @@ public class Args {
 
 	public boolean stacktrace() {
 		return this.options.has(this.stacktrace);
+	}
+
+	public boolean trace() {
+		return this.options.has(this.trace);
+	}
+
+	public boolean printB3() {
+		return this.options.has(this.printB3);
+	}
+
+	public Optional<String> zipkinUrl() {
+		if (this.options.has(this.zipkinUrl)) {
+			return Optional.ofNullable(this.options.valueOf(this.zipkinUrl));
+		}
+		else {
+			return Optional.empty();
+		}
 	}
 
 	public Optional<Duration> resume() {

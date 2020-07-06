@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Predicate;
 
+import am.ik.rsocket.tracing.Reporter;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
@@ -76,7 +77,10 @@ public class Rsc {
 							.ifPresent(f -> System.setProperty("javax.net.ssl.trustStore", f.getAbsolutePath()));
 				}
 			}
-			run(args).blockLast();
+			final long begin = System.nanoTime();
+			run(args)
+					.doOnTerminate(() -> handleSpan(args, (System.nanoTime() - begin) / 1000))
+					.blockLast();
 			if (args.interactionModel() == InteractionModel.FIRE_AND_FORGET) {
 				// Workaround for https://github.com/making/rsc/issues/18
 				Thread.sleep(10);
@@ -115,6 +119,20 @@ public class Rsc {
 				.connect(clientTransport)
 				.flatMapMany(rsocket -> args.interactionModel().request(rsocket, args))
 				.transform(s -> args.retry().map(maxAttempts -> s.retryWhen(retry(maxAttempts))).orElse(s));
+	}
+
+	static void handleSpan(Args args, long duration) {
+		args.span()
+				.ifPresent(span -> {
+					if (args.printB3()) {
+						System.err.println("b3=" + span.toB3SingleHeaderFormat());
+					}
+					args.zipkinUrl()
+							.ifPresent(url -> Reporter.report(String.format("%s/api/v2/spans", url),
+									span,
+									args.interactionModel().name().toLowerCase().replace("_", "-"),
+									duration));
+				});
 	}
 
 	static Retry retry(int maxAttempts) {
