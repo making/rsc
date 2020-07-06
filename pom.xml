@@ -125,9 +125,15 @@
                                 <echo file="${project.build.directory}/generated-sources/java/am/ik/rsocket/Version.java">
                                     package am.ik.rsocket;
                                     public class Version {
-                                    public static final String getVersion() {
-                                    return "{\"version\": \"${project.version}\", \"build\": \"${maven.build.timestamp}\"}";
-                                    }
+									  public static final String getVersion() {
+									    return "${project.version}";
+									  }
+									  public static final String getBuild() {
+									    return "${maven.build.timestamp}";
+									  }
+                                      public static final String getVersionAsJson() {
+                                        return "{\"version\": \"${project.version}\", \"build\": \"${maven.build.timestamp}\"}";
+                                      }
                                     }
                                 </echo>
                             </target>

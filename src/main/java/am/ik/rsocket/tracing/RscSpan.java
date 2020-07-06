@@ -17,6 +17,7 @@ package am.ik.rsocket.tracing;
 
 import java.time.Instant;
 
+import am.ik.rsocket.Version;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.rsocket.metadata.TracingMetadataCodec;
@@ -43,7 +44,6 @@ public class RscSpan {
 	}
 
 	public String toJsonString(String rsocketMethod, long duration) {
-
 		return String.format("{\n"
 						+ "    \"id\": \"%s\",\n"
 						+ "    \"traceId\": \"%s%s\",\n"
@@ -55,7 +55,9 @@ public class RscSpan {
 						+ "      \"serviceName\": \"rsc\"\n"
 						+ "    },\n"
 						+ "    \"tags\": {\n"
-						+ "      \"foo\": \"%s\"\n"
+						+ "      \"rsocket.method\": \"%s\",\n"
+						+ "      \"rsc.version\": \"%s\",\n"
+						+ "      \"rsc.build\": \"%s\"\n"
 						+ "    }\n"
 						+ "  }",
 				Long.toHexString(spanId),
@@ -64,7 +66,10 @@ public class RscSpan {
 				rsocketMethod,
 				this.timestamp,
 				duration,
-				rsocketMethod);
+				rsocketMethod,
+				Version.getBuild(),
+				Version.getVersion()
+		);
 	}
 
 	public String toB3SingleHeaderFormat() {

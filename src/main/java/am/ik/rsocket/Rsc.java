@@ -149,7 +149,7 @@ public class Rsc {
 
 	static void printVersion() {
 		// Version class will be generated during Maven's generated-sources phase
-		System.out.println(Version.getVersion());
+		System.out.println(Version.getVersionAsJson());
 	}
 
 	static void printSystemProperties() {
