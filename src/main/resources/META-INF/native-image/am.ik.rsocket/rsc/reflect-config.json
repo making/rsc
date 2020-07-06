@@ -20,6 +20,11 @@
     "allDeclaredMethods": true
   },
   {
+    "name": "io.rsocket.metadata.TracingMetadataCodec$Flags",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
     "name": "io.rsocket.metadata.WellKnownMimeType",
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true
