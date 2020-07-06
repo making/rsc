@@ -367,8 +367,13 @@ public class Args {
 		return this.options.has(this.stacktrace);
 	}
 
-	public boolean trace() {
-		return this.options.has(this.trace);
+	public Optional<Flags> trace() {
+		if (this.options.has(this.trace)) {
+			return Optional.ofNullable(this.options.valueOf(this.trace));
+		}
+		else {
+			return Optional.empty();
+		}
 	}
 
 	public boolean printB3() {

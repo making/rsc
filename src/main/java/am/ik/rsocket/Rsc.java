@@ -28,6 +28,7 @@ import ch.qos.logback.classic.LoggerContext;
 import io.rsocket.core.RSocketConnector;
 import io.rsocket.core.Resume;
 import io.rsocket.frame.decoder.PayloadDecoder;
+import io.rsocket.metadata.TracingMetadataCodec.Flags;
 import io.rsocket.transport.ClientTransport;
 import io.rsocket.util.DefaultPayload;
 import org.slf4j.LoggerFactory;
@@ -127,7 +128,9 @@ public class Rsc {
 					if (args.printB3()) {
 						System.err.println("b3=" + span.toB3SingleHeaderFormat());
 					}
-					args.zipkinUrl()
+					args.trace()
+							.filter(flags -> flags == Flags.DEBUG || flags == Flags.SAMPLE)
+							.flatMap(flags -> args.zipkinUrl())
 							.ifPresent(url -> Reporter.report(String.format("%s/api/v2/spans", url),
 									span,
 									args.interactionModel().name().toLowerCase().replace("_", "-"),
