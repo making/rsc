@@ -33,9 +33,7 @@ Option                                Description
 -r, --route [String]                  Enable Routing Metadata Extension     
 --request                             Shortcut of --im REQUEST_RESPONSE     
 --resume [Integer]                    Enable resume. Resume session duration
-                                        can be configured in seconds. Unless
-                                        the duration is specified, the      
-                                        default value (2min) is used.       
+                                        can be configured in seconds.        
 --retry [Integer]                     Enable retry. Retry every 1 second    
                                         with the given max attempts.        
 -s, --setup [String]                  Setup payload                         

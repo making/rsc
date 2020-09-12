@@ -83,7 +83,7 @@ public class Args {
 			"Shortcut of --im REQUEST_CHANNEL");
 
 	private final OptionSpec<Integer> resume = parser.acceptsAll(Arrays.asList("resume"),
-			"Enable resume. Resume session duration can be configured in seconds. Unless the duration is specified, the default value (2min) is used.")
+			"Enable resume. Resume session duration can be configured in seconds.")
 			.withOptionalArg().ofType(Integer.class);
 
 	private final OptionSpec<Integer> retry = parser.acceptsAll(Arrays.asList("retry"), "Enable retry. Retry every 1 second with the given max attempts.")
@@ -392,8 +392,7 @@ public class Args {
 
 	public Optional<Duration> resume() {
 		if (this.options.has(this.resume)) {
-			final Integer duration = this.options.valueOf(this.resume);
-			return Optional.of(duration == null ? Duration.ofMinutes(2) : Duration.ofSeconds(duration));
+			return Optional.ofNullable(this.options.valueOf(this.resume)).map(Duration::ofSeconds);
 		}
 		else {
 			return Optional.empty();
