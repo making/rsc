@@ -56,9 +56,17 @@ Option                                Description
                                         trace is set.    
 ```
 
-## Download
+## Install
 
-Download an executable jar or native binary (only for osx-x86_64 or linux-x86_64) from [Releases](https://github.com/making/rsc/releases).
+Download an executable jar or native binary (only for x86_64-apple-darwin or x86_64-pc-linux) from [Releases](https://github.com/making/rsc/releases).
+
+### Install via Homebrew
+
+You can install native binary via Homebrew.
+
+```
+brew install making/tap/rsc
+```
 
 ## Example usages
 
