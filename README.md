@@ -234,6 +234,14 @@ $ rsc tcp://localhost:7000 --metadataMimeType text/plain -m hello --route greeti
 ...
 ```
 
+If you use `--route/-r` option, you need to specify to `--metadataMimeType/--mmt` option for the additional metadata even if the type is `application/json` which is the default mime type.
+
+For example:
+
+```
+rsc tcp://localhost:8080 -r functionRouter --mmt application/json -m '{"function":"uppercase"}' -d 'RSocket'
+``` 
+
 ## Backpressure
 
 The `onNext` output can be delayed with the `--delayElements` (milli seconds) option.　Accordingly, the number of `request` will be automatically adjusted.
