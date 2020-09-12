@@ -37,6 +37,12 @@ jobs:
         cp target/classes/rsc* ./dist/
         ./mvnw package -Dversion.generate.skip=true -DskipTests
         cp target/rsc*.jar ./dist/
+        if [ -f ./dist/rsc-linux-x86_64 ];then
+          mv ./dist/rsc-linux-x86_64 ./dist/rsc-x86_64-pc-linux
+        fi
+        if [ -f ./dist/rsc-osx-x86_64 ];then
+          mv ./dist/rsc-osx-x86_64 ./dist/rsc-x86_64-apple-darwin
+        fi
     - name: check-cli
       run: |
         set -ex
