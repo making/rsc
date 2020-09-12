@@ -13,6 +13,8 @@
  */
 package am.ik.rsocket.tracing;
 
+import java.util.Random;
+
 import io.rsocket.metadata.TracingMetadataCodec.Flags;
 
 
@@ -30,7 +32,7 @@ public final class Tracing {
 	private static long randomLong() {
 		long nextId;
 		do {
-			nextId = java.util.concurrent.ThreadLocalRandom.current().nextLong();
+			nextId = new Random(System.nanoTime()).nextLong();
 		} while (nextId == 0L);
 		return nextId;
 	}
