@@ -383,7 +383,11 @@ public class Args {
 
 	public Optional<String> zipkinUrl() {
 		if (this.options.has(this.zipkinUrl)) {
-			return Optional.ofNullable(this.options.valueOf(this.zipkinUrl));
+			final List<String> zipkinUrl = this.options.valuesOf(this.zipkinUrl);
+			if (zipkinUrl == null) {
+				throw new IllegalArgumentException("'zipkinUrl' is not specified.");
+			}
+			return Optional.of(this.options.valueOf(this.zipkinUrl));
 		}
 		else {
 			return Optional.empty();
@@ -392,7 +396,11 @@ public class Args {
 
 	public Optional<Duration> resume() {
 		if (this.options.has(this.resume)) {
-			return Optional.ofNullable(this.options.valueOf(this.resume)).map(Duration::ofSeconds);
+			final Integer resume = this.options.valueOf(this.resume);
+			if (resume == null) {
+				throw new IllegalArgumentException("'resume' is not specified.");
+			}
+			return Optional.of(resume).map(Duration::ofSeconds);
 		}
 		else {
 			return Optional.empty();
@@ -401,7 +409,11 @@ public class Args {
 
 	public Optional<Integer> retry() {
 		if (this.options.has(this.retry)) {
-			return Optional.ofNullable(this.options.valueOf(this.retry));
+			final Integer retry = this.options.valueOf(this.retry);
+			if (retry == null) {
+				throw new IllegalArgumentException("'retry' is not specified.");
+			}
+			return Optional.of(retry);
 		}
 		else {
 			return Optional.empty();
@@ -410,7 +422,11 @@ public class Args {
 
 	public Optional<Integer> limitRate() {
 		if (this.options.has(this.limitRate)) {
-			return Optional.ofNullable(this.options.valueOf(this.limitRate));
+			final Integer limitRate = this.options.valueOf(this.limitRate);
+			if (limitRate == null) {
+				throw new IllegalArgumentException("'limitRate' is not specified.");
+			}
+			return Optional.of(limitRate);
 		}
 		else {
 			return Optional.empty();
@@ -419,7 +435,11 @@ public class Args {
 
 	public Optional<Integer> take() {
 		if (this.options.has(this.take)) {
-			return Optional.ofNullable(this.options.valueOf(this.take));
+			final Integer take = this.options.valueOf(this.take);
+			if (take == null) {
+				throw new IllegalArgumentException("'take' is not specified.");
+			}
+			return Optional.of(take);
 		}
 		else {
 			return Optional.empty();
@@ -428,7 +448,11 @@ public class Args {
 
 	public Optional<Duration> delayElements() {
 		if (this.options.has(this.delayElements)) {
-			return Optional.of(Duration.ofMillis(this.options.valueOf(this.delayElements)));
+			final Long delayElements = this.options.valueOf(this.delayElements);
+			if (delayElements == null) {
+				throw new IllegalArgumentException("'delayElements' is not specified.");
+			}
+			return Optional.of(delayElements).map(Duration::ofMillis);
 		}
 		else {
 			return Optional.empty();

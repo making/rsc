@@ -31,6 +31,7 @@ import reactor.util.function.Tuple2;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ArgsTest {
 
@@ -81,10 +82,9 @@ class ArgsTest {
 	}
 
 	@Test
-	void resumeEnabled() {
+	void resumeEnabledWithoutValue() {
 		final Args args = new Args(new String[] { "tcp://localhost:8080", "--resume" });
-		assertThat(args.resume().isPresent()).isTrue();
-		assertThat(args.resume().get()).isEqualTo(Duration.ofMinutes(2));
+		assertThatThrownBy(args::resume).isInstanceOf(IllegalArgumentException.class);
 	}
 
 	@Test
@@ -183,7 +183,7 @@ class ArgsTest {
 		assertThat(metadataMimeTypeList).containsExactly("message/x.rsocket.routing.v0",
 				"application/vnd.spring.rsocket.metadata+json");
 	}
-	
+
 
 	@Test
 	void traceDefault() {
