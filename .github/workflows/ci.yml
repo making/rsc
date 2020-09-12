@@ -29,6 +29,7 @@ jobs:
           ${{ runner.os }}-maven-
     - name: native-image
       run: |
+        set -ex
         mkdir dist
         gu install native-image
         ./mvnw package -Pgraal
@@ -43,6 +44,7 @@ jobs:
         if [ -f ./dist/rsc-osx-x86_64 ];then
           mv ./dist/rsc-osx-x86_64 ./dist/rsc-x86_64-apple-darwin
         fi
+        ls -la ./dist
     - name: check-cli
       run: |
         set -ex
