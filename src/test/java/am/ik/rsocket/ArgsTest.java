@@ -17,8 +17,10 @@ package am.ik.rsocket;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 
 import io.netty.buffer.ByteBuf;
+import io.rsocket.metadata.TracingMetadataCodec.Flags;
 import io.rsocket.transport.ClientTransport;
 import io.rsocket.transport.netty.client.TcpClientTransport;
 import io.rsocket.transport.netty.client.WebsocketClientTransport;
@@ -34,21 +36,21 @@ class ArgsTest {
 
 	@Test
 	void clientTransportTcp() {
-		final Args args = new Args(new String[]{"tcp://localhost:8080"});
+		final Args args = new Args(new String[] { "tcp://localhost:8080" });
 		final ClientTransport clientTransport = args.clientTransport();
 		assertThat(clientTransport).isOfAnyClassIn(TcpClientTransport.class);
 	}
 
 	@Test
 	void clientTransportWebsocket() {
-		final Args args = new Args(new String[]{"ws://localhost:8080"});
+		final Args args = new Args(new String[] { "ws://localhost:8080" });
 		final ClientTransport clientTransport = args.clientTransport();
 		assertThat(clientTransport).isOfAnyClassIn(WebsocketClientTransport.class);
 	}
 
 	@Test
 	void clientTransportHttp() {
-		final Args args = new Args(new String[]{"http://localhost:8080"});
+		final Args args = new Args(new String[] { "http://localhost:8080" });
 		final IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
 				args::clientTransport);
 		assertThat(exception.getMessage()).isEqualTo("http is unsupported scheme.");
@@ -56,45 +58,45 @@ class ArgsTest {
 
 	@Test
 	void port() {
-		final Args args = new Args(new String[]{"ws://localhost:8080"});
+		final Args args = new Args(new String[] { "ws://localhost:8080" });
 		assertThat(args.port()).isEqualTo(8080);
 	}
 
 	@Test
 	void portNoSecureDefault() {
-		final Args args = new Args(new String[]{"ws://localhost"});
+		final Args args = new Args(new String[] { "ws://localhost" });
 		assertThat(args.port()).isEqualTo(80);
 	}
 
 	@Test
 	void portSecureDefault() {
-		final Args args = new Args(new String[]{"wss://localhost"});
+		final Args args = new Args(new String[] { "wss://localhost" });
 		assertThat(args.port()).isEqualTo(443);
 	}
 
 	@Test
 	void resumeDisabled() {
-		final Args args = new Args(new String[]{"tcp://localhost:8080"});
+		final Args args = new Args(new String[] { "tcp://localhost:8080" });
 		assertThat(args.resume().isPresent()).isFalse();
 	}
 
 	@Test
 	void resumeEnabled() {
-		final Args args = new Args(new String[]{"tcp://localhost:8080", "--resume"});
+		final Args args = new Args(new String[] { "tcp://localhost:8080", "--resume" });
 		assertThat(args.resume().isPresent()).isTrue();
 		assertThat(args.resume().get()).isEqualTo(Duration.ofMinutes(2));
 	}
 
 	@Test
 	void resumeEnabledWithDuration() {
-		final Args args = new Args(new String[]{"tcp://localhost:8080", "--resume", "600"});
+		final Args args = new Args(new String[] { "tcp://localhost:8080", "--resume", "600" });
 		assertThat(args.resume().isPresent()).isTrue();
 		assertThat(args.resume().get()).isEqualTo(Duration.ofSeconds(600));
 	}
 
 	@Test
 	void route() {
-		final Args args = new Args(new String[]{"tcp://localhost:8080", "-r", "locate.aircrafts.for"});
+		final Args args = new Args(new String[] { "tcp://localhost:8080", "-r", "locate.aircrafts.for" });
 		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
 		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.routing.v0");
 		assertThat(metadata.getT2()).isEqualTo(Args.routingMetadata("locate.aircrafts.for"));
@@ -102,7 +104,7 @@ class ArgsTest {
 
 	@Test
 	void metadataDefault() {
-		final Args args = new Args(new String[]{"tcp://localhost:8080"});
+		final Args args = new Args(new String[] { "tcp://localhost:8080" });
 		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
 		assertThat(metadata.getT1()).isEqualTo("text/plain");
 		assertThat(metadata.getT2().toString(UTF_8)).isEqualTo("");
@@ -110,8 +112,8 @@ class ArgsTest {
 
 	@Test
 	void metadataSingle() {
-		final Args args = new Args(new String[]{"tcp://localhost:8080", "--metadataMimeType",
-				"application/vnd.spring.rsocket.metadata+json", "-m", "{\"route\":\"locate.aircrafts.for\"}"});
+		final Args args = new Args(new String[] { "tcp://localhost:8080", "--metadataMimeType",
+				"application/vnd.spring.rsocket.metadata+json", "-m", "{\"route\":\"locate.aircrafts.for\"}" });
 		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
 		assertThat(metadata.getT1()).isEqualTo("application/vnd.spring.rsocket.metadata+json");
 		assertThat(metadata.getT2().toString(UTF_8)).isEqualTo("{\"route\":\"locate.aircrafts.for\"}");
@@ -119,11 +121,11 @@ class ArgsTest {
 
 	@Test
 	void metadataComposite() {
-		final Args args = new Args(new String[]{"tcp://localhost:8080", //
+		final Args args = new Args(new String[] { "tcp://localhost:8080", //
 				"--metadataMimeType", "application/json", //
 				"-m", "{\"hello\":\"world\"}", //
 				"--metadataMimeType", "text/plain", //
-				"-m", "bar"});
+				"-m", "bar" });
 		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
 		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.composite-metadata.v0");
 		assertThat(metadata.getT2().toString(UTF_8)).doesNotContain("application/json");
@@ -139,12 +141,12 @@ class ArgsTest {
 
 	@Test
 	void metadataCompositeWithRoute() {
-		final Args args = new Args(new String[]{"tcp://localhost:8080", //
+		final Args args = new Args(new String[] { "tcp://localhost:8080", //
 				"--metadataMimeType", "application/json", //
 				"-m", "{\"hello\":\"world\"}", //
 				"--metadataMimeType", "text/plain", //
 				"-m", "bar", //
-				"--route", "greeting"});
+				"--route", "greeting" });
 		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
 		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.composite-metadata.v0");
 		assertThat(metadata.getT2().toString(UTF_8)).doesNotContain("application/json");
@@ -163,10 +165,10 @@ class ArgsTest {
 
 	@Test
 	void metadataCompositeWithUnknownMimeType() {
-		final Args args = new Args(new String[]{"tcp://localhost:8080", //
+		final Args args = new Args(new String[] { "tcp://localhost:8080", //
 				"--metadataMimeType", "application/vnd.spring.rsocket.metadata+json", //
 				"-m", "{}", //
-				"--route", "greeting"});
+				"--route", "greeting" });
 		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
 		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.composite-metadata.v0");
 		// Unknown mime type should present as a US-ASCII string
@@ -180,5 +182,22 @@ class ArgsTest {
 				.containsExactly(Args.routingMetadata("greeting").toString(UTF_8), "{}");
 		assertThat(metadataMimeTypeList).containsExactly("message/x.rsocket.routing.v0",
 				"application/vnd.spring.rsocket.metadata+json");
+	}
+	
+
+	@Test
+	void traceDefault() {
+		final Args args = new Args(new String[] { "tcp://localhost:8080", "--trace" });
+		final Optional<Flags> trace = args.trace();
+		assertThat(trace.isPresent()).isTrue();
+		assertThat(trace.get()).isEqualTo(Flags.DEBUG);
+	}
+
+	@Test
+	void traceSample() {
+		final Args args = new Args(new String[] { "tcp://localhost:8080", "--trace", "SAMPLE" });
+		final Optional<Flags> trace = args.trace();
+		assertThat(trace.isPresent()).isTrue();
+		assertThat(trace.get()).isEqualTo(Flags.SAMPLE);
 	}
 }
