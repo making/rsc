@@ -136,11 +136,25 @@ class ArgsTest {
 	}
 
 	@Test
+	void setupDataMissing() {
+		final Args args = new Args("tcp://localhost:8080 --sd");
+		assertThatThrownBy(args::setupPayload)
+				.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
 	void setupMetaData() {
 		final Args args = new Args("tcp://localhost:8080 --sm hello");
 		assertThat(args.setupPayload().isPresent()).isTrue();
 		assertThat(args.setupPayload().get().getDataUtf8()).isEqualTo("");
 		assertThat(args.setupPayload().get().getMetadataUtf8()).isEqualTo("hello");
+	}
+
+	@Test
+	void setupMetadataMissing() {
+		final Args args = new Args("tcp://localhost:8080 --sm");
+		assertThatThrownBy(args::setupPayload)
+				.isInstanceOf(IllegalArgumentException.class);
 	}
 
 	@Test
@@ -157,6 +171,13 @@ class ArgsTest {
 		assertThat(args.setupPayload().isPresent()).isTrue();
 		assertThat(args.setupPayload().get().getDataUtf8()).isEqualTo("hello");
 		assertThat(args.setupPayload().get().getMetadataUtf8()).isEqualTo("{\"value\":\"foo\"}");
+	}
+
+	@Test
+	void setupMetadataMimeTypeMissing() {
+		final Args args = new Args("tcp://localhost:8080 --sm foo --smmt");
+		assertThatThrownBy(args::setupPayload)
+				.isInstanceOf(IllegalArgumentException.class);
 	}
 
 	@Test

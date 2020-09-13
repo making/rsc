@@ -229,7 +229,11 @@ public class Args {
 	}
 
 	public String route() {
-		return this.options.valueOf(this.route);
+		final String route = this.options.valueOf(this.route);
+		if (route == null) {
+			throw new IllegalArgumentException("'route' is not specified.");
+		}
+		return route;
 	}
 
 	public String dataMimeType() {
@@ -252,9 +256,13 @@ public class Args {
 			setupData = this.setupData;
 		}
 
-		if (this.options.has(setupData) && this.options.valueOf(setupData) != null) {
+		if (this.options.has(setupData)) {
+			final String data = this.options.valueOf(setupData);
+			if (data == null) {
+				throw new IllegalArgumentException("'setupData' is not specified.");
+			}
 			return Optional
-					.of(Unpooled.wrappedBuffer(this.options.valueOf(setupData).getBytes(StandardCharsets.UTF_8)));
+					.of(Unpooled.wrappedBuffer(data.getBytes(StandardCharsets.UTF_8)));
 		}
 		else {
 			return Optional.empty();
@@ -262,13 +270,20 @@ public class Args {
 	}
 
 	private Optional<ByteBuf> setupMetaData() {
-		if (this.options.has(this.setupMetadata) && this.options.valueOf(this.setupMetadata) != null) {
-			if (this.options.has(this.setupMetadataMimeType) && this.options.valueOf(this.setupMetadataMimeType) != null) {
-				// validation only
-				SetupMetadataMimeType.of(this.options.valueOf(this.setupMetadataMimeType));
+		if (this.options.has(this.setupMetadata)) {
+			final String metadata = this.options.valueOf(this.setupMetadata);
+			if (metadata == null) {
+				throw new IllegalArgumentException("'setupMetadata' is not specified.");
 			}
-			return Optional
-					.of(Unpooled.wrappedBuffer(this.options.valueOf(this.setupMetadata).getBytes(StandardCharsets.UTF_8)));
+			if (this.options.has(this.setupMetadataMimeType)) {
+				final String mimeType = this.options.valueOf(this.setupMetadataMimeType);
+				if (mimeType == null) {
+					throw new IllegalArgumentException("'setupMetadataMimeType' is not specified.");
+				}
+				// validation only
+				SetupMetadataMimeType.of(mimeType);
+			}
+			return Optional.of(Unpooled.wrappedBuffer(metadata.getBytes(StandardCharsets.UTF_8)));
 		}
 		else {
 			return Optional.empty();
