@@ -32,11 +32,16 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import am.ik.rsocket.tracing.RscSpan;
+import am.ik.rsocket.routing.Route;
+import am.ik.rsocket.security.AuthenticationSetupMetadata;
+import am.ik.rsocket.security.BearerAuthentication;
+import am.ik.rsocket.security.SimpleAuthentication;
+import am.ik.rsocket.tracing.Span;
 import am.ik.rsocket.tracing.Tracing;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.CompositeByteBuf;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.rsocket.Payload;
 import io.rsocket.metadata.CompositeMetadataCodec;
@@ -124,6 +129,12 @@ public class Args {
 	private final OptionSpec<String> route = parser
 			.acceptsAll(Arrays.asList("route", "r"), "Enable Routing Metadata Extension").withOptionalArg();
 
+	private final OptionSpec<String> authSimple = parser
+			.acceptsAll(Arrays.asList("authSimple", "as", "u"), "Enable Authentication Metadata Extension (Simple). The format must be 'username:password'.").withOptionalArg();
+
+	private final OptionSpec<String> authBearer = parser
+			.acceptsAll(Arrays.asList("authBearer", "ab"), "Enable Authentication Metadata Extension (Bearer).").withOptionalArg();
+
 	private final OptionSpec<Flags> trace = parser
 			.acceptsAll(Arrays.asList("trace"), "Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used by default.")
 			.withOptionalArg().ofType(Flags.class);
@@ -162,7 +173,7 @@ public class Args {
 
 	private Tuple2<String, ByteBuf> composedMetadata = null;
 
-	private RscSpan span;
+	private Span span;
 
 	public Args(String[] args) {
 		final OptionSpec<String> uri = parser.nonOptions().describedAs("Uri");
@@ -228,12 +239,28 @@ public class Args {
 		return "-".equals(this.options.valueOf(this.data));
 	}
 
-	public String route() {
+	public Route route() {
 		final String route = this.options.valueOf(this.route);
 		if (route == null) {
 			throw new IllegalArgumentException("'route' is not specified.");
 		}
-		return route;
+		return new Route(route);
+	}
+
+	public SimpleAuthentication authSimple() {
+		final String authSimple = this.options.valueOf(this.authSimple);
+		if (authSimple == null) {
+			throw new IllegalArgumentException("'authSimple' is not specified.");
+		}
+		return SimpleAuthentication.valueOf(authSimple);
+	}
+
+	public BearerAuthentication authBearer() {
+		final String authBearer = this.options.valueOf(this.authBearer);
+		if (authBearer == null) {
+			throw new IllegalArgumentException("'authBearer' is not specified.");
+		}
+		return new BearerAuthentication(authBearer);
 	}
 
 	public String dataMimeType() {
@@ -269,7 +296,7 @@ public class Args {
 		}
 	}
 
-	private Optional<ByteBuf> setupMetaData() {
+	private Optional<ByteBuf> setupMetadata() {
 		if (this.options.has(this.setupMetadata)) {
 			final String metadata = this.options.valueOf(this.setupMetadata);
 			if (metadata == null) {
@@ -281,7 +308,11 @@ public class Args {
 					throw new IllegalArgumentException("'setupMetadataMimeType' is not specified.");
 				}
 				// validation only
-				SetupMetadataMimeType.of(mimeType);
+				final SetupMetadataMimeType setupMetadataMimeType = SetupMetadataMimeType.of(mimeType);
+				if (setupMetadataMimeType == SetupMetadataMimeType.MESSAGE_RSOCKET_AUTHENTICATION) {
+					final MetadataEncoder metadataEncoder = AuthenticationSetupMetadata.valueOf(metadata);
+					return Optional.of(metadataEncoder.toMetadata(new PooledByteBufAllocator(true)));
+				}
 			}
 			return Optional.of(Unpooled.wrappedBuffer(metadata.getBytes(StandardCharsets.UTF_8)));
 		}
@@ -292,14 +323,14 @@ public class Args {
 
 	public Optional<Payload> setupPayload() {
 		final Optional<Payload> payload = this.setupData()
-				.map(data -> this.setupMetaData()
+				.map(data -> this.setupMetadata()
 						.map(metadata -> DefaultPayload.create(data, metadata))
 						.orElseGet(() -> DefaultPayload.create(data)));
 		if (payload.isPresent()) {
 			return payload;
 		}
 		else {
-			return this.setupMetaData()
+			return this.setupMetadata()
 					.map(metadata -> DefaultPayload.create(Unpooled.EMPTY_BUFFER, metadata));
 		}
 	}
@@ -325,7 +356,7 @@ public class Args {
 			return Tuples.of(mimeTypeList.get(0), metadataList.get(0));
 		}
 		final CompositeByteBuf compositeByteBuf = Unpooled.compositeBuffer();
-		final ByteBufAllocator allocator = ByteBufAllocator.DEFAULT;
+		final ByteBufAllocator allocator = new PooledByteBufAllocator(true);
 		final Iterator<String> mimeTypeIterator = mimeTypeList.iterator();
 		final Iterator<ByteBuf> metadataIterator = metadataList.iterator();
 		while (mimeTypeIterator.hasNext()) {
@@ -345,20 +376,28 @@ public class Args {
 		return this.composedMetadata;
 	}
 
-	public Optional<RscSpan> span() {
+	public Optional<Span> span() {
 		return Optional.ofNullable(this.span);
 	}
 
 	List<ByteBuf> metadata() {
-		List<ByteBuf> list = new ArrayList<>();
+		final List<ByteBuf> list = new ArrayList<>();
+		final List<MetadataEncoder> metadataEncoders = new ArrayList<>();
 		if (this.options.has(this.route)) {
-			list.add(routingMetadata(this.route()));
+			metadataEncoders.add(this.route());
+		}
+		if (this.options.has(this.authSimple)) {
+			metadataEncoders.add(this.authSimple());
+		}
+		if (this.options.has(this.authBearer)) {
+			metadataEncoders.add(this.authBearer());
 		}
 		if (this.options.has(this.trace)) {
 			final Flags flags = Optional.ofNullable(this.options.valueOf(this.trace)).orElse(Flags.DEBUG);
 			this.span = Tracing.createSpan(flags);
-			list.add(this.span.toMetadata(ByteBufAllocator.DEFAULT));
+			metadataEncoders.add(this.span);
 		}
+		metadataEncoders.forEach(metadataEncoder -> list.add(metadataEncoder.toMetadata(new PooledByteBufAllocator(true))));
 		list.addAll(this.options.valuesOf(this.metadata).stream()
 				.map(metadata -> Unpooled.wrappedBuffer(metadata.getBytes(StandardCharsets.UTF_8))).collect(toList()));
 		return list;
@@ -368,6 +407,9 @@ public class Args {
 		List<String> list = new ArrayList<>();
 		if (this.options.has(this.route)) {
 			list.add(WellKnownMimeType.MESSAGE_RSOCKET_ROUTING.getString());
+		}
+		if (this.options.has(this.authSimple) || this.options.has(this.authBearer)) {
+			list.add(WellKnownMimeType.MESSAGE_RSOCKET_AUTHENTICATION.getString());
 		}
 		if (this.options.has(this.trace)) {
 			list.add(WellKnownMimeType.MESSAGE_RSOCKET_TRACING_ZIPKIN.getString());
@@ -563,16 +605,5 @@ public class Args {
 			return true;
 		}
 		return this.options.has(this.showSystemProperties);
-	}
-
-	/**
-	 * https://github.com/rsocket/rsocket/blob/master/Extensions/Routing.md
-	 */
-	static ByteBuf routingMetadata(String tag) {
-		final byte[] bytes = tag.getBytes(StandardCharsets.UTF_8);
-		final ByteBuf buf = Unpooled.buffer();
-		buf.writeByte(bytes.length);
-		buf.writeBytes(bytes);
-		return buf;
 	}
 }

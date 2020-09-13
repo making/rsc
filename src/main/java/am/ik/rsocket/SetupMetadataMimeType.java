@@ -17,23 +17,27 @@ package am.ik.rsocket;
 
 import java.util.Objects;
 
+import io.rsocket.metadata.WellKnownMimeType;
+
 enum SetupMetadataMimeType {
-	TEXT_PLAIN("text/plain"),
-	APPLICATION_JSON("application/json");
+	TEXT_PLAIN(WellKnownMimeType.TEXT_PLAIN),
+	APPLICATION_JSON(WellKnownMimeType.APPLICATION_JSON),
+	MESSAGE_RSOCKET_AUTHENTICATION(WellKnownMimeType.MESSAGE_RSOCKET_AUTHENTICATION);
 
-	private final String value;
+	private final WellKnownMimeType value;
 
-	SetupMetadataMimeType(String value) {
+	SetupMetadataMimeType(WellKnownMimeType value) {
 		this.value = value;
 	}
 
-	public String getValue() {
+	public WellKnownMimeType getValue() {
 		return value;
 	}
 
 	public static SetupMetadataMimeType of(String value) {
 		for (SetupMetadataMimeType type : values()) {
-			if (Objects.equals(type.value, value)) {
+			if (Objects.equals(type.value.getString(), value) ||
+					Objects.equals(type.value.name(), value)) {
 				return type;
 			}
 		}

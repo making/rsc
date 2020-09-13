@@ -19,7 +19,11 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
+import am.ik.rsocket.routing.Route;
+import am.ik.rsocket.security.BearerAuthentication;
+import am.ik.rsocket.security.SimpleAuthentication;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.rsocket.metadata.TracingMetadataCodec.Flags;
 import io.rsocket.transport.ClientTransport;
 import io.rsocket.transport.netty.client.TcpClientTransport;
@@ -99,7 +103,7 @@ class ArgsTest {
 		final Args args = new Args(new String[] { "tcp://localhost:8080", "-r", "locate.aircrafts.for" });
 		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
 		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.routing.v0");
-		assertThat(metadata.getT2()).isEqualTo(Args.routingMetadata("locate.aircrafts.for"));
+		assertThat(metadata.getT2()).isEqualTo(new Route("locate.aircrafts.for").toMetadata(ByteBufAllocator.DEFAULT));
 	}
 
 	@Test
@@ -174,8 +178,44 @@ class ArgsTest {
 	}
 
 	@Test
+	void setupMetadataMimeTypeEnum() {
+		final Args args = new Args("tcp://localhost:8080 --sd hello --sm {\"value\":\"foo\"} --smmt APPLICATION_JSON");
+		assertThat(args.setupPayload().isPresent()).isTrue();
+		assertThat(args.setupPayload().get().getDataUtf8()).isEqualTo("hello");
+		assertThat(args.setupPayload().get().getMetadataUtf8()).isEqualTo("{\"value\":\"foo\"}");
+	}
+
+	@Test
 	void setupMetadataMimeTypeMissing() {
 		final Args args = new Args("tcp://localhost:8080 --sm foo --smmt");
+		assertThatThrownBy(args::setupPayload)
+				.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
+	void setupMetadataAuthSimple() {
+		final Args args = new Args("tcp://localhost:8080 --sm simple:user:pass --smmt MESSAGE_RSOCKET_AUTHENTICATION");
+		assertThat(args.setupPayload().isPresent()).isTrue();
+		assertThat(args.setupPayload().get().getMetadata()).isEqualTo(new SimpleAuthentication("user", "pass").toMetadata(ByteBufAllocator.DEFAULT).nioBuffer());
+	}
+
+	@Test
+	void setupMetadataAuthBearer() {
+		final Args args = new Args("tcp://localhost:8080 --sm bearer:token --smmt MESSAGE_RSOCKET_AUTHENTICATION");
+		assertThat(args.setupPayload().isPresent()).isTrue();
+		assertThat(args.setupPayload().get().getMetadata()).isEqualTo(new BearerAuthentication("token").toMetadata(ByteBufAllocator.DEFAULT).nioBuffer());
+	}
+
+	@Test
+	void setupMetadataAuthUnknown() {
+		final Args args = new Args("tcp://localhost:8080 --sm foo:token --smmt MESSAGE_RSOCKET_AUTHENTICATION");
+		assertThatThrownBy(args::setupPayload)
+				.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
+	void setupMetadataAuthIllegal() {
+		final Args args = new Args("tcp://localhost:8080 --sm foo --smmt MESSAGE_RSOCKET_AUTHENTICATION");
 		assertThatThrownBy(args::setupPayload)
 				.isInstanceOf(IllegalArgumentException.class);
 	}
@@ -185,6 +225,22 @@ class ArgsTest {
 		final Args args = new Args("tcp://localhost:8080 --sd hello --sm {\"value\":\"foo\"} --smmt application/foo");
 		assertThatThrownBy(args::setupPayload)
 				.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
+	void metadataAuthSimple() {
+		final Args args = new Args("tcp://localhost:8080 --authSimple user:password");
+		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
+		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.authentication.v0");
+		assertThat(metadata.getT2()).isEqualTo(new SimpleAuthentication("user", "password").toMetadata(ByteBufAllocator.DEFAULT));
+	}
+
+	@Test
+	void metadataAuthBearer() {
+		final Args args = new Args("tcp://localhost:8080 --authBearer TOKEN");
+		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
+		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.authentication.v0");
+		assertThat(metadata.getT2()).isEqualTo(new BearerAuthentication("TOKEN").toMetadata(ByteBufAllocator.DEFAULT));
 	}
 
 	@Test
@@ -222,13 +278,47 @@ class ArgsTest {
 		assertThat(metadata.getT2().toString(UTF_8)).doesNotContain("text/plain");
 		assertThat(metadata.getT2().toString(UTF_8)).contains("bar");
 		assertThat(metadata.getT2().toString(UTF_8)).doesNotContain("message/x.rsocket.routing.v0");
-		assertThat(metadata.getT2().toString(UTF_8)).contains(Args.routingMetadata("greeting").toString(UTF_8));
+		assertThat(metadata.getT2().toString(UTF_8)).contains(new Route("greeting").toMetadata(ByteBufAllocator.DEFAULT).toString(UTF_8));
 		final List<ByteBuf> metadataList = args.metadata();
 		final List<String> metadataMimeTypeList = args.metadataMimeType();
 		assertThat(metadataList.stream().map(x -> x.toString(UTF_8)).collect(toList()))
-				.containsExactly(Args.routingMetadata("greeting").toString(UTF_8), "{\"hello\":\"world\"}", "bar");
+				.containsExactly(new Route("greeting").toMetadata(ByteBufAllocator.DEFAULT).toString(UTF_8), "{\"hello\":\"world\"}", "bar");
 		assertThat(metadataMimeTypeList).containsExactly("message/x.rsocket.routing.v0", "application/json",
 				"text/plain");
+	}
+
+	@Test
+	void metadataCompositeRouteAndAuthSimple() {
+		final Args args = new Args("tcp://localhost:8080 -r greeting -u user:demo");
+		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
+		final ByteBuf authMetadata = SimpleAuthentication.valueOf("user:demo").toMetadata(ByteBufAllocator.DEFAULT);
+		final ByteBuf routingMetadata = new Route("greeting").toMetadata(ByteBufAllocator.DEFAULT);
+		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.composite-metadata.v0");
+		assertThat(metadata.getT2().toString(UTF_8)).doesNotContain("message/x.rsocket.routing.v0");
+		assertThat(metadata.getT2().toString(UTF_8)).doesNotContain("message/x.rsocket.authentication.v0");
+		assertThat(metadata.getT2().toString(UTF_8)).contains(routingMetadata.toString(UTF_8));
+		assertThat(metadata.getT2().toString(UTF_8)).contains(authMetadata.toString(UTF_8));
+		final List<ByteBuf> metadataList = args.metadata();
+		final List<String> metadataMimeTypeList = args.metadataMimeType();
+		assertThat(metadataList.stream().map(x -> x.toString(UTF_8)).collect(toList())).containsExactly(routingMetadata.toString(UTF_8), authMetadata.toString(UTF_8));
+		assertThat(metadataMimeTypeList).containsExactly("message/x.rsocket.routing.v0", "message/x.rsocket.authentication.v0");
+	}
+
+	@Test
+	void metadataCompositeRouteAndAuthBearer() {
+		final Args args = new Args("tcp://localhost:8080 -r greeting --ab TOKEN");
+		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
+		final ByteBuf authMetadata = new BearerAuthentication("TOKEN").toMetadata(ByteBufAllocator.DEFAULT);
+		final ByteBuf routingMetadata = new Route("greeting").toMetadata(ByteBufAllocator.DEFAULT);
+		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.composite-metadata.v0");
+		assertThat(metadata.getT2().toString(UTF_8)).doesNotContain("message/x.rsocket.routing.v0");
+		assertThat(metadata.getT2().toString(UTF_8)).doesNotContain("message/x.rsocket.authentication.v0");
+		assertThat(metadata.getT2().toString(UTF_8)).contains(routingMetadata.toString(UTF_8));
+		assertThat(metadata.getT2().toString(UTF_8)).contains(authMetadata.toString(UTF_8));
+		final List<ByteBuf> metadataList = args.metadata();
+		final List<String> metadataMimeTypeList = args.metadataMimeType();
+		assertThat(metadataList.stream().map(x -> x.toString(UTF_8)).collect(toList())).containsExactly(routingMetadata.toString(UTF_8), authMetadata.toString(UTF_8));
+		assertThat(metadataMimeTypeList).containsExactly("message/x.rsocket.routing.v0", "message/x.rsocket.authentication.v0");
 	}
 
 	@Test
@@ -243,11 +333,11 @@ class ArgsTest {
 		assertThat(metadata.getT2().toString(UTF_8)).contains("application/vnd.spring.rsocket.metadata+json");
 		assertThat(metadata.getT2().toString(UTF_8)).contains("{}");
 		assertThat(metadata.getT2().toString(UTF_8)).doesNotContain("message/x.rsocket.routing.v0");
-		assertThat(metadata.getT2().toString(UTF_8)).contains(Args.routingMetadata("greeting").toString(UTF_8));
+		assertThat(metadata.getT2().toString(UTF_8)).contains(new Route("greeting").toMetadata(ByteBufAllocator.DEFAULT).toString(UTF_8));
 		final List<ByteBuf> metadataList = args.metadata();
 		final List<String> metadataMimeTypeList = args.metadataMimeType();
 		assertThat(metadataList.stream().map(x -> x.toString(UTF_8)).collect(toList()))
-				.containsExactly(Args.routingMetadata("greeting").toString(UTF_8), "{}");
+				.containsExactly(new Route("greeting").toMetadata(ByteBufAllocator.DEFAULT).toString(UTF_8), "{}");
 		assertThat(metadataMimeTypeList).containsExactly("message/x.rsocket.routing.v0",
 				"application/vnd.spring.rsocket.metadata+json");
 	}

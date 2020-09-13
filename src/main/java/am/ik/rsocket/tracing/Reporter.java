@@ -23,7 +23,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public final class Reporter {
-	public static void report(String url, RscSpan span, String rsocketName, long duratin) {
+	public static void report(String url, Span span, String rsocketName, long duratin) {
 		try {
 			final String content = "[" + span.toJsonString(rsocketName, duratin) + "]";
 			final HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
