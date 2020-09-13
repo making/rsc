@@ -32,6 +32,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import am.ik.rsocket.security.BearerAuthentication;
+import am.ik.rsocket.security.SimpleAuthentication;
 import am.ik.rsocket.tracing.RscSpan;
 import am.ik.rsocket.tracing.Tracing;
 import io.netty.buffer.ByteBuf;
@@ -123,6 +125,12 @@ public class Args {
 
 	private final OptionSpec<String> route = parser
 			.acceptsAll(Arrays.asList("route", "r"), "Enable Routing Metadata Extension").withOptionalArg();
+
+	private final OptionSpec<String> authSimple = parser
+			.acceptsAll(Arrays.asList("authSimple", "as", "u"), "Enable Authentication Metadata Extension (Simple). The format must be 'username:password'.").withOptionalArg();
+
+	private final OptionSpec<String> authBearer = parser
+			.acceptsAll(Arrays.asList("authBearer", "ab"), "Enable Authentication Metadata Extension (Bearer).").withOptionalArg();
 
 	private final OptionSpec<Flags> trace = parser
 			.acceptsAll(Arrays.asList("trace"), "Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used by default.")
@@ -234,6 +242,22 @@ public class Args {
 			throw new IllegalArgumentException("'route' is not specified.");
 		}
 		return route;
+	}
+
+	public SimpleAuthentication authSimple() {
+		final String authSimple = this.options.valueOf(this.authSimple);
+		if (authSimple == null) {
+			throw new IllegalArgumentException("'authSimple' is not specified.");
+		}
+		return SimpleAuthentication.valueOf(authSimple);
+	}
+
+	public BearerAuthentication authBearer() {
+		final String authBearer = this.options.valueOf(this.authBearer);
+		if (authBearer == null) {
+			throw new IllegalArgumentException("'authBearer' is not specified.");
+		}
+		return new BearerAuthentication(authBearer);
 	}
 
 	public String dataMimeType() {
@@ -354,6 +378,14 @@ public class Args {
 		if (this.options.has(this.route)) {
 			list.add(routingMetadata(this.route()));
 		}
+		if (this.options.has(this.authSimple)) {
+			final SimpleAuthentication simpleAuthentication = this.authSimple();
+			list.add(simpleAuthentication.toMetadata(ByteBufAllocator.DEFAULT));
+		}
+		if (this.options.has(this.authBearer)) {
+			final BearerAuthentication bearerAuthentication = this.authBearer();
+			list.add(bearerAuthentication.toMetadata(ByteBufAllocator.DEFAULT));
+		}
 		if (this.options.has(this.trace)) {
 			final Flags flags = Optional.ofNullable(this.options.valueOf(this.trace)).orElse(Flags.DEBUG);
 			this.span = Tracing.createSpan(flags);
@@ -368,6 +400,9 @@ public class Args {
 		List<String> list = new ArrayList<>();
 		if (this.options.has(this.route)) {
 			list.add(WellKnownMimeType.MESSAGE_RSOCKET_ROUTING.getString());
+		}
+		if (this.options.has(this.authSimple) || this.options.has(this.authBearer)) {
+			list.add(WellKnownMimeType.MESSAGE_RSOCKET_AUTHENTICATION.getString());
 		}
 		if (this.options.has(this.trace)) {
 			list.add(WellKnownMimeType.MESSAGE_RSOCKET_TRACING_ZIPKIN.getString());

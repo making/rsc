@@ -17,13 +17,14 @@ package am.ik.rsocket.tracing;
 
 import java.time.Instant;
 
+import am.ik.rsocket.MetadataEncoder;
 import am.ik.rsocket.Version;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.rsocket.metadata.TracingMetadataCodec;
 import io.rsocket.metadata.TracingMetadataCodec.Flags;
 
-public class RscSpan {
+public class RscSpan implements MetadataEncoder {
 	private final long spanId;
 
 	private final long traceIdHigh;
@@ -91,6 +92,7 @@ public class RscSpan {
 		}
 	}
 
+	@Override
 	public ByteBuf toMetadata(ByteBufAllocator allocator) {
 		return TracingMetadataCodec.encode128(allocator, this.traceIdHigh, this.traceId, this.spanId, this.flags);
 	}
