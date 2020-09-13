@@ -43,8 +43,10 @@ Option                                Description
 --setupMetadataMimeType, --smmt       Metadata MimeType for Setup payload.  
   [String]                              Only 'text/plain' and               
                                         'application/json' are supported.   
---show-system-properties, --          Show SystemProperties for troubleshoot
-  showSystemProperties                                                      
+--show-system-properties              [DEPRECATED] Show SystemProperties for
+                                        troubleshoot. Use --                
+                                        showSystemProperties instead.       
+--showSystemProperties                Show SystemProperties for troubleshoot
 --stacktrace                          Show Stacktrace when an exception     
                                         happens                             
 --stream                              Shortcut of --im REQUEST_STREAM       

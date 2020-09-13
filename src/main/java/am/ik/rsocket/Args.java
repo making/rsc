@@ -148,8 +148,11 @@ public class Args {
 	private final OptionSpec<Void> stacktrace = parser.acceptsAll(Arrays.asList("stacktrace"),
 			"Show Stacktrace when an exception happens");
 
-	private final OptionSpec<Void> showSystemProperties = parser.acceptsAll(Arrays.asList("showSystemProperties", "show-system-properties"),
+	private final OptionSpec<Void> showSystemProperties = parser.acceptsAll(Arrays.asList("showSystemProperties"),
 			"Show SystemProperties for troubleshoot");
+
+	private final OptionSpec<Void> showSystemPropertiesDeprecated = parser.acceptsAll(Arrays.asList("show-system-properties"),
+			"[DEPRECATED] Show SystemProperties for troubleshoot. Use --showSystemProperties instead.");
 
 	private final OptionSpec<String> wsHeader = parser.acceptsAll(Arrays.asList("wsh", "wsHeader"), "Header for web socket connection")
 			.withOptionalArg();
@@ -540,6 +543,10 @@ public class Args {
 	}
 
 	public boolean showSystemProperties() {
+		if (this.options.has(this.showSystemPropertiesDeprecated)) {
+			System.err.println("[WARNING] --show-system-properties option is deprecated. Use --showSystemProperties instead.");
+			return true;
+		}
 		return this.options.has(this.showSystemProperties);
 	}
 
