@@ -128,6 +128,14 @@ class ArgsTest {
 	}
 
 	@Test
+	void setupDataDeprecated() {
+		final Args args = new Args("tcp://localhost:8080 -s hello");
+		assertThat(args.setupPayload().isPresent()).isTrue();
+		assertThat(args.setupPayload().get().getDataUtf8()).isEqualTo("hello");
+		assertThat(args.setupPayload().get().getMetadataUtf8()).isEqualTo("");
+	}
+
+	@Test
 	void setupMetaData() {
 		final Args args = new Args("tcp://localhost:8080 --sm hello");
 		assertThat(args.setupPayload().isPresent()).isTrue();

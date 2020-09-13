@@ -109,7 +109,10 @@ public class Args {
 	private final OptionSpec<String> metadata = parser
 			.acceptsAll(Arrays.asList("m", "metadata"), "Metadata (default: )").withOptionalArg();
 
-	private final OptionSpec<String> setupData = parser.acceptsAll(Arrays.asList("s", "setup", "sd", "setupData"), "Data for Setup payload")
+	private final OptionSpec<String> setupData = parser.acceptsAll(Arrays.asList("setupData", "sd"), "Data for Setup payload")
+			.withOptionalArg();
+
+	private final OptionSpec<String> setupDataDeprecated = parser.acceptsAll(Arrays.asList("s", "setup"), "[DEPRECATED] Data for Setup payload. Use --setupData or --sd instead.")
 			.withOptionalArg();
 
 	private final OptionSpec<String> setupMetadata = parser.acceptsAll(Arrays.asList("sm", "setupMetadata"), "Metadata for Setup payload")
@@ -237,9 +240,18 @@ public class Args {
 	}
 
 	private Optional<ByteBuf> setupData() {
-		if (this.options.has(this.setupData) && this.options.valueOf(this.setupData) != null) {
+		final OptionSpec<String> setupData;
+		if (this.options.has(this.setupDataDeprecated)) {
+			System.err.println("[WARNING] --setup / -s option is deprecated. Use --setupData / --sd instead.");
+			setupData = this.setupDataDeprecated;
+		}
+		else {
+			setupData = this.setupData;
+		}
+
+		if (this.options.has(setupData) && this.options.valueOf(setupData) != null) {
 			return Optional
-					.of(Unpooled.wrappedBuffer(this.options.valueOf(this.setupData).getBytes(StandardCharsets.UTF_8)));
+					.of(Unpooled.wrappedBuffer(this.options.valueOf(setupData).getBytes(StandardCharsets.UTF_8)));
 		}
 		else {
 			return Optional.empty();
