@@ -193,6 +193,34 @@ class ArgsTest {
 	}
 
 	@Test
+	void setupMetadataAuthSimple() {
+		final Args args = new Args("tcp://localhost:8080 --sm simple:user:pass --smmt MESSAGE_RSOCKET_AUTHENTICATION");
+		assertThat(args.setupPayload().isPresent()).isTrue();
+		assertThat(args.setupPayload().get().getMetadata()).isEqualTo(new SimpleAuthentication("user", "pass").toMetadata(ByteBufAllocator.DEFAULT).nioBuffer());
+	}
+
+	@Test
+	void setupMetadataAuthBearer() {
+		final Args args = new Args("tcp://localhost:8080 --sm bearer:token --smmt MESSAGE_RSOCKET_AUTHENTICATION");
+		assertThat(args.setupPayload().isPresent()).isTrue();
+		assertThat(args.setupPayload().get().getMetadata()).isEqualTo(new BearerAuthentication("token").toMetadata(ByteBufAllocator.DEFAULT).nioBuffer());
+	}
+
+	@Test
+	void setupMetadataAuthUnknown() {
+		final Args args = new Args("tcp://localhost:8080 --sm foo:token --smmt MESSAGE_RSOCKET_AUTHENTICATION");
+		assertThatThrownBy(args::setupPayload)
+				.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
+	void setupMetadataAuthIllegal() {
+		final Args args = new Args("tcp://localhost:8080 --sm foo --smmt MESSAGE_RSOCKET_AUTHENTICATION");
+		assertThatThrownBy(args::setupPayload)
+				.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
 	void setupMetadataMimeTypeIllegal() {
 		final Args args = new Args("tcp://localhost:8080 --sd hello --sm {\"value\":\"foo\"} --smmt application/foo");
 		assertThatThrownBy(args::setupPayload)

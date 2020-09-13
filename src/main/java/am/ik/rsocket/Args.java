@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import am.ik.rsocket.routing.Route;
+import am.ik.rsocket.security.AuthenticationSetupMetadata;
 import am.ik.rsocket.security.BearerAuthentication;
 import am.ik.rsocket.security.SimpleAuthentication;
 import am.ik.rsocket.tracing.Span;
@@ -40,6 +41,7 @@ import am.ik.rsocket.tracing.Tracing;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.CompositeByteBuf;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.rsocket.Payload;
 import io.rsocket.metadata.CompositeMetadataCodec;
@@ -294,7 +296,7 @@ public class Args {
 		}
 	}
 
-	private Optional<ByteBuf> setupMetaData() {
+	private Optional<ByteBuf> setupMetadata() {
 		if (this.options.has(this.setupMetadata)) {
 			final String metadata = this.options.valueOf(this.setupMetadata);
 			if (metadata == null) {
@@ -306,7 +308,11 @@ public class Args {
 					throw new IllegalArgumentException("'setupMetadataMimeType' is not specified.");
 				}
 				// validation only
-				SetupMetadataMimeType.of(mimeType);
+				final SetupMetadataMimeType setupMetadataMimeType = SetupMetadataMimeType.of(mimeType);
+				if (setupMetadataMimeType == SetupMetadataMimeType.MESSAGE_RSOCKET_AUTHENTICATION) {
+					final MetadataEncoder metadataEncoder = AuthenticationSetupMetadata.valueOf(metadata);
+					return Optional.of(metadataEncoder.toMetadata(new PooledByteBufAllocator(true)));
+				}
 			}
 			return Optional.of(Unpooled.wrappedBuffer(metadata.getBytes(StandardCharsets.UTF_8)));
 		}
@@ -317,14 +323,14 @@ public class Args {
 
 	public Optional<Payload> setupPayload() {
 		final Optional<Payload> payload = this.setupData()
-				.map(data -> this.setupMetaData()
+				.map(data -> this.setupMetadata()
 						.map(metadata -> DefaultPayload.create(data, metadata))
 						.orElseGet(() -> DefaultPayload.create(data)));
 		if (payload.isPresent()) {
 			return payload;
 		}
 		else {
-			return this.setupMetaData()
+			return this.setupMetadata()
 					.map(metadata -> DefaultPayload.create(Unpooled.EMPTY_BUFFER, metadata));
 		}
 	}
@@ -350,7 +356,7 @@ public class Args {
 			return Tuples.of(mimeTypeList.get(0), metadataList.get(0));
 		}
 		final CompositeByteBuf compositeByteBuf = Unpooled.compositeBuffer();
-		final ByteBufAllocator allocator = ByteBufAllocator.DEFAULT;
+		final ByteBufAllocator allocator = new PooledByteBufAllocator(true);
 		final Iterator<String> mimeTypeIterator = mimeTypeList.iterator();
 		final Iterator<ByteBuf> metadataIterator = metadataList.iterator();
 		while (mimeTypeIterator.hasNext()) {
@@ -391,7 +397,7 @@ public class Args {
 			this.span = Tracing.createSpan(flags);
 			metadataEncoders.add(this.span);
 		}
-		metadataEncoders.forEach(metadataEncoder -> list.add(metadataEncoder.toMetadata(ByteBufAllocator.DEFAULT)));
+		metadataEncoders.forEach(metadataEncoder -> list.add(metadataEncoder.toMetadata(new PooledByteBufAllocator(true))));
 		list.addAll(this.options.valuesOf(this.metadata).stream()
 				.map(metadata -> Unpooled.wrappedBuffer(metadata.getBytes(StandardCharsets.UTF_8))).collect(toList()));
 		return list;

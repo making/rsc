@@ -21,7 +21,8 @@ import io.rsocket.metadata.WellKnownMimeType;
 
 enum SetupMetadataMimeType {
 	TEXT_PLAIN(WellKnownMimeType.TEXT_PLAIN),
-	APPLICATION_JSON(WellKnownMimeType.APPLICATION_JSON);
+	APPLICATION_JSON(WellKnownMimeType.APPLICATION_JSON),
+	MESSAGE_RSOCKET_AUTHENTICATION(WellKnownMimeType.MESSAGE_RSOCKET_AUTHENTICATION);
 
 	private final WellKnownMimeType value;
 
