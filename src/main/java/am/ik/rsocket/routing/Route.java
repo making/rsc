@@ -38,7 +38,7 @@ public class Route implements MetadataEncoder {
 	@Override
 	public ByteBuf toMetadata(ByteBufAllocator allocator) {
 		final byte[] bytes = this.value.getBytes(StandardCharsets.UTF_8);
-		final ByteBuf buf = allocator.buffer(bytes.length + 1);
+		final ByteBuf buf = allocator.buffer();
 		buf.writeByte(bytes.length);
 		buf.writeBytes(bytes);
 		return buf;
