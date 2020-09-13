@@ -10,6 +10,13 @@ Non-option arguments:
 
 Option                                Description                           
 ------                                -----------                           
+--ab, --authBearer [String]           Enable Authentication Metadata        
+                                        Extension (Bearer).                 
+--authBasic [String]                  [DEPRECATED] Enable Authentication    
+                                        Metadata Extension (Basic). This    
+                                        Metadata exist only for the backward
+                                        compatibility with Spring Security  
+                                        5.2                                 
 --channel                             Shortcut of --im REQUEST_CHANNEL      
 -d, --data [String]                   Data. Use '-' to read data from       
                                         standard input. (default: )         
@@ -56,6 +63,9 @@ Option                                Description
                                         (UNDECIDED, NOT_SAMPLE, SAMPLE,     
                                         DEBUG) is specified, DEBUG is used  
                                         by default.                         
+-u, --as, --authSimple [String]       Enable Authentication Metadata        
+                                        Extension (Simple). The format must 
+                                        be 'username:password'.             
 -v, --version                         Print version                         
 -w, --wiretap                         Enable wiretap                        
 --wsHeader, --wsh [String]            Header for web socket connection      

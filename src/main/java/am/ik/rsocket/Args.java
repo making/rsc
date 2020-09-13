@@ -33,7 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import am.ik.rsocket.routing.Route;
-import am.ik.rsocket.security.AuthenticationSetupMetadata;
+import am.ik.rsocket.security.BasicAuthentication;
 import am.ik.rsocket.security.BearerAuthentication;
 import am.ik.rsocket.security.SimpleAuthentication;
 import am.ik.rsocket.tracing.Span;
@@ -134,6 +134,9 @@ public class Args {
 
 	private final OptionSpec<String> authBearer = parser
 			.acceptsAll(Arrays.asList("authBearer", "ab"), "Enable Authentication Metadata Extension (Bearer).").withOptionalArg();
+
+	private final OptionSpec<String> authBasic = parser
+			.acceptsAll(Arrays.asList("authBasic"), "[DEPRECATED] Enable Authentication Metadata Extension (Basic). This Metadata exist only for the backward compatibility with Spring Security 5.2").withOptionalArg();
 
 	private final OptionSpec<Flags> trace = parser
 			.acceptsAll(Arrays.asList("trace"), "Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used by default.")
@@ -263,6 +266,14 @@ public class Args {
 		return new BearerAuthentication(authBearer);
 	}
 
+	public BasicAuthentication authBasic() {
+		final String authBasic = this.options.valueOf(this.authBasic);
+		if (authBasic == null) {
+			throw new IllegalArgumentException("'authBasic' is not specified.");
+		}
+		return BasicAuthentication.valueOf(authBasic);
+	}
+
 	public String dataMimeType() {
 		final String mimeType = this.options.valueOf(this.dataMimeType);
 		try {
@@ -307,14 +318,9 @@ public class Args {
 				if (mimeType == null) {
 					throw new IllegalArgumentException("'setupMetadataMimeType' is not specified.");
 				}
-				// validation only
-				final SetupMetadataMimeType setupMetadataMimeType = SetupMetadataMimeType.of(mimeType);
-				if (setupMetadataMimeType == SetupMetadataMimeType.MESSAGE_RSOCKET_AUTHENTICATION) {
-					final MetadataEncoder metadataEncoder = AuthenticationSetupMetadata.valueOf(metadata);
-					return Optional.of(metadataEncoder.toMetadata(new PooledByteBufAllocator(true)));
-				}
+				return Optional.of(SetupMetadataMimeType.of(mimeType).encode(metadata));
 			}
-			return Optional.of(Unpooled.wrappedBuffer(metadata.getBytes(StandardCharsets.UTF_8)));
+			return Optional.of(SetupMetadataMimeType.TEXT_PLAIN.encode(metadata));
 		}
 		else {
 			return Optional.empty();
@@ -392,6 +398,9 @@ public class Args {
 		if (this.options.has(this.authBearer)) {
 			metadataEncoders.add(this.authBearer());
 		}
+		if (this.options.has(this.authBasic)) {
+			metadataEncoders.add(this.authBasic());
+		}
 		if (this.options.has(this.trace)) {
 			final Flags flags = Optional.ofNullable(this.options.valueOf(this.trace)).orElse(Flags.DEBUG);
 			this.span = Tracing.createSpan(flags);
@@ -410,6 +419,9 @@ public class Args {
 		}
 		if (this.options.has(this.authSimple) || this.options.has(this.authBearer)) {
 			list.add(WellKnownMimeType.MESSAGE_RSOCKET_AUTHENTICATION.getString());
+		}
+		if (this.options.has(this.authBasic)) {
+			list.add("message/x.rsocket.authentication.basic.v0");
 		}
 		if (this.options.has(this.trace)) {
 			list.add(WellKnownMimeType.MESSAGE_RSOCKET_TRACING_ZIPKIN.getString());

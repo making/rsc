@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import am.ik.rsocket.routing.Route;
+import am.ik.rsocket.security.BasicAuthentication;
 import am.ik.rsocket.security.BearerAuthentication;
 import am.ik.rsocket.security.SimpleAuthentication;
 import io.netty.buffer.ByteBuf;
@@ -228,6 +229,13 @@ class ArgsTest {
 	}
 
 	@Test
+	void setupMetadataBasicAuth() {
+		final Args args = new Args("tcp://localhost:8080 --sm user:pass --smmt AUTHENTICATION_BASIC");
+		assertThat(args.setupPayload().isPresent()).isTrue();
+		assertThat(args.setupPayload().get().getMetadata()).isEqualTo(new BasicAuthentication("user", "pass").toMetadata(ByteBufAllocator.DEFAULT).nioBuffer());
+	}
+
+	@Test
 	void metadataAuthSimple() {
 		final Args args = new Args("tcp://localhost:8080 --authSimple user:password");
 		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
@@ -319,6 +327,22 @@ class ArgsTest {
 		final List<String> metadataMimeTypeList = args.metadataMimeType();
 		assertThat(metadataList.stream().map(x -> x.toString(UTF_8)).collect(toList())).containsExactly(routingMetadata.toString(UTF_8), authMetadata.toString(UTF_8));
 		assertThat(metadataMimeTypeList).containsExactly("message/x.rsocket.routing.v0", "message/x.rsocket.authentication.v0");
+	}
+
+	@Test
+	void metadataCompositeRouteAndAuthBasic() {
+		final Args args = new Args("tcp://localhost:8080 -r greeting --authBasic user:demo");
+		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
+		final ByteBuf authMetadata = BasicAuthentication.valueOf("user:demo").toMetadata(ByteBufAllocator.DEFAULT);
+		final ByteBuf routingMetadata = new Route("greeting").toMetadata(ByteBufAllocator.DEFAULT);
+		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.composite-metadata.v0");
+		assertThat(metadata.getT2().toString(UTF_8)).doesNotContain("message/x.rsocket.routing.v0");
+		assertThat(metadata.getT2().toString(UTF_8)).contains(routingMetadata.toString(UTF_8));
+		assertThat(metadata.getT2().toString(UTF_8)).contains(authMetadata.toString(UTF_8));
+		final List<ByteBuf> metadataList = args.metadata();
+		final List<String> metadataMimeTypeList = args.metadataMimeType();
+		assertThat(metadataList.stream().map(x -> x.toString(UTF_8)).collect(toList())).containsExactly(routingMetadata.toString(UTF_8), authMetadata.toString(UTF_8));
+		assertThat(metadataMimeTypeList).containsExactly("message/x.rsocket.routing.v0", "message/x.rsocket.authentication.basic.v0");
 	}
 
 	@Test

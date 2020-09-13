@@ -15,32 +15,81 @@
  */
 package am.ik.rsocket;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
+import am.ik.rsocket.security.AuthenticationSetupMetadata;
+import am.ik.rsocket.security.BasicAuthentication;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.buffer.Unpooled;
 import io.rsocket.metadata.WellKnownMimeType;
 
 enum SetupMetadataMimeType {
-	TEXT_PLAIN(WellKnownMimeType.TEXT_PLAIN),
-	APPLICATION_JSON(WellKnownMimeType.APPLICATION_JSON),
-	MESSAGE_RSOCKET_AUTHENTICATION(WellKnownMimeType.MESSAGE_RSOCKET_AUTHENTICATION);
+	TEXT_PLAIN(MimeType.wellKnown(WellKnownMimeType.TEXT_PLAIN)),
+	APPLICATION_JSON(MimeType.wellKnown(WellKnownMimeType.APPLICATION_JSON)),
+	MESSAGE_RSOCKET_AUTHENTICATION(MimeType.wellKnown(WellKnownMimeType.MESSAGE_RSOCKET_AUTHENTICATION)) {
+		@Override
+		public ByteBuf encode(String metadata) {
+			return AuthenticationSetupMetadata.valueOf(metadata).toMetadata(new PooledByteBufAllocator(true));
+		}
+	},
+	AUTHENTICATION_BASIC(MimeType.custom("message/x.rsocket.authentication.basic.v0")) {
+		@Override
+		public ByteBuf encode(String metadata) {
+			return BasicAuthentication.valueOf(metadata).toMetadata(new PooledByteBufAllocator(true));
+		}
+	};
 
-	private final WellKnownMimeType value;
+	private final MimeType mimeType;
 
-	SetupMetadataMimeType(WellKnownMimeType value) {
-		this.value = value;
+	SetupMetadataMimeType(MimeType mimeType) {
+		this.mimeType = mimeType;
 	}
 
-	public WellKnownMimeType getValue() {
-		return value;
+	public ByteBuf encode(String metadata) {
+		return Unpooled.wrappedBuffer(metadata.getBytes(StandardCharsets.UTF_8));
 	}
 
 	public static SetupMetadataMimeType of(String value) {
 		for (SetupMetadataMimeType type : values()) {
-			if (Objects.equals(type.value.getString(), value) ||
-					Objects.equals(type.value.name(), value)) {
+			if (Objects.equals(type.name(), value)) {
 				return type;
+			}
+			if (type.mimeType.isWellKnown()) {
+				if (Objects.equals(type.mimeType.wellKnownMimeType.getString(), value)) {
+					return type;
+				}
+			}
+			else {
+				if (Objects.equals(type.mimeType.custom, value)) {
+					return type;
+				}
 			}
 		}
 		throw new IllegalArgumentException("'" + value + "' is unsupported as a SetupMetadataMimeType.");
+	}
+
+	private static class MimeType {
+		private final WellKnownMimeType wellKnownMimeType;
+
+		private final String custom;
+
+		static MimeType wellKnown(WellKnownMimeType wellKnownMimeType) {
+			return new MimeType(wellKnownMimeType, null);
+		}
+
+		static MimeType custom(String custom) {
+			return new MimeType(null, custom);
+		}
+
+		private MimeType(WellKnownMimeType wellKnownMimeType, String custom) {
+			this.wellKnownMimeType = wellKnownMimeType;
+			this.custom = custom;
+		}
+
+		boolean isWellKnown() {
+			return this.wellKnownMimeType != null;
+		}
 	}
 }
