@@ -120,6 +120,45 @@ class ArgsTest {
 	}
 
 	@Test
+	void setupData() {
+		final Args args = new Args("tcp://localhost:8080 --sd hello");
+		assertThat(args.setupPayload().isPresent()).isTrue();
+		assertThat(args.setupPayload().get().getDataUtf8()).isEqualTo("hello");
+		assertThat(args.setupPayload().get().getMetadataUtf8()).isEqualTo("");
+	}
+
+	@Test
+	void setupMetaData() {
+		final Args args = new Args("tcp://localhost:8080 --sm hello");
+		assertThat(args.setupPayload().isPresent()).isTrue();
+		assertThat(args.setupPayload().get().getDataUtf8()).isEqualTo("");
+		assertThat(args.setupPayload().get().getMetadataUtf8()).isEqualTo("hello");
+	}
+
+	@Test
+	void setupDataAndMetadata() {
+		final Args args = new Args("tcp://localhost:8080 --sd hello --sm meta");
+		assertThat(args.setupPayload().isPresent()).isTrue();
+		assertThat(args.setupPayload().get().getDataUtf8()).isEqualTo("hello");
+		assertThat(args.setupPayload().get().getMetadataUtf8()).isEqualTo("meta");
+	}
+
+	@Test
+	void setupMetadataMimeType() {
+		final Args args = new Args("tcp://localhost:8080 --sd hello --sm {\"value\":\"foo\"} --smmt application/json");
+		assertThat(args.setupPayload().isPresent()).isTrue();
+		assertThat(args.setupPayload().get().getDataUtf8()).isEqualTo("hello");
+		assertThat(args.setupPayload().get().getMetadataUtf8()).isEqualTo("{\"value\":\"foo\"}");
+	}
+
+	@Test
+	void setupMetadataMimeTypeIllegal() {
+		final Args args = new Args("tcp://localhost:8080 --sd hello --sm {\"value\":\"foo\"} --smmt application/foo");
+		assertThatThrownBy(args::setupPayload)
+				.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
 	void metadataComposite() {
 		final Args args = new Args(new String[] { "tcp://localhost:8080", //
 				"--metadataMimeType", "application/json", //

@@ -38,10 +38,12 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.CompositeByteBuf;
 import io.netty.buffer.Unpooled;
+import io.rsocket.Payload;
 import io.rsocket.metadata.CompositeMetadataCodec;
 import io.rsocket.metadata.TracingMetadataCodec.Flags;
 import io.rsocket.metadata.WellKnownMimeType;
 import io.rsocket.transport.ClientTransport;
+import io.rsocket.util.DefaultPayload;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
@@ -107,7 +109,13 @@ public class Args {
 	private final OptionSpec<String> metadata = parser
 			.acceptsAll(Arrays.asList("m", "metadata"), "Metadata (default: )").withOptionalArg();
 
-	private final OptionSpec<String> setup = parser.acceptsAll(Arrays.asList("s", "setup"), "Setup payload")
+	private final OptionSpec<String> setupData = parser.acceptsAll(Arrays.asList("s", "setup", "sd", "setupData"), "Data for Setup payload")
+			.withOptionalArg();
+
+	private final OptionSpec<String> setupMetadata = parser.acceptsAll(Arrays.asList("sm", "setupMetadata"), "Metadata for Setup payload")
+			.withOptionalArg();
+
+	private final OptionSpec<String> setupMetadataMimeType = parser.acceptsAll(Arrays.asList("smmt", "setupMetadataMimeType"), "Metadata MimeType for Setup payload. Only 'text/plain' and 'application/json' are supported.")
 			.withOptionalArg();
 
 	private final OptionSpec<String> route = parser
@@ -154,6 +162,10 @@ public class Args {
 		final OptionSpec<String> uri = parser.nonOptions().describedAs("Uri");
 		this.options = parser.parse(args);
 		this.uri = Optional.ofNullable(uri.value(this.options)).map(URI::create).orElse(null);
+	}
+
+	public Args(String args) {
+		this(args.split("\\s"));
 	}
 
 	public boolean hasUri() {
@@ -224,13 +236,41 @@ public class Args {
 		}
 	}
 
-	public Optional<ByteBuf> setup() {
-		if (this.options.has(this.setup) && this.options.valueOf(this.setup) != null) {
+	private Optional<ByteBuf> setupData() {
+		if (this.options.has(this.setupData) && this.options.valueOf(this.setupData) != null) {
 			return Optional
-					.of(Unpooled.wrappedBuffer(this.options.valueOf(this.setup).getBytes(StandardCharsets.UTF_8)));
+					.of(Unpooled.wrappedBuffer(this.options.valueOf(this.setupData).getBytes(StandardCharsets.UTF_8)));
 		}
 		else {
 			return Optional.empty();
+		}
+	}
+
+	private Optional<ByteBuf> setupMetaData() {
+		if (this.options.has(this.setupMetadata) && this.options.valueOf(this.setupMetadata) != null) {
+			if (this.options.has(this.setupMetadataMimeType) && this.options.valueOf(this.setupMetadataMimeType) != null) {
+				// validation only
+				SetupMetadataMimeType.of(this.options.valueOf(this.setupMetadataMimeType));
+			}
+			return Optional
+					.of(Unpooled.wrappedBuffer(this.options.valueOf(this.setupMetadata).getBytes(StandardCharsets.UTF_8)));
+		}
+		else {
+			return Optional.empty();
+		}
+	}
+
+	public Optional<Payload> setupPayload() {
+		final Optional<Payload> payload = this.setupData()
+				.map(data -> this.setupMetaData()
+						.map(metadata -> DefaultPayload.create(data, metadata))
+						.orElseGet(() -> DefaultPayload.create(data)));
+		if (payload.isPresent()) {
+			return payload;
+		}
+		else {
+			return this.setupMetaData()
+					.map(metadata -> DefaultPayload.create(Unpooled.EMPTY_BUFFER, metadata));
 		}
 	}
 

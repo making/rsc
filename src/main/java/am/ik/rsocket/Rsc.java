@@ -30,7 +30,6 @@ import io.rsocket.core.Resume;
 import io.rsocket.frame.decoder.PayloadDecoder;
 import io.rsocket.metadata.TracingMetadataCodec.Flags;
 import io.rsocket.transport.ClientTransport;
-import io.rsocket.util.DefaultPayload;
 import org.slf4j.LoggerFactory;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
@@ -112,7 +111,7 @@ public class Rsc {
 				.retry(Retry.fixedDelay(10, Duration.ofSeconds(5)))));
 		args.retry().ifPresent(maxAttempts -> connector
 				.reconnect(retry(maxAttempts)));
-		args.setup().map(DefaultPayload::create).ifPresent(connector::setupPayload);
+		args.setupPayload().ifPresent(connector::setupPayload);
 		return connector
 				.payloadDecoder(PayloadDecoder.ZERO_COPY)
 				.metadataMimeType(args.composeMetadata().getT1())
