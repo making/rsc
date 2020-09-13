@@ -174,6 +174,14 @@ class ArgsTest {
 	}
 
 	@Test
+	void setupMetadataMimeTypeEnum() {
+		final Args args = new Args("tcp://localhost:8080 --sd hello --sm {\"value\":\"foo\"} --smmt APPLICATION_JSON");
+		assertThat(args.setupPayload().isPresent()).isTrue();
+		assertThat(args.setupPayload().get().getDataUtf8()).isEqualTo("hello");
+		assertThat(args.setupPayload().get().getMetadataUtf8()).isEqualTo("{\"value\":\"foo\"}");
+	}
+
+	@Test
 	void setupMetadataMimeTypeMissing() {
 		final Args args = new Args("tcp://localhost:8080 --sm foo --smmt");
 		assertThatThrownBy(args::setupPayload)
