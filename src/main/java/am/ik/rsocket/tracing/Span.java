@@ -24,7 +24,7 @@ import io.netty.buffer.ByteBufAllocator;
 import io.rsocket.metadata.TracingMetadataCodec;
 import io.rsocket.metadata.TracingMetadataCodec.Flags;
 
-public class RscSpan implements MetadataEncoder {
+public class Span implements MetadataEncoder {
 	private final long spanId;
 
 	private final long traceIdHigh;
@@ -35,7 +35,7 @@ public class RscSpan implements MetadataEncoder {
 
 	private final long timestamp;
 
-	public RscSpan(long spanId, long traceIdHigh, long traceId, Flags flags) {
+	public Span(long spanId, long traceIdHigh, long traceId, Flags flags) {
 		this.spanId = spanId;
 		this.traceIdHigh = traceIdHigh;
 		this.traceId = traceId;

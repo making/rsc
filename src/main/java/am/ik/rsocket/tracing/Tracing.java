@@ -19,11 +19,11 @@ import io.rsocket.metadata.TracingMetadataCodec.Flags;
 
 
 public final class Tracing {
-	public static RscSpan createSpan(Flags flags) {
+	public static Span createSpan(Flags flags) {
 		final long spanId = randomLong();
 		final long traceIdHigh = nextTraceIdHigh();
 		final long traceId = spanId;
-		return new RscSpan(spanId, traceIdHigh, traceId, flags);
+		return new Span(spanId, traceIdHigh, traceId, flags);
 	}
 
 	/**

@@ -35,7 +35,7 @@ import java.util.Set;
 import am.ik.rsocket.routing.Route;
 import am.ik.rsocket.security.BearerAuthentication;
 import am.ik.rsocket.security.SimpleAuthentication;
-import am.ik.rsocket.tracing.RscSpan;
+import am.ik.rsocket.tracing.Span;
 import am.ik.rsocket.tracing.Tracing;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
@@ -171,7 +171,7 @@ public class Args {
 
 	private Tuple2<String, ByteBuf> composedMetadata = null;
 
-	private RscSpan span;
+	private Span span;
 
 	public Args(String[] args) {
 		final OptionSpec<String> uri = parser.nonOptions().describedAs("Uri");
@@ -370,7 +370,7 @@ public class Args {
 		return this.composedMetadata;
 	}
 
-	public Optional<RscSpan> span() {
+	public Optional<Span> span() {
 		return Optional.ofNullable(this.span);
 	}
 
