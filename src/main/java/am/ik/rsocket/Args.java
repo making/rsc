@@ -32,6 +32,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import am.ik.rsocket.routing.Route;
 import am.ik.rsocket.security.BearerAuthentication;
 import am.ik.rsocket.security.SimpleAuthentication;
 import am.ik.rsocket.tracing.RscSpan;
@@ -236,12 +237,12 @@ public class Args {
 		return "-".equals(this.options.valueOf(this.data));
 	}
 
-	public String route() {
+	public Route route() {
 		final String route = this.options.valueOf(this.route);
 		if (route == null) {
 			throw new IllegalArgumentException("'route' is not specified.");
 		}
-		return route;
+		return new Route(route);
 	}
 
 	public SimpleAuthentication authSimple() {
@@ -374,23 +375,23 @@ public class Args {
 	}
 
 	List<ByteBuf> metadata() {
-		List<ByteBuf> list = new ArrayList<>();
+		final List<ByteBuf> list = new ArrayList<>();
+		final List<MetadataEncoder> metadataEncoders = new ArrayList<>();
 		if (this.options.has(this.route)) {
-			list.add(routingMetadata(this.route()));
+			metadataEncoders.add(this.route());
 		}
 		if (this.options.has(this.authSimple)) {
-			final SimpleAuthentication simpleAuthentication = this.authSimple();
-			list.add(simpleAuthentication.toMetadata(ByteBufAllocator.DEFAULT));
+			metadataEncoders.add(this.authSimple());
 		}
 		if (this.options.has(this.authBearer)) {
-			final BearerAuthentication bearerAuthentication = this.authBearer();
-			list.add(bearerAuthentication.toMetadata(ByteBufAllocator.DEFAULT));
+			metadataEncoders.add(this.authBearer());
 		}
 		if (this.options.has(this.trace)) {
 			final Flags flags = Optional.ofNullable(this.options.valueOf(this.trace)).orElse(Flags.DEBUG);
 			this.span = Tracing.createSpan(flags);
-			list.add(this.span.toMetadata(ByteBufAllocator.DEFAULT));
+			metadataEncoders.add(this.span);
 		}
+		metadataEncoders.forEach(metadataEncoder -> list.add(metadataEncoder.toMetadata(ByteBufAllocator.DEFAULT)));
 		list.addAll(this.options.valuesOf(this.metadata).stream()
 				.map(metadata -> Unpooled.wrappedBuffer(metadata.getBytes(StandardCharsets.UTF_8))).collect(toList()));
 		return list;
@@ -598,16 +599,5 @@ public class Args {
 			return true;
 		}
 		return this.options.has(this.showSystemProperties);
-	}
-
-	/**
-	 * https://github.com/rsocket/rsocket/blob/master/Extensions/Routing.md
-	 */
-	static ByteBuf routingMetadata(String tag) {
-		final byte[] bytes = tag.getBytes(StandardCharsets.UTF_8);
-		final ByteBuf buf = Unpooled.buffer();
-		buf.writeByte(bytes.length);
-		buf.writeBytes(bytes);
-		return buf;
 	}
 }
