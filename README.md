@@ -48,8 +48,11 @@ Option                                Description
 --sd, --setupData [String]            Data for Setup payload                
 --setupMetadata, --sm [String]        Metadata for Setup payload            
 --setupMetadataMimeType, --smmt       Metadata MimeType for Setup payload.  
-  [String]                              Only 'text/plain' and               
-                                        'application/json' are supported.   
+  [String]                              Supported MimeTypes are             
+                                        'text/plain', 'application/json',   
+                                        'message/x.rsocket.authentication.  
+                                        v0' and 'message/x.rsocket.         
+                                        authentication.basic.v0'.           
 --show-system-properties              [DEPRECATED] Show SystemProperties for
                                         troubleshoot. Use --                
                                         showSystemProperties instead.       
@@ -71,7 +74,7 @@ Option                                Description
 --wsHeader, --wsh [String]            Header for web socket connection      
 --zipkinUrl [String]                  Zipkin URL to send a span (ex. http:  
                                         //localhost:9411). Ignored unless --
-                                        trace is set.      
+                                        trace is set.     
 ```
 
 ## Install
