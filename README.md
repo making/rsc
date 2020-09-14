@@ -102,7 +102,7 @@ cs install rsc --contrib
 To install the jvm binary (executable jar) do:
 
 ```
-cs install rscj --contrib`
+cs install rscj --contrib
 ```
 
 ## Example usages
