@@ -81,6 +81,13 @@ Option                                Description
 
 Download an executable jar or native binary (only for x86_64-apple-darwin or x86_64-pc-linux) from [Releases](https://github.com/making/rsc/releases).
 
+### Install via Coursier
+If you do not already have couriser installed on your machine, install it following steps given here: https://get-coursier.io/docs/cli-installation. 
+
+To install the graalvm binary do: `cs install rsc --contrib` 
+
+To install the jvm binary do:`cs install rscj --contrib`
+
 ### Install via Homebrew
 
 You can install native binary via Homebrew.
