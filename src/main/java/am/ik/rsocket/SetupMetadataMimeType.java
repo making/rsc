@@ -47,6 +47,15 @@ enum SetupMetadataMimeType {
 		this.mimeType = mimeType;
 	}
 
+	public String getValue() {
+		if (this.mimeType.isWellKnown()) {
+			return this.mimeType.wellKnownMimeType.getString();
+		}
+		else {
+			return this.mimeType.custom;
+		}
+	}
+
 	public ByteBuf encode(String metadata) {
 		return Unpooled.wrappedBuffer(metadata.getBytes(StandardCharsets.UTF_8));
 	}

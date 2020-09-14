@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import am.ik.rsocket.routing.Route;
 import am.ik.rsocket.security.BasicAuthentication;
@@ -284,6 +285,16 @@ public class Args {
 		}
 	}
 
+	public String setupMimeType() {
+		final String mimeType = this.options.valueOf(this.setupMetadataMimeType);
+		try {
+			return SetupMetadataMimeType.of(mimeType).getValue();
+		}
+		catch (IllegalArgumentException ignored) {
+			return mimeType;
+		}
+	}
+
 	private Optional<ByteBuf> setupData() {
 		final OptionSpec<String> setupData;
 		if (this.options.has(this.setupDataDeprecated)) {
@@ -328,8 +339,22 @@ public class Args {
 	}
 
 	public Optional<Payload> setupPayload() {
+		final Function<ByteBuf, ByteBuf> prepareMetadata = metadata -> {
+			final ByteBufAllocator allocator = new PooledByteBufAllocator(true);
+			final CompositeByteBuf composite = allocator.compositeBuffer();
+			if (this.options.has(this.setupMetadataMimeType)) {
+				// Use Composite Metadata if Setup Metadata MimeType is set
+				final String mimeType = this.setupMimeType();
+				CompositeMetadataCodec.encodeAndAddMetadata(composite, allocator, mimeType, metadata);
+				return composite;
+			}
+			else {
+				return metadata;
+			}
+		};
 		final Optional<Payload> payload = this.setupData()
 				.map(data -> this.setupMetadata()
+						.map(prepareMetadata)
 						.map(metadata -> DefaultPayload.create(data, metadata))
 						.orElseGet(() -> DefaultPayload.create(data)));
 		if (payload.isPresent()) {
@@ -337,6 +362,7 @@ public class Args {
 		}
 		else {
 			return this.setupMetadata()
+					.map(prepareMetadata)
 					.map(metadata -> DefaultPayload.create(Unpooled.EMPTY_BUFFER, metadata));
 		}
 	}
@@ -358,7 +384,8 @@ public class Args {
 		if (metadataList.isEmpty()) {
 			return Tuples.of(WellKnownMimeType.TEXT_PLAIN.getString(), Unpooled.buffer());
 		}
-		if (metadataList.size() == 1) {
+		// Use Composite Metadata if Setup Metadata MimeType is set
+		if (metadataList.size() == 1 && !this.options.has(this.setupMetadataMimeType)) {
 			return Tuples.of(mimeTypeList.get(0), metadataList.get(0));
 		}
 		final CompositeByteBuf compositeByteBuf = Unpooled.compositeBuffer();
