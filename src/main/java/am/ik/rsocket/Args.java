@@ -123,7 +123,7 @@ public class Args {
 	private final OptionSpec<String> setupMetadata = parser.acceptsAll(Arrays.asList("sm", "setupMetadata"), "Metadata for Setup payload")
 			.withOptionalArg();
 
-	private final OptionSpec<String> setupMetadataMimeType = parser.acceptsAll(Arrays.asList("smmt", "setupMetadataMimeType"), "Metadata MimeType for Setup payload. Supported MimeTypes are 'text/plain', 'application/json', 'message/x.rsocket.authentication.v0' and 'message/x.rsocket.authentication.basic.v0'.")
+	private final OptionSpec<String> setupMetadataMimeType = parser.acceptsAll(Arrays.asList("smmt", "setupMetadataMimeType"), "Metadata MimeType for Setup payload.")
 			.withOptionalArg();
 
 	private final OptionSpec<String> route = parser

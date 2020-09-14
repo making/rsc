@@ -48,11 +48,7 @@ Option                                Description
 --sd, --setupData [String]            Data for Setup payload                
 --setupMetadata, --sm [String]        Metadata for Setup payload            
 --setupMetadataMimeType, --smmt       Metadata MimeType for Setup payload.  
-  [String]                              Supported MimeTypes are             
-                                        'text/plain', 'application/json',   
-                                        'message/x.rsocket.authentication.  
-                                        v0' and 'message/x.rsocket.         
-                                        authentication.basic.v0'.           
+  [String]                                                                  
 --show-system-properties              [DEPRECATED] Show SystemProperties for
                                         troubleshoot. Use --                
                                         showSystemProperties instead.       
