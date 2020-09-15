@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 
 import am.ik.rsocket.routing.Route;
 import am.ik.rsocket.security.BasicAuthentication;
@@ -285,19 +284,6 @@ public class Args {
 		}
 	}
 
-	public Optional<String> setupMetadataMimeType() {
-		if (this.options.has(this.setupMetadataMimeType)) {
-			final String mimeType = this.options.valueOf(this.setupMetadataMimeType);
-			try {
-				return Optional.of(SetupMetadataMimeType.of(mimeType).getValue());
-			}
-			catch (IllegalArgumentException ignored) {
-				return Optional.of(mimeType);
-			}
-		}
-		return Optional.empty();
-	}
-
 	private Optional<ByteBuf> setupData() {
 		final OptionSpec<String> setupData;
 		if (this.options.has(this.setupDataDeprecated)) {
@@ -321,20 +307,26 @@ public class Args {
 		}
 	}
 
-	private Optional<ByteBuf> setupMetadata() {
+	public Optional<ByteBuf> setupMetadata() {
 		if (this.options.has(this.setupMetadata)) {
+			// always encode setupMetadata as a composite metadata
 			final String metadata = this.options.valueOf(this.setupMetadata);
 			if (metadata == null) {
 				throw new IllegalArgumentException("'setupMetadata' is not specified.");
 			}
+			final SetupMetadataMimeType setupMetadataMimeType;
 			if (this.options.has(this.setupMetadataMimeType)) {
 				final String mimeType = this.options.valueOf(this.setupMetadataMimeType);
 				if (mimeType == null) {
 					throw new IllegalArgumentException("'setupMetadataMimeType' is not specified.");
 				}
-				return Optional.of(SetupMetadataMimeType.of(mimeType).encode(metadata));
+				setupMetadataMimeType = SetupMetadataMimeType.of(mimeType);
 			}
-			return Optional.of(SetupMetadataMimeType.TEXT_PLAIN.encode(metadata));
+			else {
+				setupMetadataMimeType = SetupMetadataMimeType.TEXT_PLAIN;
+			}
+			return Optional.of(addCompositeMetadata(setupMetadataMimeType.encode(metadata),
+					setupMetadataMimeType.getValue()));
 		}
 		else {
 			return Optional.empty();
@@ -349,21 +341,16 @@ public class Args {
 	}
 
 	public Optional<Payload> setupPayload() {
-		final Function<ByteBuf, ByteBuf> prepareMetadata = metadata -> this.setupMetadataMimeType()
-				.map(mimeType -> /*	Use Composite Metadata if Setup Metadata MimeType is set */
-						addCompositeMetadata(metadata, mimeType))
-				.orElse(metadata);
 		final Optional<Payload> payload = this.setupData()
 				.map(data -> this.setupMetadata()
-						.map(prepareMetadata)
-						.map(metadata -> DefaultPayload.create(data, metadata))
-						.orElseGet(() -> DefaultPayload.create(data)));
+						.map(metadata -> /* setupData and setupMetadata */ DefaultPayload.create(data, metadata))
+						.orElseGet(() -> /* only setupData */ DefaultPayload.create(data)));
 		if (payload.isPresent()) {
 			return payload;
 		}
 		else {
+			// only setupMetadata
 			return this.setupMetadata()
-					.map(prepareMetadata)
 					.map(metadata -> DefaultPayload.create(Unpooled.EMPTY_BUFFER, metadata));
 		}
 	}
@@ -385,8 +372,8 @@ public class Args {
 		if (metadataList.isEmpty()) {
 			return Tuples.of(WellKnownMimeType.TEXT_PLAIN.getString(), Unpooled.buffer());
 		}
-		// Use Composite Metadata if Setup Metadata MimeType is set
-		if (metadataList.size() == 1 && !this.setupMetadataMimeType().isPresent()) {
+		// use composite metadata if setup payload exists
+		if (metadataList.size() == 1 && !this.setupPayload().isPresent()) {
 			return Tuples.of(mimeTypeList.get(0), metadataList.get(0));
 		}
 		final CompositeByteBuf compositeByteBuf = Unpooled.compositeBuffer();

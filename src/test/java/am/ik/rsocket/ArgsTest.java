@@ -156,7 +156,8 @@ class ArgsTest {
 		final Args args = new Args("tcp://localhost:8080 --sm hello");
 		assertThat(args.setupPayload().isPresent()).isTrue();
 		assertThat(args.setupPayload().get().getDataUtf8()).isEqualTo("");
-		assertThat(args.setupPayload().get().getMetadataUtf8()).isEqualTo("hello");
+		final ByteBuf setupMetadata = addCompositeMetadata(Unpooled.wrappedBuffer("hello".getBytes()), "text/plain");
+		assertThat(args.setupPayload().get().getMetadata()).isEqualTo(setupMetadata.nioBuffer());
 	}
 
 	@Test
@@ -171,7 +172,8 @@ class ArgsTest {
 		final Args args = new Args("tcp://localhost:8080 --sd hello --sm meta");
 		assertThat(args.setupPayload().isPresent()).isTrue();
 		assertThat(args.setupPayload().get().getDataUtf8()).isEqualTo("hello");
-		assertThat(args.setupPayload().get().getMetadataUtf8()).isEqualTo("meta");
+		final ByteBuf setupMetadata = addCompositeMetadata(Unpooled.wrappedBuffer("meta".getBytes()), "text/plain");
+		assertThat(args.setupPayload().get().getMetadata()).isEqualTo(setupMetadata.nioBuffer());
 	}
 
 	@Test
