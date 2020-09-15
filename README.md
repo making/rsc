@@ -288,7 +288,7 @@ rsc tcp://localhost:8888 --sm token:MY_TOKEN --smmt MESSAGE_RSOCKET_AUTHENTICATI
 
 ### Basic Authentication
 
-[Basic Authentication](https://github.com/rsocket/rsocket/issues/272) is not a part of `Authentication Extension`.
+[Basic Authentication](https://github.com/rsocket/rsocket/issues/272) is not a part of Authentication Extension.
 It was implemented by Spring Security 5.2 before the spec was standardized.
 
 `rsc` supports Basic Authentication for the backward compatibility with Spring Security 5.2.
