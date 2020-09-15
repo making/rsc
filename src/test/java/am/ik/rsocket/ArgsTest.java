@@ -25,6 +25,7 @@ import am.ik.rsocket.security.BearerAuthentication;
 import am.ik.rsocket.security.SimpleAuthentication;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.Unpooled;
 import io.rsocket.metadata.TracingMetadataCodec.Flags;
 import io.rsocket.transport.ClientTransport;
 import io.rsocket.transport.netty.client.TcpClientTransport;
@@ -33,6 +34,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import reactor.util.function.Tuple2;
 
+import static am.ik.rsocket.Args.addCompositeMetadata;
+import static am.ik.rsocket.SetupMetadataMimeType.AUTHENTICATION_BASIC;
+import static am.ik.rsocket.SetupMetadataMimeType.MESSAGE_RSOCKET_AUTHENTICATION;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -175,7 +179,8 @@ class ArgsTest {
 		final Args args = new Args("tcp://localhost:8080 --sd hello --sm {\"value\":\"foo\"} --smmt application/json");
 		assertThat(args.setupPayload().isPresent()).isTrue();
 		assertThat(args.setupPayload().get().getDataUtf8()).isEqualTo("hello");
-		assertThat(args.setupPayload().get().getMetadataUtf8()).isEqualTo("{\"value\":\"foo\"}");
+		final ByteBuf setupMetadata = addCompositeMetadata(Unpooled.wrappedBuffer("{\"value\":\"foo\"}".getBytes()), "application/json");
+		assertThat(args.setupPayload().get().getMetadata()).isEqualTo(setupMetadata.nioBuffer());
 	}
 
 	@Test
@@ -183,7 +188,8 @@ class ArgsTest {
 		final Args args = new Args("tcp://localhost:8080 --sd hello --sm {\"value\":\"foo\"} --smmt APPLICATION_JSON");
 		assertThat(args.setupPayload().isPresent()).isTrue();
 		assertThat(args.setupPayload().get().getDataUtf8()).isEqualTo("hello");
-		assertThat(args.setupPayload().get().getMetadataUtf8()).isEqualTo("{\"value\":\"foo\"}");
+		final ByteBuf setupMetadata = addCompositeMetadata(Unpooled.wrappedBuffer("{\"value\":\"foo\"}".getBytes()), "application/json");
+		assertThat(args.setupPayload().get().getMetadata()).isEqualTo(setupMetadata.nioBuffer());
 	}
 
 	@Test
@@ -197,14 +203,18 @@ class ArgsTest {
 	void setupMetadataAuthSimple() {
 		final Args args = new Args("tcp://localhost:8080 --sm simple:user:pass --smmt MESSAGE_RSOCKET_AUTHENTICATION");
 		assertThat(args.setupPayload().isPresent()).isTrue();
-		assertThat(args.setupPayload().get().getMetadata()).isEqualTo(new SimpleAuthentication("user", "pass").toMetadata(ByteBufAllocator.DEFAULT).nioBuffer());
+		final ByteBuf setupMetadata = addCompositeMetadata(new SimpleAuthentication("user", "pass").toMetadata(ByteBufAllocator.DEFAULT),
+				MESSAGE_RSOCKET_AUTHENTICATION.getValue());
+		assertThat(args.setupPayload().get().getMetadata()).isEqualTo(setupMetadata.nioBuffer());
 	}
 
 	@Test
 	void setupMetadataAuthBearer() {
 		final Args args = new Args("tcp://localhost:8080 --sm bearer:token --smmt MESSAGE_RSOCKET_AUTHENTICATION");
 		assertThat(args.setupPayload().isPresent()).isTrue();
-		assertThat(args.setupPayload().get().getMetadata()).isEqualTo(new BearerAuthentication("token").toMetadata(ByteBufAllocator.DEFAULT).nioBuffer());
+		final ByteBuf setupMetadata = addCompositeMetadata(new BearerAuthentication("token").toMetadata(ByteBufAllocator.DEFAULT),
+				MESSAGE_RSOCKET_AUTHENTICATION.getValue());
+		assertThat(args.setupPayload().get().getMetadata()).isEqualTo(setupMetadata.nioBuffer());
 	}
 
 	@Test
@@ -232,7 +242,9 @@ class ArgsTest {
 	void setupMetadataBasicAuth() {
 		final Args args = new Args("tcp://localhost:8080 --sm user:pass --smmt AUTHENTICATION_BASIC");
 		assertThat(args.setupPayload().isPresent()).isTrue();
-		assertThat(args.setupPayload().get().getMetadata()).isEqualTo(new BasicAuthentication("user", "pass").toMetadata(ByteBufAllocator.DEFAULT).nioBuffer());
+		final ByteBuf setupMetadata = addCompositeMetadata(new BasicAuthentication("user", "pass").toMetadata(ByteBufAllocator.DEFAULT),
+				AUTHENTICATION_BASIC.getValue());
+		assertThat(args.setupPayload().get().getMetadata()).isEqualTo(setupMetadata.nioBuffer());
 	}
 
 	@Test

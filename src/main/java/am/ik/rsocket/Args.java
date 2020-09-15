@@ -285,14 +285,17 @@ public class Args {
 		}
 	}
 
-	public String setupMimeType() {
-		final String mimeType = this.options.valueOf(this.setupMetadataMimeType);
-		try {
-			return SetupMetadataMimeType.of(mimeType).getValue();
+	public Optional<String> setupMetadataMimeType() {
+		if (this.options.has(this.setupMetadataMimeType)) {
+			final String mimeType = this.options.valueOf(this.setupMetadataMimeType);
+			try {
+				return Optional.of(SetupMetadataMimeType.of(mimeType).getValue());
+			}
+			catch (IllegalArgumentException ignored) {
+				return Optional.of(mimeType);
+			}
 		}
-		catch (IllegalArgumentException ignored) {
-			return mimeType;
-		}
+		return Optional.empty();
 	}
 
 	private Optional<ByteBuf> setupData() {
@@ -338,20 +341,18 @@ public class Args {
 		}
 	}
 
+	static ByteBuf addCompositeMetadata(ByteBuf metadata, String mimeType) {
+		final ByteBufAllocator allocator = new PooledByteBufAllocator(true);
+		final CompositeByteBuf composite = allocator.compositeBuffer();
+		CompositeMetadataCodec.encodeAndAddMetadata(composite, allocator, mimeType, metadata);
+		return composite;
+	}
+
 	public Optional<Payload> setupPayload() {
-		final Function<ByteBuf, ByteBuf> prepareMetadata = metadata -> {
-			final ByteBufAllocator allocator = new PooledByteBufAllocator(true);
-			final CompositeByteBuf composite = allocator.compositeBuffer();
-			if (this.options.has(this.setupMetadataMimeType)) {
-				// Use Composite Metadata if Setup Metadata MimeType is set
-				final String mimeType = this.setupMimeType();
-				CompositeMetadataCodec.encodeAndAddMetadata(composite, allocator, mimeType, metadata);
-				return composite;
-			}
-			else {
-				return metadata;
-			}
-		};
+		final Function<ByteBuf, ByteBuf> prepareMetadata = metadata -> this.setupMetadataMimeType()
+				.map(mimeType -> /*	Use Composite Metadata if Setup Metadata MimeType is set */
+						addCompositeMetadata(metadata, mimeType))
+				.orElse(metadata);
 		final Optional<Payload> payload = this.setupData()
 				.map(data -> this.setupMetadata()
 						.map(prepareMetadata)
@@ -385,7 +386,7 @@ public class Args {
 			return Tuples.of(WellKnownMimeType.TEXT_PLAIN.getString(), Unpooled.buffer());
 		}
 		// Use Composite Metadata if Setup Metadata MimeType is set
-		if (metadataList.size() == 1 && !this.options.has(this.setupMetadataMimeType)) {
+		if (metadataList.size() == 1 && !this.setupMetadataMimeType().isPresent()) {
 			return Tuples.of(mimeTypeList.get(0), metadataList.get(0));
 		}
 		final CompositeByteBuf compositeByteBuf = Unpooled.compositeBuffer();

@@ -106,6 +106,7 @@ public class Rsc {
 		args.log().ifPresent(Rsc::configureDebugLevel);
 		final ClientTransport clientTransport = args.clientTransport();
 		final RSocketConnector connector = RSocketConnector.create();
+		final String metadataMimeType = args.composeMetadata().getT1();
 		args.resume().ifPresent(duration -> connector.resume(new Resume()
 				.sessionDuration(duration)
 				.retry(Retry.fixedDelay(10, Duration.ofSeconds(5)))));
@@ -114,7 +115,7 @@ public class Rsc {
 		args.setupPayload().ifPresent(connector::setupPayload);
 		return connector
 				.payloadDecoder(PayloadDecoder.ZERO_COPY)
-				.metadataMimeType(args.composeMetadata().getT1())
+				.metadataMimeType(metadataMimeType)
 				.dataMimeType(args.dataMimeType())
 				.connect(clientTransport)
 				.flatMapMany(rsocket -> args.interactionModel().request(rsocket, args))
