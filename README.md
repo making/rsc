@@ -504,7 +504,7 @@ rsc tcp://localhost:8888 --sm user:password --smmt AUTHENTICATION_BASIC -r hello
 The demo application is [here](https://github.com/making/demo-rsocket-tracing).
 
 ```
-rsc ws://localhost:8080/rsocket -r rr --trace --printB3 --zipkinUrl http://localhost:9411 
+$ rsc ws://localhost:8080/rsocket -r rr --trace --printB3 --zipkinUrl http://localhost:9411 
 Hello World!
 b3=5f035ed7dd21129b105564ef64c90731-105564ef64c90731-d
 ```
