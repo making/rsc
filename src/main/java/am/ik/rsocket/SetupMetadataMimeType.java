@@ -76,7 +76,7 @@ enum SetupMetadataMimeType {
 				}
 			}
 		}
-		throw new IllegalArgumentException("'" + value + "' is unsupported as a SetupMetadataMimeType.");
+		throw new IllegalArgumentException("'" + value + "' is unsupported as a mime type of setup metadata.");
 	}
 
 	private static class MimeType {

@@ -103,7 +103,7 @@ public class Args {
 			.defaultsTo(WellKnownMimeType.APPLICATION_JSON.getString());
 
 	private final OptionSpec<String> metadataMimeType = parser
-			.acceptsAll(Arrays.asList("metadataMimeType", "mmt"), "MimeType for metadata (default: text/plain)")
+			.acceptsAll(Arrays.asList("metadataMimeType", "mmt"), "MimeType for metadata (default: application/json)")
 			.withOptionalArg();
 
 
@@ -123,7 +123,7 @@ public class Args {
 	private final OptionSpec<String> setupMetadata = parser.acceptsAll(Arrays.asList("sm", "setupMetadata"), "Metadata for Setup payload")
 			.withOptionalArg();
 
-	private final OptionSpec<String> setupMetadataMimeType = parser.acceptsAll(Arrays.asList("smmt", "setupMetadataMimeType"), "Metadata MimeType for Setup payload.")
+	private final OptionSpec<String> setupMetadataMimeType = parser.acceptsAll(Arrays.asList("smmt", "setupMetadataMimeType"), "Metadata MimeType for Setup payload  (default: application/json)")
 			.withOptionalArg();
 
 	private final OptionSpec<String> route = parser
@@ -177,6 +177,8 @@ public class Args {
 	private Tuple2<String, ByteBuf> composedMetadata = null;
 
 	private Span span;
+
+	public static final String DEFAULT_METADATA_MIME_TYPE = WellKnownMimeType.APPLICATION_JSON.getString();
 
 	public Args(String[] args) {
 		final OptionSpec<String> uri = parser.nonOptions().describedAs("Uri");
@@ -323,7 +325,7 @@ public class Args {
 				setupMetadataMimeType = SetupMetadataMimeType.of(mimeType);
 			}
 			else {
-				setupMetadataMimeType = SetupMetadataMimeType.TEXT_PLAIN;
+				setupMetadataMimeType = SetupMetadataMimeType.of(DEFAULT_METADATA_MIME_TYPE);
 			}
 			return Optional.of(addCompositeMetadata(setupMetadataMimeType.encode(metadata),
 					setupMetadataMimeType.getValue()));
@@ -370,7 +372,7 @@ public class Args {
 							mimeTypeList.size()));
 		}
 		if (metadataList.isEmpty()) {
-			return Tuples.of(WellKnownMimeType.TEXT_PLAIN.getString(), Unpooled.buffer());
+			return Tuples.of(DEFAULT_METADATA_MIME_TYPE, Unpooled.buffer());
 		}
 		// use composite metadata if setup payload exists
 		if (metadataList.size() == 1 && !this.setupPayload().isPresent()) {

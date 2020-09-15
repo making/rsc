@@ -34,6 +34,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import reactor.util.function.Tuple2;
 
+import static am.ik.rsocket.Args.DEFAULT_METADATA_MIME_TYPE;
 import static am.ik.rsocket.Args.addCompositeMetadata;
 import static am.ik.rsocket.SetupMetadataMimeType.AUTHENTICATION_BASIC;
 import static am.ik.rsocket.SetupMetadataMimeType.MESSAGE_RSOCKET_AUTHENTICATION;
@@ -115,7 +116,7 @@ class ArgsTest {
 	void metadataDefault() {
 		final Args args = new Args(new String[] { "tcp://localhost:8080" });
 		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
-		assertThat(metadata.getT1()).isEqualTo("text/plain");
+		assertThat(metadata.getT1()).isEqualTo(DEFAULT_METADATA_MIME_TYPE);
 		assertThat(metadata.getT2().toString(UTF_8)).isEqualTo("");
 	}
 
@@ -156,7 +157,7 @@ class ArgsTest {
 		final Args args = new Args("tcp://localhost:8080 --sm hello");
 		assertThat(args.setupPayload().isPresent()).isTrue();
 		assertThat(args.setupPayload().get().getDataUtf8()).isEqualTo("");
-		final ByteBuf setupMetadata = addCompositeMetadata(Unpooled.wrappedBuffer("hello".getBytes()), "text/plain");
+		final ByteBuf setupMetadata = addCompositeMetadata(Unpooled.wrappedBuffer("hello".getBytes()), DEFAULT_METADATA_MIME_TYPE);
 		assertThat(args.setupPayload().get().getMetadata()).isEqualTo(setupMetadata.nioBuffer());
 	}
 
@@ -172,7 +173,7 @@ class ArgsTest {
 		final Args args = new Args("tcp://localhost:8080 --sd hello --sm meta");
 		assertThat(args.setupPayload().isPresent()).isTrue();
 		assertThat(args.setupPayload().get().getDataUtf8()).isEqualTo("hello");
-		final ByteBuf setupMetadata = addCompositeMetadata(Unpooled.wrappedBuffer("meta".getBytes()), "text/plain");
+		final ByteBuf setupMetadata = addCompositeMetadata(Unpooled.wrappedBuffer("meta".getBytes()), DEFAULT_METADATA_MIME_TYPE);
 		assertThat(args.setupPayload().get().getMetadata()).isEqualTo(setupMetadata.nioBuffer());
 	}
 
