@@ -136,7 +136,7 @@ public class Args {
 			.acceptsAll(Arrays.asList("authBearer", "ab"), "Enable Authentication Metadata Extension (Bearer).").withOptionalArg();
 
 	private final OptionSpec<String> authBasic = parser
-			.acceptsAll(Arrays.asList("authBasic"), "[DEPRECATED] Enable Authentication Metadata Extension (Basic). This Metadata exist only for the backward compatibility with Spring Security 5.2").withOptionalArg();
+			.acceptsAll(Arrays.asList("authBasic"), "[DEPRECATED] Enable Authentication Metadata Extension (Basic). This Metadata exists only for the backward compatibility with Spring Security 5.2").withOptionalArg();
 
 	private final OptionSpec<Flags> trace = parser
 			.acceptsAll(Arrays.asList("trace"), "Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used by default.")

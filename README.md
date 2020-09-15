@@ -14,7 +14,7 @@ Option                                Description
                                         Extension (Bearer).                 
 --authBasic [String]                  [DEPRECATED] Enable Authentication    
                                         Metadata Extension (Basic). This    
-                                        Metadata exist only for the backward
+                                        Metadata exists only for the backward
                                         compatibility with Spring Security  
                                         5.2                                 
 --channel                             Shortcut of --im REQUEST_CHANNEL      
