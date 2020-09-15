@@ -233,84 +233,6 @@ Accordingly, enum name of [`SetupMetadataMimeType`](https://github.com/making/rs
 * `MESSAGE_RSOCKET_AUTHENTICATION`
 * `AUTHENTICATION_BASIC`
 
-## Authentication
-
-`rsc` supports [Authentication Extension](https://github.com/rsocket/rsocket/blob/master/Extensions/Security/Authentication.md) since 0.6.0.
-
-### [Simple Authentication Type](https://github.com/rsocket/rsocket/blob/master/Extensions/Security/Simple.md)
-
-
-To send credentials per stream, use `--authSimple <username>:<password>` option as follows: 
-
-```
-rsc tcp://localhost:8888 --authSimple user:password -r hello -d World
-```
-
-For shorter options, `--as` or `-u` (like `curl`!) are also available.
-
-```
-rsc tcp://localhost:8888 -u user:password -r hello -d World
-```
-
-To send credentials in `SETUP` payload, use `--sm simple:<username>:<password> --smmt message/x.rsocket.authentication.v0` as follows.
-
-```
-rsc tcp://localhost:8888 --sm simple:user:password --smmt message/x.rsocket.authentication.v0 -r hello -d World
-```
-
-slightly shorter version
-
-```
-rsc tcp://localhost:8888 --sm simple:user:password --smmt MESSAGE_RSOCKET_AUTHENTICATION -r hello -d World
-```
-
-### [Bearer Token Authentication Type](https://github.com/rsocket/rsocket/blob/master/Extensions/Security/Bearer.md)
-
-To send token per stream, use `--authBearer <token>` option as follows: 
-
-```
-rsc tcp://localhost:8888 --authBearer MY_TOKEN -r hello -d World
-```
-
-For shorter option, `--ab` is also available.
-
-To send credentials in `SETUP` payload, use `--sm token:<token> --smmt message/x.rsocket.authentication.v0` as follows.
-
-```
-rsc tcp://localhost:8888 --sm token:MY_TOKEN --smmt message/x.rsocket.authentication.v0 -r hello -d World
-```
-
-slightly shorter version
-
-```
-rsc tcp://localhost:8888 --sm token:MY_TOKEN --smmt MESSAGE_RSOCKET_AUTHENTICATION -r hello -d World
-```
-
-### Basic Authentication
-
-[Basic Authentication](https://github.com/rsocket/rsocket/issues/272) is not a part of Authentication Extension.
-It was implemented by Spring Security 5.2 before the spec was standardized.
-
-`rsc` supports Basic Authentication for the backward compatibility with Spring Security 5.2.
-
-To send credentials per stream, use `--authBasic <username>:<password>` option as follows: 
-
-```
-rsc tcp://localhost:8888 --authBasic user:password -r hello -d World
-```
-
-To send credentials in `SETUP` payload, use `--sm <username>:<password> --smmt message/x.rsocket.authentication.basic.v0` as follows.
-
-```
-rsc tcp://localhost:8888 --sm user:password --smmt message/x.rsocket.authentication.basic.v0 -r hello -d World
-```
-
-slightly shorter version
-
-```
-rsc tcp://localhost:8888 --sm user:password --smmt AUTHENTICATION_BASIC -r hello -d World
-```
-
 ## Composite Metadata
 
 `rsc` supports [Composite Metadata Extension](https://github.com/rsocket/rsocket/blob/master/Extensions/CompositeMetadata.md) since 0.3.0.
@@ -494,6 +416,100 @@ Aaronic
 > ```
 > rsocket-cli --debug -i=@/usr/share/dict/words --server tcp://localhost:8765
 > ```
+
+## Authentication
+
+`rsc` supports [Authentication Extension](https://github.com/rsocket/rsocket/blob/master/Extensions/Security/Authentication.md) since 0.6.0.
+
+The demo application is [here](https://github.com/making/demo-rsocket-security).
+
+### [Simple Authentication Type](https://github.com/rsocket/rsocket/blob/master/Extensions/Security/Simple.md)
+
+
+To send credentials per stream, use `--authSimple <username>:<password>` option as follows: 
+
+```
+rsc tcp://localhost:8888 --authSimple user:password -r hello -d World
+```
+
+For shorter options, `--as` or `-u` (like `curl`!) are also available.
+
+```
+rsc tcp://localhost:8888 -u user:password -r hello -d World
+```
+
+To send credentials in `SETUP` payload, use `--sm simple:<username>:<password> --smmt message/x.rsocket.authentication.v0` as follows.
+
+```
+rsc tcp://localhost:8888 --sm simple:user:password --smmt message/x.rsocket.authentication.v0 -r hello -d World
+```
+
+slightly shorter version
+
+```
+rsc tcp://localhost:8888 --sm simple:user:password --smmt MESSAGE_RSOCKET_AUTHENTICATION -r hello -d World
+```
+
+### [Bearer Token Authentication Type](https://github.com/rsocket/rsocket/blob/master/Extensions/Security/Bearer.md)
+
+To send token per stream, use `--authBearer <token>` option as follows: 
+
+```
+rsc tcp://localhost:8888 --authBearer MY_TOKEN -r hello -d World
+```
+
+For shorter option, `--ab` is also available.
+
+To send credentials in `SETUP` payload, use `--sm token:<token> --smmt message/x.rsocket.authentication.v0` as follows.
+
+```
+rsc tcp://localhost:8888 --sm token:MY_TOKEN --smmt message/x.rsocket.authentication.v0 -r hello -d World
+```
+
+slightly shorter version
+
+```
+rsc tcp://localhost:8888 --sm token:MY_TOKEN --smmt MESSAGE_RSOCKET_AUTHENTICATION -r hello -d World
+```
+
+### Basic Authentication
+
+[Basic Authentication](https://github.com/rsocket/rsocket/issues/272) is not a part of Authentication Extension.
+It was implemented by Spring Security 5.2 before the spec was standardized.
+
+`rsc` supports Basic Authentication for the backward compatibility with Spring Security 5.2.
+
+To send credentials per stream, use `--authBasic <username>:<password>` option as follows: 
+
+```
+rsc tcp://localhost:8888 --authBasic user:password -r hello -d World
+```
+
+To send credentials in `SETUP` payload, use `--sm <username>:<password> --smmt message/x.rsocket.authentication.basic.v0` as follows.
+
+```
+rsc tcp://localhost:8888 --sm user:password --smmt message/x.rsocket.authentication.basic.v0 -r hello -d World
+```
+
+slightly shorter version
+
+```
+rsc tcp://localhost:8888 --sm user:password --smmt AUTHENTICATION_BASIC -r hello -d World
+```
+
+### Tracing
+
+`rsc` supports [Tracing (Zipkin) Metadata Extension](https://github.com/rsocket/rsocket/blob/master/Extensions/Tracing-Zipkin.md) since 0.5.0
+
+The demo application is [here](https://github.com/making/demo-rsocket-tracing).
+
+```
+rsc ws://localhost:8080/rsocket -r rr --trace --printB3 --zipkinUrl http://localhost:9411 
+Hello World!
+b3=5f035ed7dd21129b105564ef64c90731-105564ef64c90731-d
+```
+
+![image](https://user-images.githubusercontent.com/106908/86621556-5ad6a600-bff9-11ea-9040-8c300d2d8bcd.png)
 
 ## TODOs
 
