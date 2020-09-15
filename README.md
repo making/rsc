@@ -208,9 +208,112 @@ $ rsc tcp://localhost:7000 -r greeting.foo --wiretap -q
 2019-11-28 13:02:28.387 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xa0202801, L:/127.0.0.1:54245 - R:localhost/127.0.0.1:7000] READ COMPLETE
 ```
 
+## Setup payload
+
+The data in `SETUP` payload can be specified by `--setupData`/`--sd` option and metadata can be specified by `--setupMetaData`/`--smd`.
+Also the MIME type of the setup metadata can be specified by `--setupMetadataMimeType`/`--smmt` option.
+
+For example:
+
+```
+rsc tcp://localhost:9999 --sd hello --sm '{"value":"A metadata"}' --smmt 'application/json'
+```
+
+As of 0.6.0, the following MIME types are supported.
+
+* `application/json` (default)
+* `text/plain`
+* `message/x.rsocket.authentication.v0`
+* `message/x.rsocket.authentication.basic.v0`
+
+Accordingly, enum name of [`SetupMetadataMimeType`](https://github.com/making/rsc/blob/master/src/main/java/am/ik/rsocket/SetupMetadataMimeType.java) instead can be used with `--smmt` option
+
+* `APPLICATION_JSON`
+* `TEXT_PLAIN`
+* `MESSAGE_RSOCKET_AUTHENTICATION`
+* `AUTHENTICATION_BASIC`
+
+## Authentication
+
+`rsc` supports [Authentication Extension](https://github.com/rsocket/rsocket/blob/master/Extensions/Security/Authentication.md) since 0.6.0.
+
+### [Simple Authentication Type](https://github.com/rsocket/rsocket/blob/master/Extensions/Security/Simple.md)
+
+
+To send credentials per stream, use `--authSimple <username>:<password>` option as follows: 
+
+```
+rsc tcp://localhost:8888 --authSimple user:password -r hello -d World
+```
+
+For shorter options, `--as` or `-u` (like `curl`!) are also available.
+
+```
+rsc tcp://localhost:8888 -u user:password -r hello -d World
+```
+
+To send credentials in `SETUP` payload, use `--sm simple:<username>:<password> --smmt message/x.rsocket.authentication.v0` as follows.
+
+```
+rsc tcp://localhost:8888 --sm simple:user:password --smmt message/x.rsocket.authentication.v0 -r hello -d World
+```
+
+slightly shorter version
+
+```
+rsc tcp://localhost:8888 --sm simple:user:password --smmt MESSAGE_RSOCKET_AUTHENTICATION -r hello -d World
+```
+
+### [Bearer Token Authentication Type](https://github.com/rsocket/rsocket/blob/master/Extensions/Security/Bearer.md)
+
+To send token per stream, use `--authBearer <token>` option as follows: 
+
+```
+rsc tcp://localhost:8888 --authBearer MY_TOKEN -r hello -d World
+```
+
+For shorter option, `--ab` is also available.
+
+To send credentials in `SETUP` payload, use `--sm token:<token> --smmt message/x.rsocket.authentication.v0` as follows.
+
+```
+rsc tcp://localhost:8888 --sm token:MY_TOKEN --smmt message/x.rsocket.authentication.v0 -r hello -d World
+```
+
+slightly shorter version
+
+```
+rsc tcp://localhost:8888 --sm token:MY_TOKEN --smmt MESSAGE_RSOCKET_AUTHENTICATION -r hello -d World
+```
+
+### Basic Authentication
+
+[Basic Authentication](https://github.com/rsocket/rsocket/issues/272) is not a part of `Authentication Extension`.
+It was implemented by Spring Security 5.2 before the spec was standardized.
+
+`rsc` supports Basic Authentication for the backward compatibility with Spring Security 5.2.
+
+To send credentials per stream, use `--authBasic <username>:<password>` option as follows: 
+
+```
+rsc tcp://localhost:8888 --authBasic user:password -r hello -d World
+```
+
+To send credentials in `SETUP` payload, use `--sm <username>:<password> --smmt message/x.rsocket.authentication.basic.v0` as follows.
+
+```
+rsc tcp://localhost:8888 --sm user:password --smmt message/x.rsocket.authentication.basic.v0 -r hello -d World
+```
+
+slightly shorter version
+
+```
+rsc tcp://localhost:8888 --sm user:password --smmt AUTHENTICATION_BASIC -r hello -d World
+```
+
 ## Composite Metadata
 
-`rsc` supports [Composite Metadata Extension](https://github.com/rsocket/rsocket/blob/master/Extensions/CompositeMetadata.md) sice 0.3.0.
+`rsc` supports [Composite Metadata Extension](https://github.com/rsocket/rsocket/blob/master/Extensions/CompositeMetadata.md) since 0.3.0.
 
 If multiple metadataMimeTypes are specified, they are automatically composed (the order matters).
 
@@ -398,7 +501,7 @@ Aaronic
 - [x] Support Composite Metadata (0.3.0)
 - [x] Setup data (0.4.0)
 - [x] Setup Metadata (0.6.0)
-- [ ] RSocket Security
+- [x] RSocket Authentication (0.6.0)
 - [ ] RSocket Routing
 - [x] Request Channel (0.4.0)
 - [ ] Input from a file
