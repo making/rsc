@@ -497,7 +497,7 @@ slightly shorter version
 rsc tcp://localhost:8888 --sm user:password --smmt AUTHENTICATION_BASIC -r hello -d World
 ```
 
-### Tracing
+## Tracing
 
 `rsc` supports [Tracing (Zipkin) Metadata Extension](https://github.com/rsocket/rsocket/blob/master/Extensions/Tracing-Zipkin.md) since 0.5.0
 
