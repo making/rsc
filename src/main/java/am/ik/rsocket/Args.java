@@ -366,7 +366,11 @@ public class Args {
 		}
 		final List<String> mimeTypeList = this.metadataMimeType();
 		final List<ByteBuf> metadataList = this.metadata();
-		if (metadataList.size() != mimeTypeList.size()) {
+		if (metadataList.size() == mimeTypeList.size() + 1) {
+			// if metadata mime type is not specified, default one is used
+			mimeTypeList.add(DEFAULT_METADATA_MIME_TYPE);
+		}
+		else if (metadataList.size() != mimeTypeList.size()) {
 			throw new IllegalArgumentException(
 					String.format("The size of metadata(%d) and metadataMimeType(%d) don't match!", metadataList.size(),
 							mimeTypeList.size()));

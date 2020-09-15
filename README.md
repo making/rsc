@@ -33,7 +33,7 @@ Option                                Description
 --log [String]                        Enable log()                          
 -m, --metadata [String]               Metadata (default: )                  
 --metadataMimeType, --mmt [String]    MimeType for metadata (default:       
-                                        text/plain)                         
+                                        application/json)                   
 --printB3                             Print B3 propagation info. Ignored    
                                         unless --trace is set.              
 -q, --quiet                           Disable the output on next            
@@ -47,8 +47,8 @@ Option                                Description
                                         Use --setupData or --sd instead.    
 --sd, --setupData [String]            Data for Setup payload                
 --setupMetadata, --sm [String]        Metadata for Setup payload            
---setupMetadataMimeType, --smmt       Metadata MimeType for Setup payload.  
-  [String]                                                                  
+--setupMetadataMimeType, --smmt       Metadata MimeType for Setup payload   
+  [String]                              (default: application/json)         
 --show-system-properties              [DEPRECATED] Show SystemProperties for
                                         troubleshoot. Use --                
                                         showSystemProperties instead.       

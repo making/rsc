@@ -121,6 +121,14 @@ class ArgsTest {
 	}
 
 	@Test
+	void metadata() {
+		final Args args = new Args("tcp://localhost:8080 -m {\"foo\":\"bar\"}");
+		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
+		assertThat(metadata.getT1()).isEqualTo(DEFAULT_METADATA_MIME_TYPE);
+		assertThat(metadata.getT2().toString(UTF_8)).isEqualTo("{\"foo\":\"bar\"}");
+	}
+
+	@Test
 	void metadataSingle() {
 		final Args args = new Args(new String[] { "tcp://localhost:8080", "--metadataMimeType",
 				"application/vnd.spring.rsocket.metadata+json", "-m", "{\"route\":\"locate.aircrafts.for\"}" });
