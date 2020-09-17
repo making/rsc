@@ -48,10 +48,7 @@ Option                                Description
 --sd, --setupData [String]            Data for Setup payload                
 --setupMetadata, --sm [String]        Metadata for Setup payload            
 --setupMetadataMimeType, --smmt       Metadata MimeType for Setup payload   
-  [String]                              (default: application/json)         
---show-system-properties              [DEPRECATED] Show SystemProperties for
-                                        troubleshoot. Use --                
-                                        showSystemProperties instead.       
+  [String]                              (default: application/json)              
 --showSystemProperties                Show SystemProperties for troubleshoot
 --stacktrace                          Show Stacktrace when an exception     
                                         happens                             
