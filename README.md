@@ -43,8 +43,6 @@ Option                                Description
                                         can be configured in seconds.       
 --retry [Integer]                     Enable retry. Retry every 1 second    
                                         with the given max attempts.        
--s, --setup [String]                  [DEPRECATED] Data for Setup payload.  
-                                        Use --setupData or --sd instead.    
 --sd, --setupData [String]            Data for Setup payload                
 --setupMetadata, --sm [String]        Metadata for Setup payload            
 --setupMetadataMimeType, --smmt       Metadata MimeType for Setup payload   
