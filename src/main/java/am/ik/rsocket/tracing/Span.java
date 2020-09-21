@@ -68,8 +68,8 @@ public class Span implements MetadataEncoder {
 				this.timestamp,
 				duration,
 				rsocketMethod,
-				Version.getBuild(),
-				Version.getVersion()
+				Version.getVersion(),
+				Version.getBuild()
 		);
 	}
 
