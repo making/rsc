@@ -38,7 +38,7 @@ public final class Tracing {
 	}
 
 	private static long nextTraceIdHigh() {
-		return nextTraceIdHigh(java.util.concurrent.ThreadLocalRandom.current().nextInt());
+		return nextTraceIdHigh(new Random(System.nanoTime()).nextInt());
 	}
 
 	private static long nextTraceIdHigh(int random) {
