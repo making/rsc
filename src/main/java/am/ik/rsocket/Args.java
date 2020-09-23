@@ -342,6 +342,13 @@ public class Args {
 		return composite;
 	}
 
+	static ByteBuf addCompositeMetadata(ByteBuf metadata, WellKnownMimeType mimeType) {
+		final ByteBufAllocator allocator = new PooledByteBufAllocator(true);
+		final CompositeByteBuf composite = allocator.compositeBuffer();
+		CompositeMetadataCodec.encodeAndAddMetadata(composite, allocator, mimeType, metadata);
+		return composite;
+	}
+
 	public Optional<Payload> setupPayload() {
 		final Optional<Payload> payload = this.setupData()
 				.map(data -> this.setupMetadata()
@@ -378,10 +385,7 @@ public class Args {
 		if (metadataList.isEmpty()) {
 			return Tuples.of(DEFAULT_METADATA_MIME_TYPE, Unpooled.buffer());
 		}
-		// use composite metadata if setup payload exists
-		if (metadataList.size() == 1 && !this.setupPayload().isPresent()) {
-			return Tuples.of(mimeTypeList.get(0), metadataList.get(0));
-		}
+		// Always use composite metadata
 		final CompositeByteBuf compositeByteBuf = Unpooled.compositeBuffer();
 		final ByteBufAllocator allocator = new PooledByteBufAllocator(true);
 		final Iterator<String> mimeTypeIterator = mimeTypeList.iterator();

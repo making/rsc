@@ -27,6 +27,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.rsocket.metadata.TracingMetadataCodec.Flags;
+import io.rsocket.metadata.WellKnownMimeType;
 import io.rsocket.transport.ClientTransport;
 import io.rsocket.transport.netty.client.TcpClientTransport;
 import io.rsocket.transport.netty.client.WebsocketClientTransport;
@@ -108,8 +109,8 @@ class ArgsTest {
 	void route() {
 		final Args args = new Args(new String[] { "tcp://localhost:8080", "-r", "locate.aircrafts.for" });
 		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
-		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.routing.v0");
-		assertThat(metadata.getT2()).isEqualTo(new Route("locate.aircrafts.for").toMetadata(ByteBufAllocator.DEFAULT));
+		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.composite-metadata.v0");
+		assertThat(metadata.getT2()).isEqualTo(addCompositeMetadata(new Route("locate.aircrafts.for").toMetadata(ByteBufAllocator.DEFAULT), WellKnownMimeType.MESSAGE_RSOCKET_ROUTING));
 	}
 
 	@Test
@@ -124,8 +125,8 @@ class ArgsTest {
 	void metadata() {
 		final Args args = new Args("tcp://localhost:8080 -m {\"foo\":\"bar\"}");
 		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
-		assertThat(metadata.getT1()).isEqualTo(DEFAULT_METADATA_MIME_TYPE);
-		assertThat(metadata.getT2().toString(UTF_8)).isEqualTo("{\"foo\":\"bar\"}");
+		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.composite-metadata.v0");
+		assertThat(metadata.getT2()).isEqualTo(addCompositeMetadata(Unpooled.wrappedBuffer("{\"foo\":\"bar\"}".getBytes()), WellKnownMimeType.APPLICATION_JSON));
 	}
 
 	@Test
@@ -133,8 +134,8 @@ class ArgsTest {
 		final Args args = new Args(new String[] { "tcp://localhost:8080", "--metadataMimeType",
 				"application/vnd.spring.rsocket.metadata+json", "-m", "{\"route\":\"locate.aircrafts.for\"}" });
 		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
-		assertThat(metadata.getT1()).isEqualTo("application/vnd.spring.rsocket.metadata+json");
-		assertThat(metadata.getT2().toString(UTF_8)).isEqualTo("{\"route\":\"locate.aircrafts.for\"}");
+		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.composite-metadata.v0");
+		assertThat(metadata.getT2()).isEqualTo(addCompositeMetadata(Unpooled.wrappedBuffer("{\"route\":\"locate.aircrafts.for\"}".getBytes()), "application/vnd.spring.rsocket.metadata+json"));
 	}
 
 	@Test
@@ -262,16 +263,16 @@ class ArgsTest {
 	void metadataAuthSimple() {
 		final Args args = new Args("tcp://localhost:8080 --authSimple user:password");
 		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
-		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.authentication.v0");
-		assertThat(metadata.getT2()).isEqualTo(new SimpleAuthentication("user", "password").toMetadata(ByteBufAllocator.DEFAULT));
+		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.composite-metadata.v0");
+		assertThat(metadata.getT2()).isEqualTo(addCompositeMetadata(new SimpleAuthentication("user", "password").toMetadata(ByteBufAllocator.DEFAULT), WellKnownMimeType.MESSAGE_RSOCKET_AUTHENTICATION));
 	}
 
 	@Test
 	void metadataAuthBearer() {
 		final Args args = new Args("tcp://localhost:8080 --authBearer TOKEN");
 		final Tuple2<String, ByteBuf> metadata = args.composeMetadata();
-		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.authentication.v0");
-		assertThat(metadata.getT2()).isEqualTo(new BearerAuthentication("TOKEN").toMetadata(ByteBufAllocator.DEFAULT));
+		assertThat(metadata.getT1()).isEqualTo("message/x.rsocket.composite-metadata.v0");
+		assertThat(metadata.getT2()).isEqualTo(addCompositeMetadata(new BearerAuthentication("TOKEN").toMetadata(ByteBufAllocator.DEFAULT), WellKnownMimeType.MESSAGE_RSOCKET_AUTHENTICATION));
 	}
 
 	@Test

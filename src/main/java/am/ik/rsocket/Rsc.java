@@ -63,6 +63,9 @@ public class Rsc {
 				args.printHelp(System.out);
 				System.exit(2);
 			}
+			if (args.debug()) {
+				configureDebugLevel("io.rsocket.FrameLogger");
+			}
 			if (args.secure() && System.getenv("JAVA_HOME") != null) {
 				final File javaHome = new File(System.getenv("JAVA_HOME"));
 				if (System.getProperty("java.library.path") == null
@@ -100,9 +103,6 @@ public class Rsc {
 	}
 
 	static Flux<?> run(Args args) {
-		if (args.debug()) {
-			configureDebugLevel("io.rsocket.FrameLogger");
-		}
 		args.log().ifPresent(Rsc::configureDebugLevel);
 		final ClientTransport clientTransport = args.clientTransport();
 		final RSocketConnector connector = RSocketConnector.create();
