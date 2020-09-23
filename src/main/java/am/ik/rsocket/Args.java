@@ -117,9 +117,6 @@ public class Args {
 	private final OptionSpec<String> setupData = parser.acceptsAll(Arrays.asList("setupData", "sd"), "Data for Setup payload")
 			.withOptionalArg();
 
-	private final OptionSpec<String> setupDataDeprecated = parser.acceptsAll(Arrays.asList("s", "setup"), "[DEPRECATED] Data for Setup payload. Use --setupData or --sd instead.")
-			.withOptionalArg();
-
 	private final OptionSpec<String> setupMetadata = parser.acceptsAll(Arrays.asList("sm", "setupMetadata"), "Metadata for Setup payload")
 			.withOptionalArg();
 
@@ -164,9 +161,6 @@ public class Args {
 
 	private final OptionSpec<Void> showSystemProperties = parser.acceptsAll(Arrays.asList("showSystemProperties"),
 			"Show SystemProperties for troubleshoot");
-
-	private final OptionSpec<Void> showSystemPropertiesDeprecated = parser.acceptsAll(Arrays.asList("show-system-properties"),
-			"[DEPRECATED] Show SystemProperties for troubleshoot. Use --showSystemProperties instead.");
 
 	private final OptionSpec<String> wsHeader = parser.acceptsAll(Arrays.asList("wsh", "wsHeader"), "Header for web socket connection")
 			.withOptionalArg();
@@ -287,16 +281,7 @@ public class Args {
 	}
 
 	private Optional<ByteBuf> setupData() {
-		final OptionSpec<String> setupData;
-		if (this.options.has(this.setupDataDeprecated)) {
-			System.err.println("[WARNING] --setup / -s option is deprecated. Use --setupData / --sd instead.");
-			setupData = this.setupDataDeprecated;
-		}
-		else {
-			setupData = this.setupData;
-		}
-
-		if (this.options.has(setupData)) {
+		if (this.options.has(this.setupData)) {
 			final String data = this.options.valueOf(setupData);
 			if (data == null) {
 				throw new IllegalArgumentException("'setupData' is not specified.");
@@ -637,10 +622,6 @@ public class Args {
 	}
 
 	public boolean showSystemProperties() {
-		if (this.options.has(this.showSystemPropertiesDeprecated)) {
-			System.err.println("[WARNING] --show-system-properties option is deprecated. Use --showSystemProperties instead.");
-			return true;
-		}
 		return this.options.has(this.showSystemProperties);
 	}
 }
