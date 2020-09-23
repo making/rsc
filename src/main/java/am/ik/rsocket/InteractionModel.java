@@ -78,7 +78,7 @@ public enum InteractionModel {
 			return scanToFlux(scanner) //
 					.transform(s -> args.log().map(__ -> s.log("input")).orElse(s)) //
 					.map(x -> DefaultPayload.create(Unpooled.wrappedBuffer(x.getBytes(UTF_8)),
-							args.composeMetadata().getT2()))
+							args.composeMetadata().getT2().retain()))
 					.doOnTerminate(scanner::close);
 		} else {
 			return Flux.just(DefaultPayload.create(args.data(), args.composeMetadata().getT2()));
