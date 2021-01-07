@@ -31,8 +31,8 @@ public enum Transport {
 	WEBSOCKET {
 		@Override
 		ClientTransport clientTransport(Args args) {
-			WebsocketClientTransport transport =  WebsocketClientTransport.create(HttpClient.from(args.tcpClient()), args.path());
-			transport.setTransportHeaders(args::wsHeaders);
+			WebsocketClientTransport transport = WebsocketClientTransport.create(HttpClient.from(args.tcpClient()), args.path());
+			args.wsHeaders().forEach(transport::header);
 			return transport;
 		}
 	};

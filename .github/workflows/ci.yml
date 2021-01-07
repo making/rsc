@@ -18,9 +18,9 @@ jobs:
         - macos-latest
     steps:
     - uses: actions/checkout@v1
-    - uses: DeLaGuardo/setup-graalvm@1.0
+    - uses: DeLaGuardo/setup-graalvm@master
       with:
-        graalvm-version: '19.2.1'
+        graalvm-version: '20.3.0.java8'
     - uses: actions/cache@v1
       with:
         path: ~/.m2/repository

@@ -58,7 +58,8 @@ public class Span implements MetadataEncoder {
 						+ "    \"tags\": {\n"
 						+ "      \"rsocket.method\": \"%s\",\n"
 						+ "      \"rsc.version\": \"%s\",\n"
-						+ "      \"rsc.build\": \"%s\"\n"
+						+ "      \"rsc.build\": \"%s\",\n"
+						+ "      \"rsocket-java.version\": \"%s\"\n"
 						+ "    }\n"
 						+ "  }",
 				Long.toHexString(spanId),
@@ -69,7 +70,8 @@ public class Span implements MetadataEncoder {
 				duration,
 				rsocketMethod,
 				Version.getVersion(),
-				Version.getBuild()
+				Version.getBuild(),
+				Version.getRSocketJava()
 		);
 	}
 
