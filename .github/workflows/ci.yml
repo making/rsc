@@ -32,7 +32,7 @@ jobs:
         set -ex
         mkdir dist
         gu install native-image
-        ./mvnw package -Pgraal
+        ./mvnw package -Pnative
         chmod +x target/classes/rsc*
         cp target/classes/rsc* ./rsc
         cp target/classes/rsc* ./dist/
