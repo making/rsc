@@ -112,6 +112,8 @@ rsc wss://rsocket-demo.herokuapp.com/rsocket --stream --route searchTweets -d Tr
 
 > To get `wss` work, environment variable `JAVA_HOME` must be set. (since 0.4.0)<br>
 > If `JAVA_HOME` is set, system property `-Djava.library.path=${JAVA_HOME}/jre/lib/<platform>` is automatically added.
+> **This requirement is no longer necessary since 0.7.0.**
+
 
 ## Log options
 
@@ -418,6 +420,10 @@ Aaronic
 
 The demo application is [here](https://github.com/making/demo-rsocket-security).
 
+Note that since RSocket Java 1.0.3, [username field length is extended](https://github.com/rsocket/rsocket-java/pull/938).
+
+rsc 0.6.0 uses RSocket Java 1.0.2. To support extended username, rsc 0.7.0 which uses RSocket Java 1.1.0 or above is required. 
+
 ### [Simple Authentication Type](https://github.com/rsocket/rsocket/blob/master/Extensions/Security/Simple.md)
 
 
@@ -526,7 +532,7 @@ b3=5f035ed7dd21129b105564ef64c90731-105564ef64c90731-d
 ## Build
 
 ```
-./mvnw clean package -Pgraal -DskipTests
+./mvnw clean package -Pnative -DskipTests
 ```
 
 A native binary will be created in `target/classes/rsc-(osx|linux)-x86_64` depending on your OS.
@@ -534,20 +540,8 @@ A native binary will be created in `target/classes/rsc-(osx|linux)-x86_64` depen
 For linux binary, you can use Docker:
 
 ```
-docker run --rm \
-   -v "$PWD":/usr/src \
-   -v "$HOME/.m2":/root/.m2 \
-   -w /usr/src \
-   oracle/graalvm-ce:19.2.1 \
-   bash -c 'gu install native-image && ./mvnw package -Pgraal -DskipTests'
-```
-
-```
-docker run --rm \
-   -v "$PWD":/usr/src \
-   -w /usr/src \
-   oracle/graalvm-ce:19.2.1 \
-   ./target/classes/rsc-linux-x86_64 --version
+./mvnw spring-boot:build-image  -DskipTests
+docker run --rm rsc:<version> --version  
 ```
 
 ## License
