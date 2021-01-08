@@ -74,5 +74,4 @@ jobs:
           ${{ runner.os }}-maven-
     - run: |
         mkdir dist
-        gu install native-image
         ./mvnw package -Pnative
