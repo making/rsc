@@ -16,7 +16,6 @@ jobs:
         os:
         - ubuntu-latest
         - macos-latest
-        - windows-latest
     steps:
     - uses: actions/checkout@v1
     - uses: DeLaGuardo/setup-graalvm@master
@@ -59,3 +58,21 @@ jobs:
       with:
         name: dist
         path: dist
+  build-on-win:
+    runs-on: windows-latest
+    name: build-on-win
+    steps:
+    - uses: actions/checkout@v1
+    - uses: DeLaGuardo/setup-graalvm@1.0
+      with:
+        graalvm-version: '20.3.0.java8'
+    - uses: actions/cache@v1
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    - run: |
+        mkdir dist
+        gu install native-image
+        ./mvnw package -Pnative
