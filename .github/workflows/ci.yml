@@ -63,7 +63,7 @@ jobs:
     name: build-on-win
     steps:
     - uses: actions/checkout@v1
-    - uses: DeLaGuardo/setup-graalvm@1.0
+    - uses: DeLaGuardo/setup-graalvm@master
       with:
         graalvm-version: '20.3.0.java8'
     - uses: actions/cache@v1
