@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>am.ik.rsocket</groupId>
 	<artifactId>rsc</artifactId>
-	<version>0.7.0-SNAPSHOT</version>
+	<version>0.7.0</version>
 	<name>rsc</name>
 	<description>RSocket Client CLI</description>
 
