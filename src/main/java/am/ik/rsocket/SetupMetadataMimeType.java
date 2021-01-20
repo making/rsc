@@ -39,7 +39,8 @@ enum SetupMetadataMimeType {
 		public ByteBuf encode(String metadata) {
 			return BasicAuthentication.valueOf(metadata).toMetadata(new PooledByteBufAllocator(true));
 		}
-	};
+	},
+	APP_INFO(MimeType.custom("message/x.rsocket.application+json"));
 
 	private final MimeType mimeType;
 
