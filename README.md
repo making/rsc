@@ -222,6 +222,7 @@ As of 0.6.0, the following MIME types are supported.
 * `text/plain`
 * `message/x.rsocket.authentication.v0`
 * `message/x.rsocket.authentication.basic.v0`
+* `message/x.rsocket.application+json` (0.7.1+)
 
 Accordingly, enum name of [`SetupMetadataMimeType`](https://github.com/making/rsc/blob/master/src/main/java/am/ik/rsocket/SetupMetadataMimeType.java) instead can be used with `--smmt` option
 
@@ -229,6 +230,7 @@ Accordingly, enum name of [`SetupMetadataMimeType`](https://github.com/making/rs
 * `TEXT_PLAIN`
 * `MESSAGE_RSOCKET_AUTHENTICATION`
 * `AUTHENTICATION_BASIC`
+* `APP_INFO` (0.7.1+)
 
 ## Composite Metadata
 
