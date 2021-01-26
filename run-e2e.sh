@@ -27,7 +27,7 @@ echo "$DEBUG" | grep "Stream ID: 1 Type: NEXT_COMPLETE" > /dev/null
 set +x
 
 echo ">>> Test Request Stream"
-${RSC} --stream -r uppercase.stream -d hello --limitRate 3 --take 3 tcp://localhost:7001 | grep "^HELLO$" | wc -l | grep " 3$" > /dev/null
+${RSC} --stream -r uppercase.stream -d hello --limitRate 3 --take 3 tcp://localhost:7001 | grep "^HELLO$" | wc -l | grep "3$" > /dev/null
 DEBUG=`${RSC} --stream -r uppercase.stream -d hello --limitRate 3 --take 3 -q --debug tcp://localhost:7001`
 set -x
 echo "$DEBUG" | grep "Stream ID: 1 Type: REQUEST_STREAM" > /dev/null
