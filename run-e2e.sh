@@ -12,25 +12,6 @@ done
 ${RSC} -v
 ${RSC} --showSystemProperties
 
-echo ">>> Test Request Channel"
-FILE=$(mktemp)
-cat <<EOF > ${FILE}
-abc
-def
-ghi
-jkl
-EOF
-CHANNEL=`cat ${FILE} | ${RSC} --channel -r uppercase.channel -d - tcp://localhost:7001`
-DEBUG=`cat ${FILE} | ${RSC} --channel -r uppercase.channel -d - -q --debug tcp://localhost:7001`
-set -x
-echo "$CHANNEL" | grep "^ABC$" > /dev/null
-echo "$CHANNEL" | grep "^DEF$" > /dev/null
-echo "$DEBUG" | grep "Stream ID: 1 Type: REQUEST_CHANNEL" > /dev/null
-echo "$DEBUG" | grep "Stream ID: 1 Type: NEXT" | wc -l | grep " 7$" > /dev/null
-echo "$DEBUG" | grep "Stream ID: 1 Type: REQUEST_N" > /dev/null
-echo "$DEBUG" | grep "Stream ID: 1 Type: COMPLETE" | wc -l | grep " 2$" > /dev/null
-set +x
-
 echo ">>> Test Fire and Forget"
 DEBUG=`${RSC} --fnf -r uppercase.fnf -d hello -q --debug tcp://localhost:7001`
 set -x
@@ -50,8 +31,29 @@ ${RSC} --stream -r uppercase.stream -d hello --limitRate 3 --take 3 tcp://localh
 DEBUG=`${RSC} --stream -r uppercase.stream -d hello --limitRate 3 --take 3 -q --debug tcp://localhost:7001`
 set -x
 echo "$DEBUG" | grep "Stream ID: 1 Type: REQUEST_STREAM" > /dev/null
-echo "$DEBUG" | grep "Stream ID: 1 Type: NEXT" | wc -l | grep " 3$" > /dev/null
+echo "$DEBUG" | grep "Stream ID: 1 Type: NEXT" | wc -l | grep "3$" > /dev/null
 echo "$DEBUG" | grep "Stream ID: 1 Type: CANCEL" > /dev/null
+set +x
+
+echo ">>> Test Request Channel"
+FILE=$(mktemp)
+cat <<EOF > ${FILE}
+abc
+def
+ghi
+jkl
+EOF
+CHANNEL=`cat ${FILE} | ${RSC} --channel -r uppercase.channel -d - tcp://localhost:7001`
+DEBUG=`cat ${FILE} | ${RSC} --channel -r uppercase.channel -d - -q --debug tcp://localhost:7001`
+set -x
+echo "$CHANNEL" | grep "^ABC$" > /dev/null
+echo "$CHANNEL" | grep "^DEF$" > /dev/null
+echo "$CHANNEL" | grep "^GHI$" > /dev/null
+echo "$CHANNEL" | grep "^JKL$" > /dev/null
+echo "$DEBUG" | grep "Stream ID: 1 Type: REQUEST_CHANNEL" > /dev/null
+echo "$DEBUG" | grep "Stream ID: 1 Type: NEXT" | wc -l | grep "7$" > /dev/null
+echo "$DEBUG" | grep "Stream ID: 1 Type: REQUEST_N" > /dev/null
+echo "$DEBUG" | grep "Stream ID: 1 Type: COMPLETE" | wc -l | grep "2$" > /dev/null
 set +x
 
 docker rm -f rsc-e2e > /dev/null
