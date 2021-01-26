@@ -11,6 +11,7 @@ while ! `perl -mIO::Socket::INET -le 'exit(IO::Socket::INET->new(PeerAddr=>shift
 done
 
 ${RSC} -v
+${RSC} --showSystemProperties
 
 echo ">>> Test Request Channel"
 FILE=$(mktemp)

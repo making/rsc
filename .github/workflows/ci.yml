@@ -45,15 +45,15 @@ jobs:
           mv ./dist/rsc-osx-x86_64 ./dist/rsc-x86_64-apple-darwin
         fi
         ls -la ./dist
-    - name: check-cli
-      run: |
-        set -ex
-        env
-        ./rsc --version
-        ./rsc --showSystemProperties
-        ./rsc ws://rsocket-demo.herokuapp.com/rsocket --route searchTweets --stream -d Trump --take 3 --retry 3 --debug
-        ./rsc wss://rsocket-demo.herokuapp.com/rsocket --route searchTweets --stream -d Trump --take 3 --retry 3 --debug
-    - name: e2e test
+#    - name: check-cli
+#      run: |
+#        set -ex
+#        env
+#        ./rsc --version
+#        ./rsc --showSystemProperties
+#        ./rsc ws://rsocket-demo.herokuapp.com/rsocket --route searchTweets --stream -d Trump --take 3 --retry 3 --debug
+#        ./rsc wss://rsocket-demo.herokuapp.com/rsocket --route searchTweets --stream -d Trump --take 3 --retry 3 --debug
+    - name: e2e-test
       run: |
         set -e
         ./run-e2e.sh ./rsc
