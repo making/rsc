@@ -4,7 +4,6 @@ RSC=$1
 if [ "${RSC}" == "" ];then
   RSC=rsc
 fi
-docker rm -f rsc-e2e > /dev/null
 docker run -d --name rsc-e2e --rm -p 7001:7001 ghcr.io/making/rsc-e2e
 while ! `perl -mIO::Socket::INET -le 'exit(IO::Socket::INET->new(PeerAddr=>shift,PeerPort=>shift,Proto=>shift,Timeout=>5)?0:1)' localhost 7001`; do
   sleep 1
