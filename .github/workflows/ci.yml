@@ -53,6 +53,10 @@ jobs:
         ./rsc --showSystemProperties
         ./rsc ws://rsocket-demo.herokuapp.com/rsocket --route searchTweets --stream -d Trump --take 3 --retry 3 --debug
         ./rsc wss://rsocket-demo.herokuapp.com/rsocket --route searchTweets --stream -d Trump --take 3 --retry 3 --debug
+    - name: e2e test
+      run: |
+        set -e
+        ./run-e2e.sh ./rsc
     - name: upload-dist
       uses: actions/upload-artifact@v1
       with:
