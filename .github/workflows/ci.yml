@@ -13,9 +13,17 @@ jobs:
       matrix:
         include:
         - os: ubuntu-latest
-          file: ./dist/rsc-x86_64-pc-linux
+          platform: x86_64-pc-linux
+          classifier: linux-x86_64
+          move: mv
+          separator: /
+          extension: ""
         - os: macos-latest
-          file: ./dist/rsc-x86_64-apple-darwin
+          platform: x86_64-apple-darwin
+          classifier: osx-x86_64
+          move: mv
+          separator: /
+          extension: ""
     steps:
     - uses: actions/checkout@v1
     - uses: ayltai/setup-graalvm@v1
@@ -36,13 +44,13 @@ jobs:
         mvn package -DskipTests
         cp target/rsc*.jar ./dist/
         mvn package -Dversion.generate.skip=true -Pnative
-        cp target/classes/rsc* ${{ matrix.file }}
-        chmod +x ${{ matrix.file }}
+        ${{ matrix.move }} target${{ matrix.separator }}classes${{ matrix.separator }}rsc-${{ matrix.classifier }}${{ matrix.extension }} dist${{ matrix.separator }}rsc-${{ matrix.platform }}${{ matrix.extension }}
+        chmod +x dist${{ matrix.separator }}rsc-${{ matrix.platform }}${{ matrix.extension }}
     - name: e2e-test
       run: |
         set -e
         echo "📝 E2E Test for native image"
-        ./run-e2e.sh ${{ matrix.file }} ${{ runner.os }}
+        ./run-e2e.sh dist${{ matrix.separator }}rsc-${{ matrix.platform }}${{ matrix.extension }} ${{ runner.os }}
         echo "📝 E2E Test for uber jar"
         ./run-e2e.sh "java -jar ./dist/*.jar" ${{ runner.os }}
     - name: upload-dist
