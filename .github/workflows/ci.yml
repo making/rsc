@@ -59,6 +59,7 @@ jobs:
         ${{ matrix.move }} target${{ matrix.separator }}classes${{ matrix.separator }}rsc-${{ matrix.classifier }}${{ matrix.extension }} dist${{ matrix.separator }}rsc-${{ matrix.platform }}${{ matrix.extension }}
     - name: chmod
       if: runner.os != 'Windows'
+      run: |
         chmod +x dist${{ matrix.separator }}rsc-${{ matrix.platform }}${{ matrix.extension }}
     - name: e2e-test
       if: runner.os != 'Windows'
