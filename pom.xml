@@ -17,7 +17,7 @@
 
 	<properties>
 		<java.version>1.8</java.version>
-		<version.generate.skip>false</version.generate.skip>
+		<version-generate-skip>false</version-generate-skip>
 		<native-build.args>
 			--enable-all-security-services
 			--enable-https
@@ -108,7 +108,7 @@
 							<goal>run</goal>
 						</goals>
 						<configuration>
-							<skip>${version.generate.skip}</skip>
+							<skip>${version-generate-skip}</skip>
 							<target>
 								<echo file="${project.build.directory}/generated-sources/java/am/ik/rsocket/Version.java">
 									package am.ik.rsocket;

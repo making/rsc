@@ -55,7 +55,7 @@ jobs:
         mkdir dist
         mvn package -DskipTests
         ${{ matrix.copy }} target{{ matrix.separator }}rsc*.jar .{{ matrix.separator }}dist{{ matrix.separator }}
-        mvn package -Dversion.generate.skip=true -Pnative
+        mvn package -Dversion-generate-skip=true -Pnative
         ${{ matrix.move }} target${{ matrix.separator }}classes${{ matrix.separator }}rsc-${{ matrix.classifier }}${{ matrix.extension }} dist${{ matrix.separator }}rsc-${{ matrix.platform }}${{ matrix.extension }}
         chmod +x dist${{ matrix.separator }}rsc-${{ matrix.platform }}${{ matrix.extension }}
     - name: e2e-test
