@@ -67,14 +67,14 @@ jobs:
         chmod +x dist${{ matrix.separator }}rsc-${{ matrix.platform }}${{ matrix.extension }}
     - name: e2e-test-native
       env:
-        RSC_PATH: dist${{ matrix.separator }}rsc-${{ matrix.platform }}${{ matrix.extension }}
+        RSC_PATH: ..${{ matrix.separator }}dist${{ matrix.separator }}rsc-${{ matrix.platform }}${{ matrix.extension }}
       run: |
         git clone https://github.com/making/rsc-e2e
         mvn test -f rsc-e2e
     - name: e2e-test-uber-jar
       if: runner.os == 'Linux'
       run: |      
-        export RSC_PATH="java -jar $(ls ./dist/*.jar)"
+        export RSC_PATH="java -jar ../$(ls ./dist/*.jar)"
         mvn test -f rsc-e2e
     - name: upload-dist
       uses: actions/upload-artifact@v1
