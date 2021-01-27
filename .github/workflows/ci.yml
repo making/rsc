@@ -11,25 +11,18 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os:
-        - ubuntu-latest
-        - macos-latest
-        gu-binary: [gu, gu.cmd]
-        exclude:
+        include:
         - os: ubuntu-latest
-          gu-binary: gu.cmd
+          file: ./dist/rsc-x86_64-pc-linux
         - os: macos-latest
-          gu-binary: gu.cmd
-        #- os: windows-latest
-        #  gu-binary: gu
+          file: ./dist/rsc-x86_64-apple-darwin
     steps:
     - uses: actions/checkout@v1
-    - uses: DeLaGuardo/setup-graalvm@master
+    - uses: ayltai/setup-graalvm@v1
       with:
-        graalvm-version: '21.0.0.java8'
-    - name: install native-image
-      run: |
-        ${{ matrix.gu-binary }} install native-image
+        java-version: 8
+        graalvm-version: 21.0.0
+        native-image: true
     - uses: actions/cache@v1
       with:
         path: ~/.m2/repository
@@ -40,24 +33,16 @@ jobs:
       run: |
         set -ex
         mkdir dist
-        ./mvnw package -DskipTests
+        mvn package -DskipTests
         cp target/rsc*.jar ./dist/
-        ./mvnw package -Dversion.generate.skip=true -Pnative
-        chmod +x target/classes/rsc*
-        cp target/classes/rsc* ./rsc
-        cp target/classes/rsc* ./dist/
-        if [ -f ./dist/rsc-linux-x86_64 ];then
-          mv ./dist/rsc-linux-x86_64 ./dist/rsc-x86_64-pc-linux
-        fi
-        if [ -f ./dist/rsc-osx-x86_64 ];then
-          mv ./dist/rsc-osx-x86_64 ./dist/rsc-x86_64-apple-darwin
-        fi
-        ls -la ./dist
+        mvn package -Dversion.generate.skip=true -Pnative
+        cp target/classes/rsc* ${{ matrix.file }}
+        chmod +x ${{ matrix.file }}
     - name: e2e-test
       run: |
         set -e
         echo "📝 E2E Test for native image"
-        ./run-e2e.sh ./rsc ${{ runner.os }}
+        ./run-e2e.sh ${{ matrix.file }} ${{ runner.os }}
         echo "📝 E2E Test for uber jar"
         ./run-e2e.sh "java -jar ./dist/*.jar" ${{ runner.os }}
     - name: upload-dist
