@@ -3,11 +3,9 @@ on:
   push:
     branches:
     - master
-    - 0.4.x
   pull_request:
     branches:
     - master
-    - 0.4.x
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -16,11 +14,22 @@ jobs:
         os:
         - ubuntu-latest
         - macos-latest
+        gu-binary: [gu, gu.cmd]
+        exclude:
+        - os: ubuntu-latest
+          gu-binary: gu.cmd
+        - os: macos-latest
+          gu-binary: gu.cmd
+        #- os: windows-latest
+        #  gu-binary: gu
     steps:
     - uses: actions/checkout@v1
     - uses: DeLaGuardo/setup-graalvm@master
       with:
         graalvm-version: '21.0.0.java8'
+    - name: install native-image
+      run: |
+        ${{ matrix.gu-binary }} install native-image
     - uses: actions/cache@v1
       with:
         path: ~/.m2/repository
@@ -31,7 +40,6 @@ jobs:
       run: |
         set -ex
         mkdir dist
-        gu install native-image
         ./mvnw package -DskipTests
         cp target/rsc*.jar ./dist/
         ./mvnw package -Dversion.generate.skip=true -Pnative
