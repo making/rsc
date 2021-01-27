@@ -531,7 +531,7 @@ b3=5f035ed7dd21129b105564ef64c90731-105564ef64c90731-d
 ./mvnw clean package -Pnative -DskipTests
 ```
 
-A native binary will be created in `target/classes/rsc-(osx|linux|windows-x86_64)-x86_64` depending on your OS.
+A native binary will be created in `target/classes/rsc-(osx|linux|windows)-x86_64` depending on your OS.
 
 For linux binary, you can use Docker:
 
