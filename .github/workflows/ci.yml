@@ -65,14 +65,17 @@ jobs:
       if: runner.os != 'Windows'
       run: |
         chmod +x dist${{ matrix.separator }}rsc-${{ matrix.platform }}${{ matrix.extension }}
-    - name: e2e-test
-      if: runner.os != 'Windows'
+    - name: e2e-test-native
+      env:
+        RSC_PATH: dist${{ matrix.separator }}rsc-${{ matrix.platform }}${{ matrix.extension }}
       run: |
-        set -e
-        echo "📝 E2E Test for native image"
-        ./run-e2e.sh dist${{ matrix.separator }}rsc-${{ matrix.platform }}${{ matrix.extension }} ${{ runner.os }}
-        echo "📝 E2E Test for uber jar"
-        ./run-e2e.sh "java -jar ./dist/*.jar" ${{ runner.os }}
+        git clone https://github.com/making/rsc-e2e
+        mvn test -f rsc-e2e
+    - name: e2e-test-uber-jar
+      if: runner.os == 'Linux'
+      run: |      
+        export RSC_PATH="java -jar $(ls ./dist/*.jar)"
+        mvn test -f rsc-e2e
     - name: upload-dist
       uses: actions/upload-artifact@v1
       with:
