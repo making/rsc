@@ -16,21 +16,34 @@ jobs:
           platform: x86_64-pc-linux
           classifier: linux-x86_64
           move: mv
+          copy: cp
           separator: /
           extension: ""
         - os: macos-latest
           platform: x86_64-apple-darwin
           classifier: osx-x86_64
           move: mv
+          copy: cp
           separator: /
           extension: ""
+        - os: windows-latest
+          platform: x86_64-pc-win32
+          classifier: windows-x86_64
+          move: move
+          copy: copy
+          separator: \
+          extension: .exe
     steps:
     - uses: actions/checkout@v1
     - uses: ayltai/setup-graalvm@v1
       with:
         java-version: 8
-        graalvm-version: 21.0.0
+        graalvm-version: 20.3.1
         native-image: true
+    - uses: ilammy/msvc-dev-cmd@v1.5.0
+      if: runner.os == 'Windows'
+    - uses: microsoft/setup-msbuild@v1
+      if: runner.os == 'Windows'
     - uses: actions/cache@v1
       with:
         path: ~/.m2/repository
@@ -39,14 +52,14 @@ jobs:
           ${{ runner.os }}-maven-
     - name: native-image
       run: |
-        set -ex
         mkdir dist
         mvn package -DskipTests
-        cp target/rsc*.jar ./dist/
+        ${{ matrix.copy }} target{{ matrix.separator }}rsc*.jar .{{ matrix.separator }}dist{{ matrix.separator }}
         mvn package -Dversion.generate.skip=true -Pnative
         ${{ matrix.move }} target${{ matrix.separator }}classes${{ matrix.separator }}rsc-${{ matrix.classifier }}${{ matrix.extension }} dist${{ matrix.separator }}rsc-${{ matrix.platform }}${{ matrix.extension }}
         chmod +x dist${{ matrix.separator }}rsc-${{ matrix.platform }}${{ matrix.extension }}
     - name: e2e-test
+      if: runner.os != 'Windows'
       run: |
         set -e
         echo "📝 E2E Test for native image"
