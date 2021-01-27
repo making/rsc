@@ -11,25 +11,22 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os:
-        - ubuntu-latest
-        - macos-latest
-        gu-binary: [gu, gu.cmd]
-        exclude:
+        include:
         - os: ubuntu-latest
-          gu-binary: gu.cmd
+          file: ./dist/rsc-x86_64-pc-linux
+          args: --best --lzma
+          strip: true
         - os: macos-latest
-          gu-binary: gu.cmd
-        #- os: windows-latest
-        #  gu-binary: gu
+          file: ./dist/rsc-x86_64-apple-darwin
+          args: --best
+          strip: true
     steps:
     - uses: actions/checkout@v1
-    - uses: DeLaGuardo/setup-graalvm@master
+    - uses: ayltai/setup-graalvm@v1
       with:
-        graalvm-version: '21.0.0.java8'
-    - name: install native-image
-      run: |
-        ${{ matrix.gu-binary }} install native-image
+        java-version: 8
+        graalvm-version: 21.0.0
+        native-image: true
     - uses: actions/cache@v1
       with:
         path: ~/.m2/repository
@@ -40,34 +37,21 @@ jobs:
       run: |
         set -ex
         mkdir dist
-        ./mvnw package -DskipTests
+        mvn package -DskipTests
         cp target/rsc*.jar ./dist/
-        ./mvnw package -Dversion.generate.skip=true -Pnative
-        cp target/classes/rsc* ./dist/rsc
-        chmod +x ./dist/rsc
-        cp ./dist/rsc ./rsc
-    - uses: crazy-max/ghaction-upx@v1.3.3
+        mvn package -Dversion.generate.skip=true -Pnative
+        cp target/classes/rsc* ${{ matrix.file }}
+        chmod +x ${{ matrix.file }}
+    - uses: svenstaro/upx-action@v2
       with:
-        version: latest
-        file: ./dist/rsc
-        args: -fq -9                
-    - name: move-on-linux
-      if: runner.os == 'Linux'
-      run: |
-        set -ex
-        mv ./dist/rsc ./dist/rsc-x86_64-pc-linux
-        ls -la ./dist
-    - name: move-on-macOS
-      if: runner.os == 'macOS'
-      run: |
-        set -ex
-        mv ./dist/rsc ./dist/rsc-x86_64-apple-darwin
-        ls -la ./dist
+        file: ${{ matrix.file }}
+        args: ${{ matrix.args }}
+        strip: ${{ matrix.strip }}
     - name: e2e-test
       run: |
         set -e
         echo "📝 E2E Test for native image"
-        ./run-e2e.sh ./rsc ${{ runner.os }}
+        ./run-e2e.sh ${{ matrix.file }} ${{ runner.os }}
         echo "📝 E2E Test for uber jar"
         ./run-e2e.sh "java -jar ./dist/*.jar" ${{ runner.os }}
     - name: upload-dist
