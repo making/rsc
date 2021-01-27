@@ -46,11 +46,11 @@ jobs:
         cp target/classes/rsc* ./dist/rsc
         chmod +x ./dist/rsc
         cp ./dist/rsc ./rsc
-    - uses: crazy-max/ghaction-upx@v1
+    - uses: crazy-max/ghaction-upx@v1.3.3
       with:
         version: latest
         file: ./dist/rsc
-        args: -fq                
+        args: -fq -9                
     - name: move-on-linux
       if: runner.os == 'Linux'
       run: |
