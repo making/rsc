@@ -70,7 +70,7 @@ Option                                Description
 
 ## Install
 
-Download an executable jar or native binary (only for x86_64-apple-darwin or x86_64-pc-linux) from [Releases](https://github.com/making/rsc/releases).
+Download an executable jar or native binary from [Releases](https://github.com/making/rsc/releases).
 
 ### Install via Homebrew
 
