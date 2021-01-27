@@ -66,7 +66,7 @@ jobs:
       run: |
         set -e
         echo "📝 E2E Test for native image"
-        ./run-e2e.sh ./rsc ${{ runner.os }}
+        ./run-e2e.sh ./dist/rsc ${{ runner.os }}
         echo "📝 E2E Test for uber jar"
         ./run-e2e.sh "java -jar ./dist/*.jar" ${{ runner.os }}
     - name: upload-dist
