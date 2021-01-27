@@ -4,7 +4,18 @@ RSC=$1
 if [ "${RSC}" == "" ];then
   RSC=rsc
 fi
-docker run -d --name rsc-e2e --rm -p 7001:7001 ghcr.io/making/rsc-e2e
+OS=$2
+if [ "${OS}" == "" ];then
+  OS=macOS
+fi
+
+if [ ! -f ./rsc-e2e ];then
+  echo ">>> Download rsc-e2e"
+  wget -qO rsc-e2e https://github.com/making/rsc-e2e/releases/download/0.1.0/rsc-e2e-${OS}
+fi
+chmod +x rsc-e2e
+./rsc-e2e &
+
 while ! `perl -mIO::Socket::INET -le 'exit(IO::Socket::INET->new(PeerAddr=>shift,PeerPort=>shift,Proto=>shift,Timeout=>5)?0:1)' localhost 7001`; do
   sleep 1
 done
@@ -56,5 +67,5 @@ echo "$DEBUG" | grep "Stream ID: 1 Type: REQUEST_N" > /dev/null
 echo "$DEBUG" | grep "Stream ID: 1 Type: COMPLETE" | wc -l | grep "2$" > /dev/null
 set +x
 
-docker rm -f rsc-e2e > /dev/null
+pkill -KILL rsc-e2e
 echo "✅ E2E test succeeded!"
