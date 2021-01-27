@@ -56,7 +56,12 @@ jobs:
     - uses: crazy-max/ghaction-upx@v1
       with:
         version: latest
-        file: ./rsc ./dist/rsc-x86_64*
+        file: ./rsc
+        args: -fq
+    - uses: crazy-max/ghaction-upx@v1
+      with:
+        version: latest
+        file: ./dist/rsc-x86_64*
         args: -fq
     - name: e2e-test
       run: |
