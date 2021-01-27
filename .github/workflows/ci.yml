@@ -45,18 +45,13 @@ jobs:
           mv ./dist/rsc-osx-x86_64 ./dist/rsc-x86_64-apple-darwin
         fi
         ls -la ./dist
-#    - name: check-cli
-#      run: |
-#        set -ex
-#        env
-#        ./rsc --version
-#        ./rsc --showSystemProperties
-#        ./rsc ws://rsocket-demo.herokuapp.com/rsocket --route searchTweets --stream -d Trump --take 3 --retry 3 --debug
-#        ./rsc wss://rsocket-demo.herokuapp.com/rsocket --route searchTweets --stream -d Trump --take 3 --retry 3 --debug
     - name: e2e-test
       run: |
         set -e
+        echo "📝 E2E Test for native image"
         ./run-e2e.sh ./rsc ${{ runner.os }}
+        echo "📝 E2E Test for uber jar"
+        ./run-e2e.sh "java -jar ./dist/*.jar" ${{ runner.os }}
     - name: upload-dist
       uses: actions/upload-artifact@v1
       with:
