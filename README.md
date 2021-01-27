@@ -110,11 +110,6 @@ rsc ws://localhost:8080/rsocket --stream --route hello --debug --take 30
 rsc wss://rsocket-demo.herokuapp.com/rsocket --stream --route searchTweets -d Trump
 ```
 
-> To get `wss` work, environment variable `JAVA_HOME` must be set. (since 0.4.0)<br>
-> If `JAVA_HOME` is set, system property `-Djava.library.path=${JAVA_HOME}/jre/lib/<platform>` is automatically added.
-> **This requirement is no longer necessary since 0.7.0.**
-
-
 ## Log options
 
 ### Default
@@ -528,7 +523,6 @@ b3=5f035ed7dd21129b105564ef64c90731-105564ef64c90731-d
 
 ## Known issues
 
-* ~Secure protocols (`wss`, `tcp+tls`) don't work with native binaries (the executable jar will work)~ (Supported in 0.4.0)
 * Client side responder will not be supported.
 
 ## Build
@@ -537,13 +531,22 @@ b3=5f035ed7dd21129b105564ef64c90731-105564ef64c90731-d
 ./mvnw clean package -Pnative -DskipTests
 ```
 
-A native binary will be created in `target/classes/rsc-(osx|linux)-x86_64` depending on your OS.
+A native binary will be created in `target/classes/rsc-(osx|linux|windows-x86_64)-x86_64` depending on your OS.
 
 For linux binary, you can use Docker:
 
 ```
 ./mvnw spring-boot:build-image  -DskipTests
 docker run --rm rsc:<version> --version  
+```
+
+### How to run E2E testing
+
+```
+git clone https://github.com/making/rsc-e2e
+cd rsc-e2e
+export RSC_PATH=...
+./mvnw test
 ```
 
 ## License
