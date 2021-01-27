@@ -45,6 +45,7 @@ jobs:
         ./mvnw package -Dversion.generate.skip=true -Pnative
         cp target/classes/rsc* ./dist/rsc
         chmod +x ./dist/rsc
+        cp ./dist/rsc ./rsc
     - uses: crazy-max/ghaction-upx@v1
       with:
         version: latest
@@ -66,7 +67,7 @@ jobs:
       run: |
         set -e
         echo "📝 E2E Test for native image"
-        ./run-e2e.sh ./dist/rsc ${{ runner.os }}
+        ./run-e2e.sh ./rsc ${{ runner.os }}
         echo "📝 E2E Test for uber jar"
         ./run-e2e.sh "java -jar ./dist/*.jar" ${{ runner.os }}
     - name: upload-dist
