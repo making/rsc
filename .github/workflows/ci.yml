@@ -14,12 +14,8 @@ jobs:
         include:
         - os: ubuntu-latest
           file: ./dist/rsc-x86_64-pc-linux
-          args: --best --lzma
-          strip: true
         - os: macos-latest
           file: ./dist/rsc-x86_64-apple-darwin
-          args: --best
-          strip: true
     steps:
     - uses: actions/checkout@v1
     - uses: ayltai/setup-graalvm@v1
@@ -42,11 +38,6 @@ jobs:
         mvn package -Dversion.generate.skip=true -Pnative
         cp target/classes/rsc* ${{ matrix.file }}
         chmod +x ${{ matrix.file }}
-    - uses: svenstaro/upx-action@v2
-      with:
-        file: ${{ matrix.file }}
-        args: ${{ matrix.args }}
-        strip: ${{ matrix.strip }}
     - name: e2e-test
       run: |
         set -e
