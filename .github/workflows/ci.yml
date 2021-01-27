@@ -43,26 +43,25 @@ jobs:
         ./mvnw package -DskipTests
         cp target/rsc*.jar ./dist/
         ./mvnw package -Dversion.generate.skip=true -Pnative
-        chmod +x target/classes/rsc*
-        cp target/classes/rsc* ./rsc
-        cp target/classes/rsc* ./dist/
-        if [ -f ./dist/rsc-linux-x86_64 ];then
-          mv ./dist/rsc-linux-x86_64 ./dist/rsc-x86_64-pc-linux
-        fi
-        if [ -f ./dist/rsc-osx-x86_64 ];then
-          mv ./dist/rsc-osx-x86_64 ./dist/rsc-x86_64-apple-darwin
-        fi
+        cp target/classes/rsc* ./dist/rsc
+        chmod +x ./dist/rsc
+    - uses: crazy-max/ghaction-upx@v1
+      with:
+        version: latest
+        file: ./dist/rsc
+        args: -fq                
+    - name: move-on-linux
+      if: runner.os == 'Linux'
+      run: |
+        set -ex
+        mv ./dist/rsc ./dist/rsc-x86_64-pc-linux
         ls -la ./dist
-    - uses: crazy-max/ghaction-upx@v1
-      with:
-        version: latest
-        file: ./rsc
-        args: -fq
-    - uses: crazy-max/ghaction-upx@v1
-      with:
-        version: latest
-        file: ./dist/rsc-x86_64*
-        args: -fq
+    - name: move-on-macOS
+      if: runner.os == 'macOS'
+      run: |
+        set -ex
+        mv ./dist/rsc ./dist/rsc-x86_64-apple-darwin
+        ls -la ./dist
     - name: e2e-test
       run: |
         set -e
