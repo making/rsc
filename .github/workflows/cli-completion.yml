@@ -1,0 +1,25 @@
+name: CLI completion
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - src/main/java/am/ik/rsocket/completion/*
+    - .github/workflows/cli-completion.yml
+  pull_request:
+    branches:
+    - master
+    paths:
+    - src/main/java/am/ik/rsocket/completion/*
+    - .github/workflows/cli-completion.yml
+  workflow_dispatch: { }
+jobs:
+  completion:
+    name: cli-completion
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+    - run: cargo install cli-completion
+    - run: cli-completion -h
