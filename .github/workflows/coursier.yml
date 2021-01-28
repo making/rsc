@@ -24,7 +24,7 @@ jobs:
         - os: macos-latest
         - os: windows-latest
     steps:
-    - name: cas install
+    - name: cs install
       uses: laughedelic/coursier-setup@v1
       with:
         apps: rsc --contrib
