@@ -18,8 +18,17 @@ jobs:
     name: cli-completion
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v1
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
     - run: cargo install cli-completion
-    - run: cli-completion -h
+    - uses: actions/cache@v1
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    - run: |
+        mvn package -DskipTests
+        java -jar target/*.jar -h cli-completion
