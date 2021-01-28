@@ -4,12 +4,14 @@ on:
     branches:
     - master
     paths:
+    - src/main/java/am/ik/rsocket/Args.java
     - src/main/java/am/ik/rsocket/completion/*
     - .github/workflows/cli-completion.yml
   pull_request:
     branches:
     - master
     paths:
+    - src/main/java/am/ik/rsocket/Args.java
     - src/main/java/am/ik/rsocket/completion/*
     - .github/workflows/cli-completion.yml
   workflow_dispatch: { }
