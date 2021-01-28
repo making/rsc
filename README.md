@@ -546,6 +546,9 @@ docker run --rm rsc:<version> --version
 git clone https://github.com/making/rsc-e2e
 cd rsc-e2e
 export RSC_PATH=...
+export RSC_OIDCISSUERURL=https://uaa.run.pivotal.io/oauth/token # you can change this
+export RSC_OIDCUSERNAME=...
+export RSC_OIDCPASSWORD=...
 ./mvnw test
 ```
 
