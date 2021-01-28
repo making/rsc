@@ -1,0 +1,36 @@
+name: Coursier
+on:
+  schedule:
+  - cron: 0 3 * * *
+  push:
+    branches:
+    - master
+    paths:
+    - .github/workflows/coursier.yml
+  pull_request:
+    branches:
+    - master
+    paths:
+    - .github/workflows/coursier.yml
+  workflow_dispatch: { }
+jobs:
+  install:
+    name: cs install
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+        - os: ubuntu-latest
+        - os: macos-latest
+        - os: windows-latest
+    steps:
+    - name: cas install
+      uses: laughedelic/coursier-setup@v1
+      with:
+        apps: rsc --contrib
+    - name: check cli
+      run: |
+        rsc --version
+        rsc --showSystemProperties
+        rsc ws://rsocket-demo.herokuapp.com/rsocket --route searchTweets --stream -d Trump --take 3 --retry 3 --debug
+        rsc wss://rsocket-demo.herokuapp.com/rsocket --route searchTweets --stream -d Trump --take 3 --retry 3 --debug

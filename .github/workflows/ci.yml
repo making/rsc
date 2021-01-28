@@ -3,13 +3,17 @@ on:
   push:
     branches:
     - master
-    paths-ignore:
-    - README.md
+    paths:
+    - src/**
+    - pom.xml
+    - .github/workflows/ci.yml
   pull_request:
     branches:
     - master
-    paths-ignore:
-    - README.md
+    paths:
+    - src/**
+    - pom.xml
+    - .github/workflows/ci.yml
 jobs:
   build:
     runs-on: ${{ matrix.os }}

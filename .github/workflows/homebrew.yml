@@ -1,0 +1,34 @@
+name: Homebrew
+on:
+  schedule:
+  - cron: 0 3 * * *
+  push:
+    branches:
+    - master
+    paths:
+    - .github/workflows/homebrew.yml
+  pull_request:
+    branches:
+    - master
+    paths:
+    - .github/workflows/homebrew.yml
+  workflow_dispatch: { }
+jobs:
+  install:
+    name: brew install
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+        - os: ubuntu-latest
+        - os: macos-latest
+    steps:
+    - name: brew install
+      run: |
+        brew install making/tap/rsc
+    - name: check cli
+      run: |
+        rsc --version
+        rsc --showSystemProperties
+        rsc ws://rsocket-demo.herokuapp.com/rsocket --route searchTweets --stream -d Trump --take 3 --retry 3 --debug
+        rsc wss://rsocket-demo.herokuapp.com/rsocket --route searchTweets --stream -d Trump --take 3 --retry 3 --debug
