@@ -72,7 +72,7 @@ Option                                Description
 
 Download an executable jar or native binary from [Releases](https://github.com/making/rsc/releases).
 
-### Install via Homebrew
+### Install via Homebrew (Max / Linux)
 
 You can install native binary via Homebrew.
 
@@ -80,7 +80,7 @@ You can install native binary via Homebrew.
 brew install making/tap/rsc
 ```
 
-### Install via Coursier
+### Install via Coursier (Max / Linux / Windows)
 
 If you do not already have [couriser](https://get-coursier.io) installed on your machine, install it following steps given here: https://get-coursier.io/docs/cli-installation. 
 
