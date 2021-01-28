@@ -1,4 +1,5 @@
 # RSocket Client CLI (RSC)
+[![CI](https://github.com/making/rsc/workflows/CI/badge.svg)](https://github.com/making/rsc/actions?query=workflow%3ACI)
 
 > Aiming to be a curl for RSocket
 
@@ -73,6 +74,7 @@ Option                                Description
 Download an executable jar or native binary from [Releases](https://github.com/making/rsc/releases).
 
 ### Install via Homebrew (Max / Linux)
+[![Homebrew](https://github.com/making/rsc/workflows/Homebrew/badge.svg)](https://github.com/making/rsc/actions?query=workflow%3AHomebrew)
 
 You can install native binary via Homebrew.
 
@@ -81,6 +83,7 @@ brew install making/tap/rsc
 ```
 
 ### Install via Coursier (Max / Linux / Windows)
+[![Coursier](https://github.com/making/rsc/workflows/Coursier/badge.svg)](https://github.com/making/rsc/actions?query=workflow%3ACoursier)
 
 If you do not already have [couriser](https://get-coursier.io) installed on your machine, install it following steps given here: https://get-coursier.io/docs/cli-installation. 
 
