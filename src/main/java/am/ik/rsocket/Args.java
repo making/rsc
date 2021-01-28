@@ -49,6 +49,7 @@ import io.rsocket.metadata.TracingMetadataCodec.Flags;
 import io.rsocket.metadata.WellKnownMimeType;
 import io.rsocket.transport.ClientTransport;
 import io.rsocket.util.DefaultPayload;
+import joptsimple.HelpFormatter;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
@@ -66,7 +67,7 @@ public class Args {
 
 	private final OptionSpec<Void> version = parser.acceptsAll(Arrays.asList("v", "version"), "Print version");
 
-	private final OptionSpec<Void> help = parser.acceptsAll(Arrays.asList("help"), "Print help");
+	private final OptionSpec<String> help = parser.acceptsAll(Arrays.asList("h", "help"), "Print help").withOptionalArg();
 
 	private final OptionSpec<Void> wiretap = parser.acceptsAll(Arrays.asList("w", "wiretap"), "Enable wiretap");
 
@@ -606,6 +607,10 @@ public class Args {
 		return this.options.has(this.help);
 	}
 
+	public String helpFormatter() {
+		return this.options.valueOf(this.help);
+	}
+
 	public boolean version() {
 		return this.options.has(this.version);
 	}
@@ -614,6 +619,16 @@ public class Args {
 		try {
 			stream.println("usage: rsc Uri [Options]");
 			stream.println();
+			this.parser.printHelpOn(stream);
+		}
+		catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	public void printHelp(PrintStream stream, HelpFormatter helpFormatter) {
+		try {
+			this.parser.formatHelpWith(helpFormatter);
 			this.parser.printHelpOn(stream);
 		}
 		catch (IOException e) {

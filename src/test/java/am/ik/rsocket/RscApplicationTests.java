@@ -12,9 +12,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 class RscApplicationTests {
 
 	@Test
-	void test(CapturedOutput capture) throws Exception {
+	void help(CapturedOutput capture) throws Exception {
 		RscApplication.main(new String[] { "-h" });
 		assertThat(capture.toString()).isNotEmpty();
 	}
 
+	@Test
+	void helpYamlMode(CapturedOutput capture) throws Exception {
+		RscApplication.main(new String[] { "-h", "cli-completion" });
+		assertThat(capture.toString()).isNotEmpty();
+	}
 }

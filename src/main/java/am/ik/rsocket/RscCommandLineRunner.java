@@ -42,7 +42,12 @@ public class RscCommandLineRunner implements CommandLineRunner {
 		final Args args = new Args(a);
 		try {
 			if (args.help()) {
-				args.printHelp(System.out);
+				if ("cli-completion".equals(args.helpFormatter())) {
+					args.printHelp(System.out, new CliCompletionHelpFormatter());
+				}
+				else {
+					args.printHelp(System.out);
+				}
 				return;
 			}
 			if (args.version()) {
