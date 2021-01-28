@@ -68,11 +68,16 @@ jobs:
     - name: e2e-test-native
       env:
         RSC_PATH: ..${{ matrix.separator }}dist${{ matrix.separator }}rsc-${{ matrix.platform }}${{ matrix.extension }}
+        RSC_OIDCUSERNAME: ${{ secrets.RSC_OIDCUSERNAME }}
+        RSC_OIDCPASSWORD: ${{ secrets.RSC_OIDCPASSWORD }}
       run: |
         git clone https://github.com/making/rsc-e2e
         mvn test -f rsc-e2e
     - name: e2e-test-uber-jar
       if: runner.os == 'Linux'
+      env:
+        RSC_OIDCUSERNAME: ${{ secrets.RSC_OIDCUSERNAME }}
+        RSC_OIDCPASSWORD: ${{ secrets.RSC_OIDCPASSWORD }}
       run: |      
         export RSC_PATH="java -jar ../$(ls ./dist/*.jar)"
         mvn test -f rsc-e2e
