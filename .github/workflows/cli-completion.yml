@@ -31,4 +31,9 @@ jobs:
           ${{ runner.os }}-maven-
     - run: |
         mvn package -DskipTests
-        java -jar target/*.jar -h cli-completion
+        java -jar target/*.jar -h cli-completion > /tmp/cli-completion.yml
+        cli-completion --zsh /tmp/cli-completion.yml > src/main/resources/completions/zsh
+        cli-completion --bash /tmp/cli-completion.yml > src/main/resources/completions/bash
+        cli-completion --fish /tmp/cli-completion.yml > src/main/resources/completions/fish
+        cli-completion --powershell /tmp/cli-completion.yml > src/main/resources/completions/powershell
+        git diff
