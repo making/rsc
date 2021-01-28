@@ -20,6 +20,11 @@
     "allDeclaredMethods": true
   },
   {
+    "name": "am.ik.rsocket.completion.ShellType",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
     "name": "io.rsocket.metadata.TracingMetadataCodec$Flags",
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true

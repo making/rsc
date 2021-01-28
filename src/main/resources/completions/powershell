@@ -1,0 +1,73 @@
+
+using namespace System.Management.Automation
+using namespace System.Management.Automation.Language
+
+Register-ArgumentCompleter -Native -CommandName 'rsc' -ScriptBlock {
+    param($wordToComplete, $commandAst, $cursorPosition)
+
+    $commandElements = $commandAst.CommandElements
+    $command = @(
+        'rsc'
+        for ($i = 1; $i -lt $commandElements.Count; $i++) {
+            $element = $commandElements[$i]
+            if ($element -isnot [StringConstantExpressionAst] -or
+                $element.StringConstantType -ne [StringConstantType]::BareWord -or
+                $element.Value.StartsWith('-')) {
+                break
+        }
+        $element.Value
+    }) -join ';'
+
+    $completions = @(switch ($command) {
+        'rsc' {
+            [CompletionResult]::new('--authBearer', 'authBearer', [CompletionResultType]::ParameterName, 'Enable Authentication Metadata Extension (Bearer).')
+            [CompletionResult]::new('--authBasic', 'authBasic', [CompletionResultType]::ParameterName, '[DEPRECATED] Enable Authentication Metadata Extension (Basic). This Metadata exists only for the backward compatibility with Spring Security 5.2')
+            [CompletionResult]::new('--completion', 'completion', [CompletionResultType]::ParameterName, 'Output shell completion code for the specified shell (bash, zsh, fish, powershell)')
+            [CompletionResult]::new('-d', 'd', [CompletionResultType]::ParameterName, 'Data. Use ''-'' to read data from standard input.')
+            [CompletionResult]::new('--data', 'data', [CompletionResultType]::ParameterName, 'Data. Use ''-'' to read data from standard input.')
+            [CompletionResult]::new('--dataMimeType', 'dataMimeType', [CompletionResultType]::ParameterName, 'MimeType for data')
+            [CompletionResult]::new('--delayElements', 'delayElements', [CompletionResultType]::ParameterName, 'Enable delayElements(delay) in milli seconds')
+            [CompletionResult]::new('-h', 'h', [CompletionResultType]::ParameterName, 'Print help')
+            [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Print help')
+            [CompletionResult]::new('--interactionModel', 'interactionModel', [CompletionResultType]::ParameterName, 'InteractionModel')
+            [CompletionResult]::new('--limitRate', 'limitRate', [CompletionResultType]::ParameterName, 'Enable limitRate(rate)')
+            [CompletionResult]::new('--log', 'log', [CompletionResultType]::ParameterName, 'Enable log()')
+            [CompletionResult]::new('-m', 'm', [CompletionResultType]::ParameterName, 'Metadata (default: )')
+            [CompletionResult]::new('--metadata', 'metadata', [CompletionResultType]::ParameterName, 'Metadata (default: )')
+            [CompletionResult]::new('--metadataMimeType', 'metadataMimeType', [CompletionResultType]::ParameterName, 'MimeType for metadata (default: application/json)')
+            [CompletionResult]::new('-r', 'r', [CompletionResultType]::ParameterName, 'Enable Routing Metadata Extension')
+            [CompletionResult]::new('--route', 'route', [CompletionResultType]::ParameterName, 'Enable Routing Metadata Extension')
+            [CompletionResult]::new('--resume', 'resume', [CompletionResultType]::ParameterName, 'Enable resume. Resume session duration can be configured in seconds.')
+            [CompletionResult]::new('--retry', 'retry', [CompletionResultType]::ParameterName, 'Enable retry. Retry every 1 second with the given max attempts.')
+            [CompletionResult]::new('--setupData', 'setupData', [CompletionResultType]::ParameterName, 'Data for Setup payload')
+            [CompletionResult]::new('--setupMetadata', 'setupMetadata', [CompletionResultType]::ParameterName, 'Metadata for Setup payload')
+            [CompletionResult]::new('--setupMetadataMimeType', 'setupMetadataMimeType', [CompletionResultType]::ParameterName, 'Metadata MimeType for Setup payload  (default: application/json)')
+            [CompletionResult]::new('--take', 'take', [CompletionResultType]::ParameterName, 'Enable take(n)')
+            [CompletionResult]::new('--trace', 'trace', [CompletionResultType]::ParameterName, 'Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used by default.')
+            [CompletionResult]::new('-u', 'u', [CompletionResultType]::ParameterName, 'Enable Authentication Metadata Extension (Simple). The format must be ''username:password''.')
+            [CompletionResult]::new('--authSimple', 'authSimple', [CompletionResultType]::ParameterName, 'Enable Authentication Metadata Extension (Simple). The format must be ''username:password''.')
+            [CompletionResult]::new('--wsHeader', 'wsHeader', [CompletionResultType]::ParameterName, 'Header for web socket connection')
+            [CompletionResult]::new('--zipkinUrl', 'zipkinUrl', [CompletionResultType]::ParameterName, 'Zipkin URL to send a span (ex. http://localhost:9411). Ignored unless --trace is set.')
+            [CompletionResult]::new('--channel', 'channel', [CompletionResultType]::ParameterName, 'Shortcut of --im REQUEST_CHANNEL')
+            [CompletionResult]::new('--debug', 'debug', [CompletionResultType]::ParameterName, 'Enable FrameLogger')
+            [CompletionResult]::new('--fnf', 'fnf', [CompletionResultType]::ParameterName, 'Shortcut of --im FIRE_AND_FORGET')
+            [CompletionResult]::new('--printB3', 'printB3', [CompletionResultType]::ParameterName, 'Print B3 propagation info. Ignored unless --trace is set.')
+            [CompletionResult]::new('-q', 'q', [CompletionResultType]::ParameterName, 'Disable the output on next')
+            [CompletionResult]::new('--quiet', 'quiet', [CompletionResultType]::ParameterName, 'Disable the output on next')
+            [CompletionResult]::new('--request', 'request', [CompletionResultType]::ParameterName, 'Shortcut of --im REQUEST_RESPONSE')
+            [CompletionResult]::new('--showSystemProperties', 'showSystemProperties', [CompletionResultType]::ParameterName, 'Show SystemProperties for troubleshoot')
+            [CompletionResult]::new('--stacktrace', 'stacktrace', [CompletionResultType]::ParameterName, 'Show Stacktrace when an exception happens')
+            [CompletionResult]::new('--stream', 'stream', [CompletionResultType]::ParameterName, 'Shortcut of --im REQUEST_STREAM')
+            [CompletionResult]::new('-v', 'v', [CompletionResultType]::ParameterName, 'Print version')
+            [CompletionResult]::new('--version', 'version', [CompletionResultType]::ParameterName, 'Print version')
+            [CompletionResult]::new('-w', 'w', [CompletionResultType]::ParameterName, 'Enable wiretap')
+            [CompletionResult]::new('--wiretap', 'wiretap', [CompletionResultType]::ParameterName, 'Enable wiretap')
+            [CompletionResult]::new('-h', 'h', [CompletionResultType]::ParameterName, 'Prints help information')
+            [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Prints help information')
+            break
+        }
+    })
+
+    $completions.Where{ $_.CompletionText -like "$wordToComplete*" } |
+        Sort-Object -Property ListItemText
+}

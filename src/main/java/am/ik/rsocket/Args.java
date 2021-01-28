@@ -32,6 +32,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import am.ik.rsocket.completion.ShellType;
 import am.ik.rsocket.routing.Route;
 import am.ik.rsocket.security.BasicAuthentication;
 import am.ik.rsocket.security.BearerAuthentication;
@@ -166,6 +167,9 @@ public class Args {
 	private final OptionSpec<String> wsHeader = parser.acceptsAll(Arrays.asList("wsh", "wsHeader"), "Header for web socket connection")
 			.withOptionalArg();
 
+	private final OptionSpec<ShellType> completion = parser
+			.acceptsAll(Arrays.asList("completion"), "Output shell completion code for the specified shell (bash, zsh, fish, powershell)")
+			.withOptionalArg().ofType(ShellType.class);
 
 	private final OptionSet options;
 
@@ -638,5 +642,18 @@ public class Args {
 
 	public boolean showSystemProperties() {
 		return this.options.has(this.showSystemProperties);
+	}
+
+	public Optional<ShellType> completion() {
+		if (this.options.has(this.completion)) {
+			final ShellType completion = this.options.valueOf(this.completion);
+			if (completion == null) {
+				throw new IllegalArgumentException("'completion' must be specified. Possible values: " + Arrays.toString(ShellType.values()));
+			}
+			return Optional.of(completion);
+		}
+		else {
+			return Optional.empty();
+		}
 	}
 }

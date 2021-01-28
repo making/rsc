@@ -16,8 +16,11 @@
 package am.ik.rsocket;
 
 import java.time.Duration;
+import java.util.Optional;
 import java.util.TreeMap;
 
+import am.ik.rsocket.completion.CliCompletionHelpFormatter;
+import am.ik.rsocket.completion.ShellType;
 import am.ik.rsocket.tracing.Reporter;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -56,6 +59,11 @@ public class RscCommandLineRunner implements CommandLineRunner {
 			}
 			if (args.showSystemProperties()) {
 				printSystemProperties();
+				return;
+			}
+			final Optional<ShellType> completion = args.completion();
+			if (completion.isPresent()) {
+				System.out.println(completion.get().script());
 				return;
 			}
 			if (args.resume().isPresent() && args.retry().isPresent()) {

@@ -1,0 +1,74 @@
+#compdef rsc
+
+autoload -U is-at-least
+
+_rsc() {
+    typeset -A opt_args
+    typeset -a _arguments_options
+    local ret=1
+
+    if is-at-least 5.2; then
+        _arguments_options=(-s -S -C)
+    else
+        _arguments_options=(-s -C)
+    fi
+
+    local context curcontext="$curcontext" state line
+    _arguments "${_arguments_options[@]}" \
+'--authBearer=[Enable Authentication Metadata Extension (Bearer).]' \
+'--authBasic=[\[DEPRECATED\] Enable Authentication Metadata Extension (Basic). This Metadata exists only for the backward compatibility with Spring Security 5.2]' \
+'--completion=[Output shell completion code for the specified shell (bash, zsh, fish, powershell)]: :(bash zsh fish powershell)' \
+'-d+[Data. Use '\''-'\'' to read data from standard input.]' \
+'--data=[Data. Use '\''-'\'' to read data from standard input.]' \
+'--dataMimeType=[MimeType for data]' \
+'--delayElements=[Enable delayElements(delay) in milli seconds]' \
+'-h+[Print help]' \
+'--help=[Print help]' \
+'--interactionModel=[InteractionModel]: :(REQUEST_RESPONSE REQUEST_STREAM REQUEST_CHANNEL FIRE_AND_FORGET)' \
+'--limitRate=[Enable limitRate(rate)]' \
+'--log=[Enable log()]' \
+'-m+[Metadata (default: )]' \
+'--metadata=[Metadata (default: )]' \
+'--metadataMimeType=[MimeType for metadata (default: application/json)]' \
+'-r+[Enable Routing Metadata Extension]' \
+'--route=[Enable Routing Metadata Extension]' \
+'--resume=[Enable resume. Resume session duration can be configured in seconds.]' \
+'--retry=[Enable retry. Retry every 1 second with the given max attempts.]' \
+'--setupData=[Data for Setup payload]' \
+'--setupMetadata=[Metadata for Setup payload]' \
+'--setupMetadataMimeType=[Metadata MimeType for Setup payload  (default: application/json)]' \
+'--take=[Enable take(n)]' \
+'--trace=[Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used by default.]: :(UNDECIDED NOT_SAMPLE SAMPLE DEBUG)' \
+'-u+[Enable Authentication Metadata Extension (Simple). The format must be '\''username:password'\''.]' \
+'--authSimple=[Enable Authentication Metadata Extension (Simple). The format must be '\''username:password'\''.]' \
+'--wsHeader=[Header for web socket connection]' \
+'--zipkinUrl=[Zipkin URL to send a span (ex. http://localhost:9411). Ignored unless --trace is set.]' \
+'--channel[Shortcut of --im REQUEST_CHANNEL]' \
+'--debug[Enable FrameLogger]' \
+'--fnf[Shortcut of --im FIRE_AND_FORGET]' \
+'--printB3[Print B3 propagation info. Ignored unless --trace is set.]' \
+'-q[Disable the output on next]' \
+'--quiet[Disable the output on next]' \
+'--request[Shortcut of --im REQUEST_RESPONSE]' \
+'--showSystemProperties[Show SystemProperties for troubleshoot]' \
+'--stacktrace[Show Stacktrace when an exception happens]' \
+'--stream[Shortcut of --im REQUEST_STREAM]' \
+'-v[Print version]' \
+'--version[Print version]' \
+'-w[Enable wiretap]' \
+'--wiretap[Enable wiretap]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+&& ret=0
+    
+}
+
+(( $+functions[_rsc_commands] )) ||
+_rsc_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'rsc commands' commands "$@"
+}
+
+_rsc "$@"

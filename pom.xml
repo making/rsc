@@ -27,6 +27,7 @@
 			-Dfile.encoding=UTF-8
 			-H:IncludeResourceBundles=joptsimple.HelpFormatterMessages
 			-H:IncludeResourceBundles=joptsimple.ExceptionMessages
+			-H:IncludeResources=completions/.*
 		</native-build.args>
 	</properties>
 
