@@ -25,6 +25,8 @@ _rsc() {
 '-h+[Print help]' \
 '--help=[Print help]' \
 '--interactionModel=[InteractionModel]: :(REQUEST_RESPONSE REQUEST_STREAM REQUEST_CHANNEL FIRE_AND_FORGET)' \
+'-l+[Load a file as Data. (e.g. ./foo.txt, file:///tmp/foo, https://example.com)]: :(file:// https:// http://)' \
+'--load=[Load a file as Data. (e.g. ./foo.txt, file:///tmp/foo, https://example.com)]: :(file:// https:// http://)' \
 '--limitRate=[Enable limitRate(rate)]' \
 '--log=[Enable log()]' \
 '-m+[Metadata (default: )]' \
@@ -42,7 +44,7 @@ _rsc() {
 '-u+[Enable Authentication Metadata Extension (Simple). The format must be '\''username:password'\''.]' \
 '--authSimple=[Enable Authentication Metadata Extension (Simple). The format must be '\''username:password'\''.]' \
 '--wsHeader=[Header for web socket connection]' \
-'--zipkinUrl=[Zipkin URL to send a span (ex. http://localhost:9411). Ignored unless --trace is set.]' \
+'--zipkinUrl=[Zipkin URL to send a span (e.g. http://localhost:9411). Ignored unless --trace is set.]' \
 '--channel[Shortcut of --im REQUEST_CHANNEL]' \
 '--debug[Enable FrameLogger]' \
 '--fnf[Shortcut of --im FIRE_AND_FORGET]' \

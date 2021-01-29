@@ -6,6 +6,7 @@ complete -c rsc -n "__fish_use_subcommand" -l dataMimeType -d 'MimeType for data
 complete -c rsc -n "__fish_use_subcommand" -l delayElements -d 'Enable delayElements(delay) in milli seconds' -r
 complete -c rsc -n "__fish_use_subcommand" -s h -l help -d 'Print help' -r
 complete -c rsc -n "__fish_use_subcommand" -l interactionModel -d 'InteractionModel' -r -f -a "REQUEST_RESPONSE REQUEST_STREAM REQUEST_CHANNEL FIRE_AND_FORGET"
+complete -c rsc -n "__fish_use_subcommand" -s l -l load -d 'Load a file as Data. (e.g. ./foo.txt, file:///tmp/foo, https://example.com)' -r -f -a "file:// https:// http://"
 complete -c rsc -n "__fish_use_subcommand" -l limitRate -d 'Enable limitRate(rate)' -r
 complete -c rsc -n "__fish_use_subcommand" -l log -d 'Enable log()' -r
 complete -c rsc -n "__fish_use_subcommand" -s m -l metadata -d 'Metadata (default: )' -r
@@ -20,7 +21,7 @@ complete -c rsc -n "__fish_use_subcommand" -l take -d 'Enable take(n)' -r
 complete -c rsc -n "__fish_use_subcommand" -l trace -d 'Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used if no state is specified.' -r -f -a "UNDECIDED NOT_SAMPLE SAMPLE DEBUG"
 complete -c rsc -n "__fish_use_subcommand" -s u -l authSimple -d 'Enable Authentication Metadata Extension (Simple). The format must be \'username:password\'.' -r
 complete -c rsc -n "__fish_use_subcommand" -l wsHeader -d 'Header for web socket connection' -r
-complete -c rsc -n "__fish_use_subcommand" -l zipkinUrl -d 'Zipkin URL to send a span (ex. http://localhost:9411). Ignored unless --trace is set.' -r
+complete -c rsc -n "__fish_use_subcommand" -l zipkinUrl -d 'Zipkin URL to send a span (e.g. http://localhost:9411). Ignored unless --trace is set.' -r
 complete -c rsc -n "__fish_use_subcommand" -l channel -d 'Shortcut of --im REQUEST_CHANNEL'
 complete -c rsc -n "__fish_use_subcommand" -l debug -d 'Enable FrameLogger'
 complete -c rsc -n "__fish_use_subcommand" -l fnf -d 'Shortcut of --im FIRE_AND_FORGET'
