@@ -43,7 +43,7 @@ Register-ArgumentCompleter -Native -CommandName 'rsc' -ScriptBlock {
             [CompletionResult]::new('--setupMetadata', 'setupMetadata', [CompletionResultType]::ParameterName, 'Metadata for Setup payload')
             [CompletionResult]::new('--setupMetadataMimeType', 'setupMetadataMimeType', [CompletionResultType]::ParameterName, 'Metadata MimeType for Setup payload  (default: application/json)')
             [CompletionResult]::new('--take', 'take', [CompletionResultType]::ParameterName, 'Enable take(n)')
-            [CompletionResult]::new('--trace', 'trace', [CompletionResultType]::ParameterName, 'Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used by default.')
+            [CompletionResult]::new('--trace', 'trace', [CompletionResultType]::ParameterName, 'Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used if no state is specified.')
             [CompletionResult]::new('-u', 'u', [CompletionResultType]::ParameterName, 'Enable Authentication Metadata Extension (Simple). The format must be ''username:password''.')
             [CompletionResult]::new('--authSimple', 'authSimple', [CompletionResultType]::ParameterName, 'Enable Authentication Metadata Extension (Simple). The format must be ''username:password''.')
             [CompletionResult]::new('--wsHeader', 'wsHeader', [CompletionResultType]::ParameterName, 'Header for web socket connection')

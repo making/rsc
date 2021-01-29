@@ -38,7 +38,7 @@ _rsc() {
 '--setupMetadata=[Metadata for Setup payload]' \
 '--setupMetadataMimeType=[Metadata MimeType for Setup payload  (default: application/json)]' \
 '--take=[Enable take(n)]' \
-'--trace=[Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used by default.]: :(UNDECIDED NOT_SAMPLE SAMPLE DEBUG)' \
+'--trace=[Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used if no state is specified.]: :(UNDECIDED NOT_SAMPLE SAMPLE DEBUG)' \
 '-u+[Enable Authentication Metadata Extension (Simple). The format must be '\''username:password'\''.]' \
 '--authSimple=[Enable Authentication Metadata Extension (Simple). The format must be '\''username:password'\''.]' \
 '--wsHeader=[Header for web socket connection]' \
