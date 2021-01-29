@@ -44,7 +44,6 @@ public class CliCompletionHelpFormatter implements HelpFormatter {
 			put("dataMimeType", wellKnownMimeTypes);
 			put("metadataMimeType", wellKnownMimeTypes);
 			put("setupMetadataMimeType", Arrays.stream(SetupMetadataMimeType.values()).map(SetupMetadataMimeType::getValue).toArray());
-			put("load", new Object[] { "file://", "https://", "http://" });
 		}
 	};
 
