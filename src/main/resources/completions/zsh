@@ -36,7 +36,7 @@ _rsc() {
 '--retry=[Enable retry. Retry every 1 second with the given max attempts.]' \
 '--setupData=[Data for Setup payload]' \
 '--setupMetadata=[Metadata for Setup payload]' \
-'--setupMetadataMimeType=[Metadata MimeType for Setup payload  (default: application/json)]' \
+'--setupMetadataMimeType=[Metadata MimeType for Setup payload  (default: application/json)]: :(TEXT_PLAIN APPLICATION_JSON MESSAGE_RSOCKET_AUTHENTICATION AUTHENTICATION_BASIC APP_INFO)' \
 '--take=[Enable take(n)]' \
 '--trace=[Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used if no state is specified.]: :(UNDECIDED NOT_SAMPLE SAMPLE DEBUG)' \
 '-u+[Enable Authentication Metadata Extension (Simple). The format must be '\''username:password'\''.]' \

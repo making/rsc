@@ -112,7 +112,7 @@ _rsc() {
                     return 0
                     ;;
                 --setupMetadataMimeType)
-                    COMPREPLY=($(compgen -f "${cur}"))
+                    COMPREPLY=($(compgen -W "TEXT_PLAIN APPLICATION_JSON MESSAGE_RSOCKET_AUTHENTICATION AUTHENTICATION_BASIC APP_INFO" -- "${cur}"))
                     return 0
                     ;;
                 --take)

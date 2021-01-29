@@ -15,7 +15,7 @@ complete -c rsc -n "__fish_use_subcommand" -l resume -d 'Enable resume. Resume s
 complete -c rsc -n "__fish_use_subcommand" -l retry -d 'Enable retry. Retry every 1 second with the given max attempts.' -r
 complete -c rsc -n "__fish_use_subcommand" -l setupData -d 'Data for Setup payload' -r
 complete -c rsc -n "__fish_use_subcommand" -l setupMetadata -d 'Metadata for Setup payload' -r
-complete -c rsc -n "__fish_use_subcommand" -l setupMetadataMimeType -d 'Metadata MimeType for Setup payload  (default: application/json)' -r
+complete -c rsc -n "__fish_use_subcommand" -l setupMetadataMimeType -d 'Metadata MimeType for Setup payload  (default: application/json)' -r -f -a "TEXT_PLAIN APPLICATION_JSON MESSAGE_RSOCKET_AUTHENTICATION AUTHENTICATION_BASIC APP_INFO"
 complete -c rsc -n "__fish_use_subcommand" -l take -d 'Enable take(n)' -r
 complete -c rsc -n "__fish_use_subcommand" -l trace -d 'Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used if no state is specified.' -r -f -a "UNDECIDED NOT_SAMPLE SAMPLE DEBUG"
 complete -c rsc -n "__fish_use_subcommand" -s u -l authSimple -d 'Enable Authentication Metadata Extension (Simple). The format must be \'username:password\'.' -r
