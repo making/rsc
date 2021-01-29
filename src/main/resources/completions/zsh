@@ -20,7 +20,7 @@ _rsc() {
 '--completion=[Output shell completion code for the specified shell (bash, zsh, fish, powershell)]: :(bash zsh fish powershell)' \
 '-d+[Data. Use '\''-'\'' to read data from standard input.]' \
 '--data=[Data. Use '\''-'\'' to read data from standard input.]' \
-'--dataMimeType=[MimeType for data]' \
+'--dataMimeType=[MimeType for data]: :(application/avro application/cbor application/graphql application/gzip application/javascript application/json application/octet-stream application/pdf application/vnd.apache.thrift.binary application/vnd.google.protobuf application/xml application/zip audio/aac audio/mp3 audio/mp4 audio/mpeg3 audio/mpeg audio/ogg audio/opus audio/vorbis image/bmp image/gif image/heic-sequence image/heic image/heif-sequence image/heif image/jpeg image/png image/tiff multipart/mixed text/css text/csv text/html text/plain text/xml video/H264 video/H265 video/VP8 application/x-hessian application/x-java-object application/cloudevents+json message/x.rsocket.mime-type.v0 message/x.rsocket.accept-mime-types.v0 message/x.rsocket.authentication.v0 message/x.rsocket.tracing-zipkin.v0 message/x.rsocket.routing.v0 message/x.rsocket.composite-metadata.v0)' \
 '--delayElements=[Enable delayElements(delay) in milli seconds]' \
 '-h+[Print help]' \
 '--help=[Print help]' \
@@ -29,14 +29,14 @@ _rsc() {
 '--log=[Enable log()]' \
 '-m+[Metadata (default: )]' \
 '--metadata=[Metadata (default: )]' \
-'--metadataMimeType=[MimeType for metadata (default: application/json)]' \
+'--metadataMimeType=[MimeType for metadata (default: application/json)]: :(application/avro application/cbor application/graphql application/gzip application/javascript application/json application/octet-stream application/pdf application/vnd.apache.thrift.binary application/vnd.google.protobuf application/xml application/zip audio/aac audio/mp3 audio/mp4 audio/mpeg3 audio/mpeg audio/ogg audio/opus audio/vorbis image/bmp image/gif image/heic-sequence image/heic image/heif-sequence image/heif image/jpeg image/png image/tiff multipart/mixed text/css text/csv text/html text/plain text/xml video/H264 video/H265 video/VP8 application/x-hessian application/x-java-object application/cloudevents+json message/x.rsocket.mime-type.v0 message/x.rsocket.accept-mime-types.v0 message/x.rsocket.authentication.v0 message/x.rsocket.tracing-zipkin.v0 message/x.rsocket.routing.v0 message/x.rsocket.composite-metadata.v0)' \
 '-r+[Enable Routing Metadata Extension]' \
 '--route=[Enable Routing Metadata Extension]' \
 '--resume=[Enable resume. Resume session duration can be configured in seconds.]' \
 '--retry=[Enable retry. Retry every 1 second with the given max attempts.]' \
 '--setupData=[Data for Setup payload]' \
 '--setupMetadata=[Metadata for Setup payload]' \
-'--setupMetadataMimeType=[Metadata MimeType for Setup payload  (default: application/json)]: :(TEXT_PLAIN APPLICATION_JSON MESSAGE_RSOCKET_AUTHENTICATION AUTHENTICATION_BASIC APP_INFO)' \
+'--setupMetadataMimeType=[Metadata MimeType for Setup payload  (default: application/json)]: :(text/plain application/json message/x.rsocket.authentication.v0 message/x.rsocket.authentication.basic.v0 message/x.rsocket.application+json)' \
 '--take=[Enable take(n)]' \
 '--trace=[Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used if no state is specified.]: :(UNDECIDED NOT_SAMPLE SAMPLE DEBUG)' \
 '-u+[Enable Authentication Metadata Extension (Simple). The format must be '\''username:password'\''.]' \
