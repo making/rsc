@@ -17,7 +17,7 @@ complete -c rsc -n "__fish_use_subcommand" -l setupData -d 'Data for Setup paylo
 complete -c rsc -n "__fish_use_subcommand" -l setupMetadata -d 'Metadata for Setup payload' -r
 complete -c rsc -n "__fish_use_subcommand" -l setupMetadataMimeType -d 'Metadata MimeType for Setup payload  (default: application/json)' -r
 complete -c rsc -n "__fish_use_subcommand" -l take -d 'Enable take(n)' -r
-complete -c rsc -n "__fish_use_subcommand" -l trace -d 'Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used by default.' -r -f -a "UNDECIDED NOT_SAMPLE SAMPLE DEBUG"
+complete -c rsc -n "__fish_use_subcommand" -l trace -d 'Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used if no state is specified.' -r -f -a "UNDECIDED NOT_SAMPLE SAMPLE DEBUG"
 complete -c rsc -n "__fish_use_subcommand" -s u -l authSimple -d 'Enable Authentication Metadata Extension (Simple). The format must be \'username:password\'.' -r
 complete -c rsc -n "__fish_use_subcommand" -l wsHeader -d 'Header for web socket connection' -r
 complete -c rsc -n "__fish_use_subcommand" -l zipkinUrl -d 'Zipkin URL to send a span (ex. http://localhost:9411). Ignored unless --trace is set.' -r
