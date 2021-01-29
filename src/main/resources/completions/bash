@@ -48,7 +48,7 @@ _rsc() {
                     return 0
                     ;;
                 --dataMimeType)
-                    COMPREPLY=($(compgen -f "${cur}"))
+                    COMPREPLY=($(compgen -W "application/avro application/cbor application/graphql application/gzip application/javascript application/json application/octet-stream application/pdf application/vnd.apache.thrift.binary application/vnd.google.protobuf application/xml application/zip audio/aac audio/mp3 audio/mp4 audio/mpeg3 audio/mpeg audio/ogg audio/opus audio/vorbis image/bmp image/gif image/heic-sequence image/heic image/heif-sequence image/heif image/jpeg image/png image/tiff multipart/mixed text/css text/csv text/html text/plain text/xml video/H264 video/H265 video/VP8 application/x-hessian application/x-java-object application/cloudevents+json message/x.rsocket.mime-type.v0 message/x.rsocket.accept-mime-types.v0 message/x.rsocket.authentication.v0 message/x.rsocket.tracing-zipkin.v0 message/x.rsocket.routing.v0 message/x.rsocket.composite-metadata.v0" -- "${cur}"))
                     return 0
                     ;;
                 --delayElements)
@@ -84,7 +84,7 @@ _rsc() {
                     return 0
                     ;;
                 --metadataMimeType)
-                    COMPREPLY=($(compgen -f "${cur}"))
+                    COMPREPLY=($(compgen -W "application/avro application/cbor application/graphql application/gzip application/javascript application/json application/octet-stream application/pdf application/vnd.apache.thrift.binary application/vnd.google.protobuf application/xml application/zip audio/aac audio/mp3 audio/mp4 audio/mpeg3 audio/mpeg audio/ogg audio/opus audio/vorbis image/bmp image/gif image/heic-sequence image/heic image/heif-sequence image/heif image/jpeg image/png image/tiff multipart/mixed text/css text/csv text/html text/plain text/xml video/H264 video/H265 video/VP8 application/x-hessian application/x-java-object application/cloudevents+json message/x.rsocket.mime-type.v0 message/x.rsocket.accept-mime-types.v0 message/x.rsocket.authentication.v0 message/x.rsocket.tracing-zipkin.v0 message/x.rsocket.routing.v0 message/x.rsocket.composite-metadata.v0" -- "${cur}"))
                     return 0
                     ;;
                 --route)
@@ -112,7 +112,7 @@ _rsc() {
                     return 0
                     ;;
                 --setupMetadataMimeType)
-                    COMPREPLY=($(compgen -W "TEXT_PLAIN APPLICATION_JSON MESSAGE_RSOCKET_AUTHENTICATION AUTHENTICATION_BASIC APP_INFO" -- "${cur}"))
+                    COMPREPLY=($(compgen -W "text/plain application/json message/x.rsocket.authentication.v0 message/x.rsocket.authentication.basic.v0 message/x.rsocket.application+json" -- "${cur}"))
                     return 0
                     ;;
                 --take)
