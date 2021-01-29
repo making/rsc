@@ -68,11 +68,11 @@ _rsc() {
                     return 0
                     ;;
                 --load)
-                    COMPREPLY=($(compgen -W "file:// https:// http://" -- "${cur}"))
+                    COMPREPLY=($(compgen -f "${cur}"))
                     return 0
                     ;;
                     -l)
-                    COMPREPLY=($(compgen -W "file:// https:// http://" -- "${cur}"))
+                    COMPREPLY=($(compgen -f "${cur}"))
                     return 0
                     ;;
                 --limitRate)
