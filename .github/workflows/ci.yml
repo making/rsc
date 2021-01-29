@@ -12,6 +12,7 @@ on:
     - master
     paths:
     - src/**
+    - '!src/main/java/am/ik/rsocket/completion/*'
     - pom.xml
     - .github/workflows/ci.yml
 jobs:
