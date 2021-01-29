@@ -9,64 +9,69 @@ usage: rsc Uri [Options]
 Non-option arguments:
 [String: Uri]        
 
-Option                                Description                           
-------                                -----------                           
---ab, --authBearer [String]           Enable Authentication Metadata        
-                                        Extension (Bearer).                 
---authBasic [String]                  [DEPRECATED] Enable Authentication    
-                                        Metadata Extension (Basic). This    
-                                        Metadata exists only for the backward
-                                        compatibility with Spring Security  
-                                        5.2                                 
---channel                             Shortcut of --im REQUEST_CHANNEL      
--d, --data [String]                   Data. Use '-' to read data from       
-                                        standard input. (default: )         
---dataMimeType, --dmt [String]        MimeType for data (default:           
-                                        application/json)                   
---debug                               Enable FrameLogger                    
---delayElements [Long]                Enable delayElements(delay) in milli  
-                                        seconds                             
---fnf                                 Shortcut of --im FIRE_AND_FORGET      
---help                                Print help                            
---im, --interactionModel              InteractionModel (default:            
-  [InteractionModel]                    REQUEST_RESPONSE)                   
---limitRate [Integer]                 Enable limitRate(rate)                
---log [String]                        Enable log()                          
--m, --metadata [String]               Metadata (default: )                  
---metadataMimeType, --mmt [String]    MimeType for metadata (default:       
-                                        application/json)                   
---printB3                             Print B3 propagation info. Ignored    
-                                        unless --trace is set.              
--q, --quiet                           Disable the output on next            
--r, --route [String]                  Enable Routing Metadata Extension     
---request                             Shortcut of --im REQUEST_RESPONSE     
---resume [Integer]                    Enable resume. Resume session duration
-                                        can be configured in seconds.       
---retry [Integer]                     Enable retry. Retry every 1 second    
-                                        with the given max attempts.        
---sd, --setupData [String]            Data for Setup payload                
---setupMetadata, --sm [String]        Metadata for Setup payload            
---setupMetadataMimeType, --smmt       Metadata MimeType for Setup payload   
-  [String]                              (default: application/json)              
---showSystemProperties                Show SystemProperties for troubleshoot
---stacktrace                          Show Stacktrace when an exception     
-                                        happens                             
---stream                              Shortcut of --im REQUEST_STREAM       
---take [Integer]                      Enable take(n)                        
---trace [TracingMetadataCodec$Flags]  Enable Tracing (Zipkin) Metadata      
-                                        Extension. Unless sampling state    
-                                        (UNDECIDED, NOT_SAMPLE, SAMPLE,     
-                                        DEBUG) is specified, DEBUG is used  
-                                        by default.                         
--u, --as, --authSimple [String]       Enable Authentication Metadata        
-                                        Extension (Simple). The format must 
-                                        be 'username:password'.             
--v, --version                         Print version                         
--w, --wiretap                         Enable wiretap                        
---wsHeader, --wsh [String]            Header for web socket connection      
---zipkinUrl [String]                  Zipkin URL to send a span (ex. http:  
-                                        //localhost:9411). Ignored unless --
-                                        trace is set.     
+Option                                Description                            
+------                                -----------                            
+--ab, --authBearer [String]           Enable Authentication Metadata         
+                                        Extension (Bearer).                  
+--authBasic [String]                  [DEPRECATED] Enable Authentication     
+                                        Metadata Extension (Basic). This     
+                                        Metadata exists only for the         
+                                        backward compatibility with Spring   
+                                        Security 5.2                         
+--channel                             Shortcut of --im REQUEST_CHANNEL       
+--completion [ShellType]              Output shell completion code for the   
+                                        specified shell (bash, zsh, fish,    
+                                        powershell)                          
+-d, --data [String]                   Data. Use '-' to read data from        
+                                        standard input. (default: )          
+--dataMimeType, --dmt [String]        MimeType for data (default:            
+                                        application/json)                    
+--debug                               Enable FrameLogger                     
+--delayElements [Long]                Enable delayElements(delay) in milli   
+                                        seconds                              
+--fnf                                 Shortcut of --im FIRE_AND_FORGET       
+-h, --help [String]                   Print help                             
+--im, --interactionModel              InteractionModel (default:             
+  [InteractionModel]                    REQUEST_RESPONSE)                    
+-l, --load [String]                   Load a file as Data. (e.g. ./foo.txt,  
+                                        file:///tmp/foo, https://example.com)
+--limitRate [Integer]                 Enable limitRate(rate)                 
+--log [String]                        Enable log()                           
+-m, --metadata [String]               Metadata (default: )                   
+--metadataMimeType, --mmt [String]    MimeType for metadata (default:        
+                                        application/json)                    
+--printB3                             Print B3 propagation info. Ignored     
+                                        unless --trace is set.               
+-q, --quiet                           Disable the output on next             
+-r, --route [String]                  Enable Routing Metadata Extension      
+--request                             Shortcut of --im REQUEST_RESPONSE      
+--resume [Integer]                    Enable resume. Resume session duration 
+                                        can be configured in seconds.        
+--retry [Integer]                     Enable retry. Retry every 1 second     
+                                        with the given max attempts.         
+--sd, --setupData [String]            Data for Setup payload                 
+--setupMetadata, --sm [String]        Metadata for Setup payload             
+--setupMetadataMimeType, --smmt       Metadata MimeType for Setup payload    
+  [String]                              (default: application/json)          
+--showSystemProperties                Show SystemProperties for troubleshoot 
+--stacktrace                          Show Stacktrace when an exception      
+                                        happens                              
+--stream                              Shortcut of --im REQUEST_STREAM        
+--take [Integer]                      Enable take(n)                         
+--trace [TracingMetadataCodec$Flags]  Enable Tracing (Zipkin) Metadata       
+                                        Extension. Unless sampling state     
+                                        (UNDECIDED, NOT_SAMPLE, SAMPLE,      
+                                        DEBUG) is specified, DEBUG is used   
+                                        if no state is specified.            
+-u, --as, --authSimple [String]       Enable Authentication Metadata         
+                                        Extension (Simple). The format must  
+                                        be 'username:password'.              
+-v, --version                         Print version                          
+-w, --wiretap                         Enable wiretap                         
+--wsHeader, --wsh [String]            Header for web socket connection       
+--zipkinUrl [String]                  Zipkin URL to send a span (e.g. http:  
+                                        //localhost:9411). Ignored unless -- 
+                                        trace is set.                           
 ```
 
 ## Install
@@ -111,6 +116,92 @@ rsc ws://localhost:8080/rsocket --stream --route hello --debug --take 30
 
 ```
 rsc wss://rsocket-demo.herokuapp.com/rsocket --stream --route searchTweets -d Trump
+```
+## Enable shell autocompletion 
+
+rsc (0.8.0+) provides autocompletion support for Bash, Zsh, Fish and Powershell.
+
+```
+rsc --completion <SHELL>
+```
+
+shows the completion script.
+
+![rsc-completion](https://user-images.githubusercontent.com/106908/106292859-af40bc00-6290-11eb-9f76-99b0d5e2914a.gif)
+
+If you install `rsc` via Homebrew, the completion script is also installed under `/usr/local/Homebrew/completions/`.
+
+Below are the procedures to set up autocompletion manually.
+
+### Zsh
+
+Add the following to the beginning of your `~/.zshrc`
+
+```
+autoload -Uz compinit && compinit
+```
+
+You now need to ensure that the rsc completion script gets sourced in all your shell sessions. 
+
+```
+echo 'source <(rsc --completion bash)' >>~/.zshrc
+```
+
+### Bash
+
+the completion script depends on [bash-completion](https://github.com/scop/bash-completion).
+
+#### on Mac
+
+the completion script doesn't work with Bash 3.2 which is the default bash version on Mac.
+It requires Bash 4.1+ bash-completion v2. 
+
+You can install these as follows
+
+```
+brew install bash
+brew install bash-completion@2
+```
+
+Make sure `bash -v` shows 4.1+.
+
+Add the bellow to your `~/.bash_profile`
+
+```
+[[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
+```
+
+You now need to ensure that the rsc completion script gets sourced in all your shell sessions. 
+
+```
+echo 'source <(rsc --completion bash)' >>~/.bash_profile
+```
+
+#### on Linux
+You can install rsc-completion with `apt-get install bash-completion` or `yum install bash-completion`, etc.
+
+Add `source /usr/share/bash-completion/bash_completion` in your `~/.bashrc`.
+
+You now need to ensure that the rsc completion script gets sourced in all your shell sessions. 
+
+```
+echo 'source <(rsc --completion bash)' >>~/.bashrc
+```
+
+### Fish
+
+TBD
+
+```
+rsc --completion fish
+```
+
+### Powershell
+
+TBD
+
+```
+rsc --completion powershell
 ```
 
 ## Log options
@@ -519,10 +610,10 @@ b3=5f035ed7dd21129b105564ef64c90731-105564ef64c90731-d
 - [x] Setup data (0.4.0)
 - [x] Setup Metadata (0.6.0)
 - [x] RSocket Authentication (0.6.0)
-- [ ] RSocket Routing
 - [x] Request Channel (0.4.0)
-- [ ] Input from a file
+- [x] Input from a file (0.8.0)
 - [x] Input from STDIN (0.4.0)
+- [ ] RSocket Routing Broker
 
 ## Known issues
 
