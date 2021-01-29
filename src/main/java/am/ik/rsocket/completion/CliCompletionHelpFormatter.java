@@ -28,16 +28,22 @@ import java.util.TreeSet;
 import am.ik.rsocket.InteractionModel;
 import am.ik.rsocket.SetupMetadataMimeType;
 import io.rsocket.metadata.TracingMetadataCodec;
+import io.rsocket.metadata.WellKnownMimeType;
 import joptsimple.HelpFormatter;
 import joptsimple.OptionDescriptor;
 
 public class CliCompletionHelpFormatter implements HelpFormatter {
 	private final Map<String, Object[]> possibleValues = new HashMap<String, Object[]>() {
 		{
+			final Object[] wellKnownMimeTypes = Arrays.stream(WellKnownMimeType.values())
+					.filter(type -> type != WellKnownMimeType.UNPARSEABLE_MIME_TYPE && type != WellKnownMimeType.UNKNOWN_RESERVED_MIME_TYPE)
+					.map(WellKnownMimeType::getString).toArray();
 			put("interactionModel", InteractionModel.values());
 			put("completion", ShellType.values());
 			put("trace", TracingMetadataCodec.Flags.values());
-			put("setupMetadataMimeType", SetupMetadataMimeType.values());
+			put("dataMimeType", wellKnownMimeTypes);
+			put("metadataMimeType", wellKnownMimeTypes);
+			put("setupMetadataMimeType", Arrays.stream(SetupMetadataMimeType.values()).map(SetupMetadataMimeType::getValue).toArray());
 		}
 	};
 
@@ -76,7 +82,7 @@ public class CliCompletionHelpFormatter implements HelpFormatter {
 			final String indicator = descriptor.argumentTypeIndicator();
 			sb.append("    takes_value: ").append(!"".equals(indicator)).append(System.lineSeparator());
 			if (possibleValues.containsKey(longest)) {
-				sb.append("    possible_values: ").append(Arrays.toString(possibleValues.get(longest))).append(System.lineSeparator());
+				sb.append("    possible_values: ").append(Arrays.toString(Arrays.stream(possibleValues.get(longest)).map(s -> "\"" + s + "\"").toArray())).append(System.lineSeparator());
 			}
 		});
 		return sb.toString();
