@@ -117,6 +117,15 @@ rsc ws://localhost:8080/rsocket --stream --route hello --debug --take 30
 ```
 rsc wss://rsocket-demo.herokuapp.com/rsocket --stream --route searchTweets -d Trump
 ```
+
+You can also send data via a file or URL using `-l`/`--load` option as follows
+
+```
+rsc tcp://localhost:8080 --request --route hello -l ./hello.txt --debug
+rsc tcp://localhost:8080 --request --route hello -l file:///tmp/hello.txt --debug
+rsc tcp://localhost:8080 --request --route hello -l https://example.com --debug
+```
+
 ## Enable shell autocompletion 
 
 rsc (0.8.0+) provides autocompletion support for Bash, Zsh, Fish and Powershell.
