@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import am.ik.rsocket.InteractionModel;
+import am.ik.rsocket.SetupMetadataMimeType;
 import io.rsocket.metadata.TracingMetadataCodec;
 import joptsimple.HelpFormatter;
 import joptsimple.OptionDescriptor;
@@ -33,9 +34,10 @@ import joptsimple.OptionDescriptor;
 public class CliCompletionHelpFormatter implements HelpFormatter {
 	private final Map<String, Object[]> possibleValues = new HashMap<String, Object[]>() {
 		{
-			put("am.ik.rsocket.InteractionModel", InteractionModel.values());
-			put("am.ik.rsocket.completion.ShellType", ShellType.values());
-			put("io.rsocket.metadata.TracingMetadataCodec$Flags", TracingMetadataCodec.Flags.values());
+			put("interactionModel", InteractionModel.values());
+			put("completion", ShellType.values());
+			put("trace", TracingMetadataCodec.Flags.values());
+			put("setupMetadataMimeType", SetupMetadataMimeType.values());
 		}
 	};
 
@@ -73,8 +75,8 @@ public class CliCompletionHelpFormatter implements HelpFormatter {
 			sb.append("    about: \"").append(descriptor.description()).append("\"").append(System.lineSeparator());
 			final String indicator = descriptor.argumentTypeIndicator();
 			sb.append("    takes_value: ").append(!"".equals(indicator)).append(System.lineSeparator());
-			if (possibleValues.containsKey(indicator)) {
-				sb.append("    possible_values: ").append(Arrays.toString(possibleValues.get(indicator))).append(System.lineSeparator());
+			if (possibleValues.containsKey(longest)) {
+				sb.append("    possible_values: ").append(Arrays.toString(possibleValues.get(longest))).append(System.lineSeparator());
 			}
 		});
 		return sb.toString();

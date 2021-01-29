@@ -25,7 +25,7 @@ import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.rsocket.metadata.WellKnownMimeType;
 
-enum SetupMetadataMimeType {
+public enum SetupMetadataMimeType {
 	TEXT_PLAIN(MimeType.wellKnown(WellKnownMimeType.TEXT_PLAIN)),
 	APPLICATION_JSON(MimeType.wellKnown(WellKnownMimeType.APPLICATION_JSON)),
 	MESSAGE_RSOCKET_AUTHENTICATION(MimeType.wellKnown(WellKnownMimeType.MESSAGE_RSOCKET_AUTHENTICATION)) {
