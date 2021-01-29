@@ -1,0 +1,52 @@
+name: CLI completion
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - src/main/java/am/ik/rsocket/Args.java
+    - src/main/java/am/ik/rsocket/completion/*
+    - .github/workflows/cli-completion.yml
+  workflow_dispatch: { }
+jobs:
+  completion:
+    name: cli-completion
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+    - run: cargo install cli-completion
+    - uses: actions/cache@v1
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    - name: Update Completions
+      run: |
+        mvn package -DskipTests
+        java -jar target/*.jar -h cli-completion > /tmp/cli-completion.yml
+        cli-completion --zsh /tmp/cli-completion.yml > src/main/resources/completions/zsh
+        cli-completion --bash /tmp/cli-completion.yml > src/main/resources/completions/bash
+        cli-completion --fish /tmp/cli-completion.yml > src/main/resources/completions/fish
+        cli-completion --powershell /tmp/cli-completion.yml > src/main/resources/completions/powershell
+        git diff
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v3
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}
+        commit-message: Update completions
+        committer: ${{ secrets.GIT_NAME }} <${{ secrets.GIT_EMAIL }}>
+        author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+        signoff: false
+        branch: update-completions
+        delete-branch: true
+        title:  Update completions
+        body: Update completions
+        base: master
+    - name: Check outputs
+      run: |
+        echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+        echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
