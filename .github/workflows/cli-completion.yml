@@ -31,7 +31,8 @@ jobs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
-    - run: |
+    - name: Update Completions
+      run: |
         mvn package -DskipTests
         java -jar target/*.jar -h cli-completion > /tmp/cli-completion.yml
         cli-completion --zsh /tmp/cli-completion.yml > src/main/resources/completions/zsh
@@ -39,3 +40,19 @@ jobs:
         cli-completion --fish /tmp/cli-completion.yml > src/main/resources/completions/fish
         cli-completion --powershell /tmp/cli-completion.yml > src/main/resources/completions/powershell
         git diff
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v3
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}
+        commit-message: Update completions
+        committer: ${{ secrets.GIT_NAME }} <${{ secrets.GIT_EMAIL }}>
+        author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+        signoff: false
+        branch: update-completions
+        delete-branch: true
+        title:  Update completions
+        body: Update completions
+    - name: Check outputs
+      run: |
+        echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+        echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
