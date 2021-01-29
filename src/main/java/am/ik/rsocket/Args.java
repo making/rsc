@@ -58,6 +58,11 @@ import reactor.netty.tcp.TcpClient;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
+import org.springframework.core.io.FileSystemResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.util.StreamUtils;
+import org.springframework.util.StringUtils;
+
 import static am.ik.rsocket.Transport.TCP;
 import static am.ik.rsocket.Transport.WEBSOCKET;
 import static java.util.stream.Collectors.toList;
@@ -113,6 +118,9 @@ public class Args {
 			.acceptsAll(Arrays.asList("d", "data"), "Data. Use '-' to read data from standard input.").withOptionalArg()
 			.defaultsTo("");
 
+	private final OptionSpec<String> load = parser
+			.acceptsAll(Arrays.asList("l", "load"), "Load a file as Data. (e.g. ./foo.txt, file:///tmp/foo, https://example.com)").withOptionalArg();
+
 	private final OptionSpec<String> metadata = parser
 			.acceptsAll(Arrays.asList("m", "metadata"), "Metadata (default: )").withOptionalArg();
 
@@ -142,7 +150,7 @@ public class Args {
 			.withOptionalArg().ofType(Flags.class);
 
 	private final OptionSpec<String> zipkinUrl = parser
-			.acceptsAll(Arrays.asList("zipkinUrl"), "Zipkin URL to send a span (ex. http://localhost:9411). Ignored unless --trace is set.").withOptionalArg();
+			.acceptsAll(Arrays.asList("zipkinUrl"), "Zipkin URL to send a span (e.g. http://localhost:9411). Ignored unless --trace is set.").withOptionalArg();
 
 	private final OptionSpec<Void> printB3 = parser.acceptsAll(Arrays.asList("printB3"), "Print B3 propagation info. Ignored unless --trace is set.");
 
@@ -236,11 +244,36 @@ public class Args {
 	}
 
 	public ByteBuf data() {
-		return Unpooled.wrappedBuffer(this.options.valueOf(this.data).getBytes(StandardCharsets.UTF_8));
+		final String data = this.options.valueOf(this.data);
+		final Optional<ByteBuf> load = this.load();
+		if (load.isPresent() && StringUtils.hasText(data)) {
+			throw new IllegalArgumentException("--data and --load are mutually exclusive.");
+		}
+		return load.orElseGet(() -> Unpooled.wrappedBuffer(data.getBytes(StandardCharsets.UTF_8)));
 	}
 
 	public boolean readFromStdin() {
 		return "-".equals(this.options.valueOf(this.data));
+	}
+
+	private Optional<ByteBuf> load() {
+		if (this.options.has(this.load)) {
+			final String load = this.options.valueOf(this.load);
+			if (load == null) {
+				throw new IllegalArgumentException("'load' is not specified.");
+			}
+			try {
+				final Resource resource = new FileSystemResourceLoader().getResource(load);
+				final byte[] data = StreamUtils.copyToByteArray(resource.getInputStream());
+				return Optional.of(Unpooled.wrappedBuffer(data));
+			}
+			catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+		else {
+			return Optional.empty();
+		}
 	}
 
 	public Route route() {
