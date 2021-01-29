@@ -52,6 +52,7 @@ jobs:
         delete-branch: true
         title:  Update completions
         body: Update completions
+        base: master
     - name: Check outputs
       run: |
         echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
