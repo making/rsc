@@ -118,7 +118,7 @@ rsc ws://localhost:8080/rsocket --stream --route hello --debug --take 30
 rsc wss://rsocket-demo.herokuapp.com/rsocket --stream --route searchTweets -d Trump
 ```
 
-You can also send data via a file or URL using `-l`/`--load` option as follows
+You can also send data via a file or URL using `-l`/`--load` option instead of `-d`/`--data` as follows
 
 ```
 rsc tcp://localhost:8080 --request --route hello -l ./hello.txt --debug
@@ -163,7 +163,7 @@ the completion script depends on [bash-completion](https://github.com/scop/bash-
 #### on Mac
 
 the completion script doesn't work with Bash 3.2 which is the default bash version on Mac.
-It requires Bash 4.1+ bash-completion v2. 
+It requires Bash 4.1+ and bash-completion v2. 
 
 You can install these as follows
 
@@ -187,9 +187,9 @@ echo 'source <(rsc --completion bash)' >>~/.bash_profile
 ```
 
 #### on Linux
-You can install rsc-completion with `apt-get install bash-completion` or `yum install bash-completion`, etc.
+You can install bash-completion with `apt-get install bash-completion` or `yum install bash-completion`, etc.
 
-Add `source /usr/share/bash-completion/bash_completion` in your `~/.bashrc`.
+Add `source /usr/share/bash-completion/bash_completion` to your `~/.bashrc`.
 
 You now need to ensure that the rsc completion script gets sourced in all your shell sessions. 
 
@@ -199,7 +199,7 @@ echo 'source <(rsc --completion bash)' >>~/.bashrc
 
 ### Fish
 
-TBD
+TBD (help wanted)
 
 ```
 rsc --completion fish
@@ -207,7 +207,7 @@ rsc --completion fish
 
 ### Powershell
 
-TBD
+TBD (help wanted)
 
 ```
 rsc --completion powershell
