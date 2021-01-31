@@ -25,8 +25,8 @@ _rsc() {
 '-h+[Print help]' \
 '--help=[Print help]' \
 '--interactionModel=[InteractionModel]: :(REQUEST_RESPONSE REQUEST_STREAM REQUEST_CHANNEL FIRE_AND_FORGET)' \
-'-l+[Load a file as Data. (e.g. ./foo.txt, file:///tmp/foo, https://example.com)]' \
-'--load=[Load a file as Data. (e.g. ./foo.txt, file:///tmp/foo, https://example.com)]' \
+'-l+[Load a file as Data. (e.g. ./foo.txt, /tmp/foo.txt, https://example.com)]' \
+'--load=[Load a file as Data. (e.g. ./foo.txt, /tmp/foo.txt, https://example.com)]' \
 '--limitRate=[Enable limitRate(rate)]' \
 '--log=[Enable log()]' \
 '-m+[Metadata (default: )]' \
