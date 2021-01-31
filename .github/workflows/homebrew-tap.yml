@@ -1,0 +1,18 @@
+name: Homebrew-tab
+on:
+  release:
+    types:
+    - released
+jobs:
+  update-homebrew-tap:
+    name: update homebrew-tap
+    runs-on: ubuntu-latest
+    steps:
+    - name: download-binaries
+      run: |
+        set -ex
+        VERSION=$(echo $GITHUB_REF | sed 's/refs\/tags\///')
+        wget https://github.com/making/rsc/releases/download/${VERSION}/rsc-x86_64-apple-darwin
+        wget https://github.com/making/rsc/releases/download/${VERSION}/rsc-x86_64-pc-linux
+        shasum -a 256 rsc-x86_64-apple-darwin
+        shasum -a 256 rsc-x86_64-pc-linux
