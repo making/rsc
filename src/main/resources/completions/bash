@@ -20,7 +20,7 @@ _rsc() {
 
     case "${cmd}" in
         rsc)
-            opts=" -d -h -l -m -q -r -u -v -w -V  --authBearer --authBasic --channel --completion --data --dataMimeType --debug --delayElements --fnf --help --interactionModel --load --limitRate --log --metadata --metadataMimeType --printB3 --quiet --route --request --resume --retry --setupData --setupMetadata --setupMetadataMimeType --showSystemProperties --stacktrace --stream --take --trace --authSimple --version --wiretap --wsHeader --zipkinUrl  "
+            opts=" -d -h -l -m -q -r -u -v -w -V  --authBearer --authBasic --channel --completion --data --dataMimeType --debug --delayElements --fnf --help --interactionModel --load --limitRate --log --metadata --metadataMimeType --printB3 --quiet --route --request --resume --retry --setupData --setupMetadata --setupMetadataMimeType --showSystemProperties --stacktrace --stream --take --trace --trustCert --authSimple --version --wiretap --wsHeader --zipkinUrl  "
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -129,6 +129,10 @@ _rsc() {
                     ;;
                 --trace)
                     COMPREPLY=($(compgen -W "UNDECIDED NOT_SAMPLE SAMPLE DEBUG" -- "${cur}"))
+                    return 0
+                    ;;
+                --trustCert)
+                    COMPREPLY=($(compgen -f "${cur}"))
                     return 0
                     ;;
                 --authSimple)

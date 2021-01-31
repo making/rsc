@@ -41,6 +41,7 @@ _rsc() {
 '--setupMetadataMimeType=[Metadata MimeType for Setup payload  (default: application/json)]: :(text/plain application/json message/x.rsocket.authentication.v0 message/x.rsocket.authentication.basic.v0 message/x.rsocket.application+json)' \
 '--take=[Enable take(n)]' \
 '--trace=[Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used if no state is specified.]: :(UNDECIDED NOT_SAMPLE SAMPLE DEBUG)' \
+'--trustCert=[PEM file for a trusted certificate. (e.g. ./foo.crt, /tmp/foo.crt, https://example.com/foo.crt)]' \
 '-u+[Enable Authentication Metadata Extension (Simple). The format must be '\''username:password'\''.]' \
 '--authSimple=[Enable Authentication Metadata Extension (Simple). The format must be '\''username:password'\''.]' \
 '--wsHeader=[Header for web socket connection]' \

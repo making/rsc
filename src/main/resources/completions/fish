@@ -19,6 +19,7 @@ complete -c rsc -n "__fish_use_subcommand" -l setupMetadata -d 'Metadata for Set
 complete -c rsc -n "__fish_use_subcommand" -l setupMetadataMimeType -d 'Metadata MimeType for Setup payload  (default: application/json)' -r -f -a "text/plain application/json message/x.rsocket.authentication.v0 message/x.rsocket.authentication.basic.v0 message/x.rsocket.application+json"
 complete -c rsc -n "__fish_use_subcommand" -l take -d 'Enable take(n)' -r
 complete -c rsc -n "__fish_use_subcommand" -l trace -d 'Enable Tracing (Zipkin) Metadata Extension. Unless sampling state (UNDECIDED, NOT_SAMPLE, SAMPLE, DEBUG) is specified, DEBUG is used if no state is specified.' -r -f -a "UNDECIDED NOT_SAMPLE SAMPLE DEBUG"
+complete -c rsc -n "__fish_use_subcommand" -l trustCert -d 'PEM file for a trusted certificate. (e.g. ./foo.crt, /tmp/foo.crt, https://example.com/foo.crt)' -r
 complete -c rsc -n "__fish_use_subcommand" -s u -l authSimple -d 'Enable Authentication Metadata Extension (Simple). The format must be \'username:password\'.' -r
 complete -c rsc -n "__fish_use_subcommand" -l wsHeader -d 'Header for web socket connection' -r
 complete -c rsc -n "__fish_use_subcommand" -l zipkinUrl -d 'Zipkin URL to send a span (e.g. http://localhost:9411). Ignored unless --trace is set.' -r
