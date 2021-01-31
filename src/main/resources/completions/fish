@@ -6,7 +6,7 @@ complete -c rsc -n "__fish_use_subcommand" -l dataMimeType -d 'MimeType for data
 complete -c rsc -n "__fish_use_subcommand" -l delayElements -d 'Enable delayElements(delay) in milli seconds' -r
 complete -c rsc -n "__fish_use_subcommand" -s h -l help -d 'Print help' -r
 complete -c rsc -n "__fish_use_subcommand" -l interactionModel -d 'InteractionModel' -r -f -a "REQUEST_RESPONSE REQUEST_STREAM REQUEST_CHANNEL FIRE_AND_FORGET"
-complete -c rsc -n "__fish_use_subcommand" -s l -l load -d 'Load a file as Data. (e.g. ./foo.txt, file:///tmp/foo, https://example.com)' -r
+complete -c rsc -n "__fish_use_subcommand" -s l -l load -d 'Load a file as Data. (e.g. ./foo.txt, /tmp/foo.txt, https://example.com)' -r
 complete -c rsc -n "__fish_use_subcommand" -l limitRate -d 'Enable limitRate(rate)' -r
 complete -c rsc -n "__fish_use_subcommand" -l log -d 'Enable log()' -r
 complete -c rsc -n "__fish_use_subcommand" -s m -l metadata -d 'Metadata (default: )' -r
