@@ -16,10 +16,14 @@
 package am.ik.rsocket;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.UncheckedIOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +49,7 @@ import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.CompositeByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
+import io.netty.handler.ssl.SslContextBuilder;
 import io.rsocket.Payload;
 import io.rsocket.metadata.CompositeMetadataCodec;
 import io.rsocket.metadata.TracingMetadataCodec.Flags;
@@ -165,6 +170,9 @@ public class Args {
 	private final OptionSpec<Long> delayElements = parser
 			.acceptsAll(Arrays.asList("delayElements"), "Enable delayElements(delay) in milli seconds")
 			.withOptionalArg().ofType(Long.class);
+
+	private final OptionSpec<String> trustCert = parser
+			.acceptsAll(Arrays.asList("trustCert"), "PEM file for a trusted certificate. (e.g. ./foo.crt, /tmp/foo.crt, https://example.com/foo.crt)").withOptionalArg();
 
 	private final OptionSpec<Void> stacktrace = parser.acceptsAll(Arrays.asList("stacktrace"),
 			"Show Stacktrace when an exception happens");
@@ -518,9 +526,40 @@ public class Args {
 	public TcpClient tcpClient() {
 		final TcpClient tcpClient = TcpClient.create().host(this.host()).port(this.port()).wiretap(this.wiretap());
 		if (this.secure()) {
-			return tcpClient.secure();
+			final List<String> trustCerts = trustCerts();
+			if (trustCerts.isEmpty()) {
+				return tcpClient.secure();
+			}
+			else {
+				return tcpClient.secure(provider -> {
+					final List<X509Certificate> trustCertificates = this.loadCertificates(trustCerts);
+					provider.sslContext(SslContextBuilder.forClient().trustManager(trustCertificates));
+				});
+			}
 		}
 		return tcpClient;
+	}
+
+	List<X509Certificate> loadCertificates(List<String> pemLocations) {
+		try {
+			final FileSystemResourceLoader resourceLoader = new FileSystemResourceLoader();
+			final CertificateFactory fact = CertificateFactory.getInstance("X.509");
+			final List<X509Certificate> certificates = new ArrayList<>();
+			for (String pemLocation : pemLocations) {
+				final Resource pemResource = resourceLoader.getResource(pemLocation);
+				try (final InputStream inputStream = pemResource.getInputStream()) {
+					final X509Certificate certificate = (X509Certificate) fact.generateCertificate(inputStream);
+					certificates.add(certificate);
+				}
+			}
+			return certificates;
+		}
+		catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+		catch (GeneralSecurityException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	public boolean wiretap() {
@@ -638,6 +677,10 @@ public class Args {
 		else {
 			return Optional.empty();
 		}
+	}
+
+	public List<String> trustCerts() {
+		return this.options.valuesOf(this.trustCert);
 	}
 
 	public boolean help() {
