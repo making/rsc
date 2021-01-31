@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import am.ik.rsocket.completion.ShellType;
+import am.ik.rsocket.file.FileSystemResourceLoader;
 import am.ik.rsocket.routing.Route;
 import am.ik.rsocket.security.BasicAuthentication;
 import am.ik.rsocket.security.BearerAuthentication;
@@ -58,7 +59,6 @@ import reactor.netty.tcp.TcpClient;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
-import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
@@ -119,7 +119,7 @@ public class Args {
 			.defaultsTo("");
 
 	private final OptionSpec<String> load = parser
-			.acceptsAll(Arrays.asList("l", "load"), "Load a file as Data. (e.g. ./foo.txt, file:///tmp/foo, https://example.com)").withOptionalArg();
+			.acceptsAll(Arrays.asList("l", "load"), "Load a file as Data. (e.g. ./foo.txt, /tmp/foo.txt, https://example.com)").withOptionalArg();
 
 	private final OptionSpec<String> metadata = parser
 			.acceptsAll(Arrays.asList("m", "metadata"), "Metadata (default: )").withOptionalArg();
