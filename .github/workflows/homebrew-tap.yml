@@ -1,0 +1,97 @@
+name: Homebrew-tap
+on:
+  release:
+    types:
+    - released
+  workflow_dispatch: { }      
+jobs:
+  update-homebrew-tap:
+    name: update homebrew-tap
+    runs-on: ubuntu-latest
+    steps:
+    - name: download-macox-binaries
+      uses: dsaltares/fetch-gh-release-asset@master
+      with:
+        repo: making/rsc
+        version: "latest"
+        file: rsc-x86_64-apple-darwin
+        token: ${{ secrets.ACCESS_TOKEN }}
+    - name: download-linux-binaries
+      id: download-linux-binaries
+      uses: dsaltares/fetch-gh-release-asset@master
+      with:
+        repo: making/rsc
+        version: "latest"
+        file: rsc-x86_64-pc-linux
+        token: ${{ secrets.ACCESS_TOKEN }}
+    - name: send a pull request
+      env:
+        REPOSITORY: making/homebrew-tap
+        VERSION: ${{ steps.download-linux-binaries.outputs.version }}
+        GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
+        GIT_NAME: ${{ secrets.GIT_NAME }}
+        GIT_SSH_KEY: ${{ secrets.GIT_SSH_KEY }}
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        BRANCH_NAME: update-rsc
+        BASE: master
+      run: |
+        set -ex
+        mkdir -p ~/.ssh
+        cat > ~/.ssh/config <<EOF
+        StrictHostKeyChecking no
+        LogLevel quiet
+        EOF
+        cat > ~/.ssh/id_rsa <<EOF
+        ${GIT_SSH_KEY}
+        EOF
+        chmod 0600 ~/.ssh/*
+
+        git config --global user.email "${GIT_EMAIL}"
+        git config --global user.name "${GIT_NAME}"
+        git clone git@github.com:${REPOSITORY}.git
+        cd homebrew-tap
+        git checkout -b ${BRANCH_NAME}
+
+        cat <<EOF > rsc.rb
+        class Rsc < Formula
+          desc "RSocket Client CLI (RSC)"
+          homepage "https://github.com/making/rsc"
+          version "${VERSION}"
+          license "Apache-2.0"
+
+          depends_on :arch => :x86_64
+
+          if OS.mac?
+            url "https://github.com/making/rsc/releases/download/#{version}/rsc-x86_64-apple-darwin"
+            sha256 "$(shasum -a 256 ../rsc-x86_64-apple-darwin | awk '{print $1}')"
+          elsif OS.linux?
+            url "https://github.com/making/rsc/releases/download/#{version}/rsc-x86_64-pc-linux"
+            sha256 "$(shasum -a 256 ../rsc-x86_64-pc-linux | awk '{print $1}')"
+          end
+
+          def install
+            if OS.mac?
+              mv "rsc-x86_64-apple-darwin", "rsc"
+            elsif OS.linux?
+              mv "rsc-x86_64-pc-linux", "rsc"
+            end
+            bin.install "rsc"
+            chmod 0755, "#{bin}/rsc"
+            output = Utils.safe_popen_read("#{bin}/rsc", "--completion", "bash")
+            (bash_completion/"rsc").write output
+            output = Utils.safe_popen_read("#{bin}/rsc", "--completion", "zsh")
+            (zsh_completion/"_rsc").write output
+            output = Utils.safe_popen_read("#{bin}/rsc", "--completion", "fish")
+            (fish_completion/"rsc.fish").write output
+          end
+
+          test do
+            system "#{bin}/rsc -v"
+          end
+        end
+        EOF
+        git diff
+        git add -A
+        git commit -m "Bump rsc to ${VERSION}"
+        git push origin ${BRANCH_NAME}
+        curl -u ${GIT_NAME}:${ACCESS_TOKEN} -H "Content-Type: application/json" -X POST -d "{\"title\":\"Bump rsc to ${VERSION}\",\"body\":\"automatically created pr\",\"head\":\"${BRANCH_NAME}\",\"base\":\"${BASE}\"}" https://api.github.com/repos/${REPOSITORY}/pulls
