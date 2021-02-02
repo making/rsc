@@ -44,8 +44,8 @@ public class RscCommandLineRunner implements CommandLineRunner {
 	public void run(String... a) throws Exception {
 		final Args args = new Args(a);
 		try {
-			if (args.isDumpArgs()) {
-				args.dumpArgs(System.out);
+			if (args.isDumpOpts()) {
+				args.dumpOpts(System.out);
 				return;
 			}
 			if (args.help()) {

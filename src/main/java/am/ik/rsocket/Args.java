@@ -191,10 +191,10 @@ public class Args {
 			.acceptsAll(Arrays.asList("completion"), "Output shell completion code for the specified shell (bash, zsh, fish, powershell)")
 			.withOptionalArg().ofType(ShellType.class);
 
-	private final OptionSpec<String> argsFile = parser
-			.acceptsAll(Arrays.asList("argsFile"), "Configure arguments from a YAML file (e.g. ./args.yaml, /tmp/args.yaml, https://example.com/args.yaml)").withOptionalArg();
+	private final OptionSpec<String> optsFile = parser
+			.acceptsAll(Arrays.asList("optsFile"), "Configure options from a YAML file (e.g. ./opts.yaml, /tmp/opts.yaml, https://example.com/opts.yaml)").withOptionalArg();
 
-	private final OptionSpec<Void> dumpArgs = parser.acceptsAll(Arrays.asList("dumpArgs"), "Dump args as a file that can be loaded by --argsFile option");
+	private final OptionSpec<Void> dumpOpts = parser.acceptsAll(Arrays.asList("dumpOpts"), "Dump options as a file that can be loaded by --optsFile option");
 
 	private OptionSet options;
 
@@ -752,24 +752,24 @@ public class Args {
 	}
 
 	private Optional<List<String>> argsFile() {
-		if (this.options.has(this.argsFile)) {
-			final String argsFile = this.options.valueOf(this.argsFile);
-			if (argsFile == null) {
-				throw new IllegalArgumentException("'argsFile' is not specified.");
+		if (this.options.has(this.optsFile)) {
+			final String optsFile = this.options.valueOf(this.optsFile);
+			if (optsFile == null) {
+				throw new IllegalArgumentException("'optsFile' is not specified.");
 			}
 			try {
-				final Resource resource = new FileSystemResourceLoader().getResource(argsFile);
+				final Resource resource = new FileSystemResourceLoader().getResource(optsFile);
 				Map<?, ?> yaml = new Yaml().loadAs(resource.getInputStream(), Map.class);
-				final List<String> args = new ArrayList<>();
+				final List<String> options = new ArrayList<>();
 				for (Map.Entry<?, ?> entry : yaml.entrySet()) {
-					final String argName = (String) entry.getKey();
-					final String argValue = (String) entry.getValue();
-					args.add((argName.length() == 1 ? "-" : "--") + argName);
-					if (argValue != null) {
-						args.add(argValue);
+					final String optionName = (String) entry.getKey();
+					final String optionValue = (String) entry.getValue();
+					options.add((optionName.length() == 1 ? "-" : "--") + optionName);
+					if (optionValue != null) {
+						options.add(optionValue);
 					}
 				}
-				return Optional.of(args);
+				return Optional.of(options);
 			}
 			catch (IOException e) {
 				throw new UncheckedIOException(e);
@@ -780,45 +780,45 @@ public class Args {
 		}
 	}
 
-	public boolean isDumpArgs() {
-		return this.options.has(this.dumpArgs);
+	public boolean isDumpOpts() {
+		return this.options.has(this.dumpOpts);
 	}
 
-	public void dumpArgs(PrintStream stream) {
-		String lastArgName = null;
-		final Map<String, String> argMap = new TreeMap<>();
-		final List<String> newArgs = new ArrayList<>();
+	public void dumpOpts(PrintStream stream) {
+		String lastOptionName = null;
+		final Map<String, String> optionMap = new TreeMap<>();
+		final List<String> options = new ArrayList<>();
 		for (String s : this.args) {
 			if (s.matches("^-{1,2}.+=.*")) {
 				final String[] split = s.split("=", 2);
-				newArgs.add(split[0]);
-				newArgs.add(split[1]);
+				options.add(split[0]);
+				options.add(split[1]);
 			}
 			else {
-				newArgs.add(s);
+				options.add(s);
 			}
 		}
-		for (String s : newArgs) {
+		for (String s : options) {
 			if (s.startsWith("-")) {
 				// name
-				if (lastArgName != null) {
-					argMap.put(lastArgName.replaceAll("^-{1,2}", ""), null);
+				if (lastOptionName != null) {
+					optionMap.put(lastOptionName.replaceAll("^-{1,2}", ""), null);
 				}
-				lastArgName = s;
+				lastOptionName = s;
 			}
-			else if (lastArgName != null) {
+			else if (lastOptionName != null) {
 				// value
-				argMap.put(lastArgName.replaceAll("^-{1,2}", ""), s);
-				lastArgName = null;
+				optionMap.put(lastOptionName.replaceAll("^-{1,2}", ""), s);
+				lastOptionName = null;
 			}
-			if (lastArgName != null) {
-				argMap.put(lastArgName.replaceAll("^-{1,2}", ""), null);
+			if (lastOptionName != null) {
+				optionMap.put(lastOptionName.replaceAll("^-{1,2}", ""), null);
 			}
 		}
-		argMap.remove("argsFile");
-		argMap.remove("dumpArgs");
+		optionMap.remove("optsFile");
+		optionMap.remove("dumpOpts");
 		final DumperOptions dumperOptions = new DumperOptions();
 		dumperOptions.setDefaultFlowStyle(FlowStyle.BLOCK);
-		stream.println(new Yaml(dumperOptions).dump(argMap));
+		stream.println(new Yaml(dumperOptions).dump(optionMap));
 	}
 }
