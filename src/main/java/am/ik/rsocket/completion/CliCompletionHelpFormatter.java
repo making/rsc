@@ -56,8 +56,8 @@ public class CliCompletionHelpFormatter implements HelpFormatter {
 		sb.append("name: rsc").append(System.lineSeparator());
 		sb.append("binary_name: rsc").append(System.lineSeparator());
 		sb.append("before_help: |").append(System.lineSeparator());
-		sb.append("  usage: rsc Uri [Options]").append(System.lineSeparator());
-		sb.append("  Non-option arguments: [String: Uri]").append(System.lineSeparator());
+		sb.append("  usage: rsc [options] uri").append(System.lineSeparator());
+		sb.append("  Non-option arguments: [String: uri]").append(System.lineSeparator());
 		sb.append(System.lineSeparator());
 		sb.append("args:").append(System.lineSeparator());
 		sorted.forEach(descriptor -> {

@@ -207,7 +207,7 @@ public class Args {
 	public static final String DEFAULT_METADATA_MIME_TYPE = WellKnownMimeType.APPLICATION_JSON.getString();
 
 	public Args(String[] args) {
-		final OptionSpec<String> uri = parser.nonOptions().describedAs("Uri");
+		final OptionSpec<String> uri = parser.nonOptions().describedAs("uri");
 		this.args = args;
 		this.options = parser.parse(args);
 		this.argsFile().ifPresent(fileArgs -> {
@@ -715,7 +715,7 @@ public class Args {
 
 	public void printHelp(PrintStream stream) {
 		try {
-			stream.println("usage: rsc Uri [Options]");
+			stream.println("usage: rsc [options] uri");
 			stream.println();
 			this.parser.printHelpOn(stream);
 		}
