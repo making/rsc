@@ -10,6 +10,11 @@
     "allDeclaredMethods": true
   },
   {
+    "name": "java.util.Map",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
     "name": "am.ik.rsocket.Transport",
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true

@@ -37,8 +37,6 @@ import reactor.util.retry.Retry;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StreamUtils;
-import org.springframework.util.StringUtils;
 
 @Component
 public class RscCommandLineRunner implements CommandLineRunner {
@@ -46,6 +44,10 @@ public class RscCommandLineRunner implements CommandLineRunner {
 	public void run(String... a) throws Exception {
 		final Args args = new Args(a);
 		try {
+			if (args.isDumpArgs()) {
+				args.dumpArgs(System.out);
+				return;
+			}
 			if (args.help()) {
 				if ("cli-completion".equals(args.helpFormatter())) {
 					args.printHelp(System.out, new CliCompletionHelpFormatter());

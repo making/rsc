@@ -62,10 +62,6 @@
 					<artifactId>jul-to-slf4j</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>org.yaml</groupId>
-					<artifactId>snakeyaml</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>jakarta.annotation</groupId>
 					<artifactId>annotations-api</artifactId>
 				</exclusion>

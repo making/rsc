@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 
 import am.ik.rsocket.completion.ShellType;
 import am.ik.rsocket.file.FileSystemResourceLoader;
@@ -60,6 +61,9 @@ import joptsimple.HelpFormatter;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.DumperOptions.FlowStyle;
+import org.yaml.snakeyaml.Yaml;
 import reactor.netty.tcp.TcpClient;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
@@ -187,7 +191,14 @@ public class Args {
 			.acceptsAll(Arrays.asList("completion"), "Output shell completion code for the specified shell (bash, zsh, fish, powershell)")
 			.withOptionalArg().ofType(ShellType.class);
 
-	private final OptionSet options;
+	private final OptionSpec<String> argsFile = parser
+			.acceptsAll(Arrays.asList("argsFile"), "Configure arguments from a YAML file (e.g. ./args.yaml, /tmp/args.yaml, https://example.com/args.yaml)").withOptionalArg();
+
+	private final OptionSpec<Void> dumpArgs = parser.acceptsAll(Arrays.asList("dumpArgs"), "Dump args as a file that can be loaded by --argsFile option");
+
+	private OptionSet options;
+
+	private String[] args;
 
 	private Tuple2<String, ByteBuf> composedMetadata = null;
 
@@ -197,7 +208,14 @@ public class Args {
 
 	public Args(String[] args) {
 		final OptionSpec<String> uri = parser.nonOptions().describedAs("Uri");
+		this.args = args;
 		this.options = parser.parse(args);
+		this.argsFile().ifPresent(fileArgs -> {
+			fileArgs.addAll(Arrays.asList(args));
+			final String[] newArgs = fileArgs.toArray(new String[0]);
+			this.options = parser.parse(newArgs);
+			this.args = newArgs;
+		});
 		this.uri = Optional.ofNullable(uri.value(this.options)).map(URI::create).orElse(null);
 	}
 
@@ -731,5 +749,76 @@ public class Args {
 		else {
 			return Optional.empty();
 		}
+	}
+
+	private Optional<List<String>> argsFile() {
+		if (this.options.has(this.argsFile)) {
+			final String argsFile = this.options.valueOf(this.argsFile);
+			if (argsFile == null) {
+				throw new IllegalArgumentException("'argsFile' is not specified.");
+			}
+			try {
+				final Resource resource = new FileSystemResourceLoader().getResource(argsFile);
+				Map<?, ?> yaml = new Yaml().loadAs(resource.getInputStream(), Map.class);
+				final List<String> args = new ArrayList<>();
+				for (Map.Entry<?, ?> entry : yaml.entrySet()) {
+					final String argName = (String) entry.getKey();
+					final String argValue = (String) entry.getValue();
+					args.add((argName.length() == 1 ? "-" : "--") + argName);
+					if (argValue != null) {
+						args.add(argValue);
+					}
+				}
+				return Optional.of(args);
+			}
+			catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+		else {
+			return Optional.empty();
+		}
+	}
+
+	public boolean isDumpArgs() {
+		return this.options.has(this.dumpArgs);
+	}
+
+	public void dumpArgs(PrintStream stream) {
+		String lastArgName = null;
+		final Map<String, String> argMap = new TreeMap<>();
+		final List<String> newArgs = new ArrayList<>();
+		for (String s : this.args) {
+			if (s.matches("^-{1,2}.+=.*")) {
+				final String[] split = s.split("=", 2);
+				newArgs.add(split[0]);
+				newArgs.add(split[1]);
+			}
+			else {
+				newArgs.add(s);
+			}
+		}
+		for (String s : newArgs) {
+			if (s.startsWith("-")) {
+				// name
+				if (lastArgName != null) {
+					argMap.put(lastArgName.replaceAll("^-{1,2}", ""), null);
+				}
+				lastArgName = s;
+			}
+			else if (lastArgName != null) {
+				// value
+				argMap.put(lastArgName.replaceAll("^-{1,2}", ""), s);
+				lastArgName = null;
+			}
+			if (lastArgName != null) {
+				argMap.put(lastArgName.replaceAll("^-{1,2}", ""), null);
+			}
+		}
+		argMap.remove("argsFile");
+		argMap.remove("dumpArgs");
+		final DumperOptions dumperOptions = new DumperOptions();
+		dumperOptions.setDefaultFlowStyle(FlowStyle.BLOCK);
+		stream.println(new Yaml(dumperOptions).dump(argMap));
 	}
 }
