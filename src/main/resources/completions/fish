@@ -1,4 +1,5 @@
 complete -c rsc -n "__fish_use_subcommand" -l authBearer -d 'Enable Authentication Metadata Extension (Bearer).' -r
+complete -c rsc -n "__fish_use_subcommand" -l argsFile -d 'Configure arguments from a YAML file (e.g. ./args.yaml, /tmp/args.yaml, https://example.com/args.yaml)' -r
 complete -c rsc -n "__fish_use_subcommand" -l authBasic -d '[DEPRECATED] Enable Authentication Metadata Extension (Basic). This Metadata exists only for the backward compatibility with Spring Security 5.2' -r
 complete -c rsc -n "__fish_use_subcommand" -l completion -d 'Output shell completion code for the specified shell (bash, zsh, fish, powershell)' -r -f -a "bash zsh fish powershell"
 complete -c rsc -n "__fish_use_subcommand" -s d -l data -d 'Data. Use \'-\' to read data from standard input.' -r
@@ -25,6 +26,7 @@ complete -c rsc -n "__fish_use_subcommand" -l wsHeader -d 'Header for web socket
 complete -c rsc -n "__fish_use_subcommand" -l zipkinUrl -d 'Zipkin URL to send a span (e.g. http://localhost:9411). Ignored unless --trace is set.' -r
 complete -c rsc -n "__fish_use_subcommand" -l channel -d 'Shortcut of --im REQUEST_CHANNEL'
 complete -c rsc -n "__fish_use_subcommand" -l debug -d 'Enable FrameLogger'
+complete -c rsc -n "__fish_use_subcommand" -l dumpArgs -d 'Dump args as a file that can be loaded by --argsFile option'
 complete -c rsc -n "__fish_use_subcommand" -l fnf -d 'Shortcut of --im FIRE_AND_FORGET'
 complete -c rsc -n "__fish_use_subcommand" -l printB3 -d 'Print B3 propagation info. Ignored unless --trace is set.'
 complete -c rsc -n "__fish_use_subcommand" -s q -l quiet -d 'Disable the output on next'

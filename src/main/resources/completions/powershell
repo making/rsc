@@ -21,6 +21,7 @@ Register-ArgumentCompleter -Native -CommandName 'rsc' -ScriptBlock {
     $completions = @(switch ($command) {
         'rsc' {
             [CompletionResult]::new('--authBearer', 'authBearer', [CompletionResultType]::ParameterName, 'Enable Authentication Metadata Extension (Bearer).')
+            [CompletionResult]::new('--argsFile', 'argsFile', [CompletionResultType]::ParameterName, 'Configure arguments from a YAML file (e.g. ./args.yaml, /tmp/args.yaml, https://example.com/args.yaml)')
             [CompletionResult]::new('--authBasic', 'authBasic', [CompletionResultType]::ParameterName, '[DEPRECATED] Enable Authentication Metadata Extension (Basic). This Metadata exists only for the backward compatibility with Spring Security 5.2')
             [CompletionResult]::new('--completion', 'completion', [CompletionResultType]::ParameterName, 'Output shell completion code for the specified shell (bash, zsh, fish, powershell)')
             [CompletionResult]::new('-d', 'd', [CompletionResultType]::ParameterName, 'Data. Use ''-'' to read data from standard input.')
@@ -53,6 +54,7 @@ Register-ArgumentCompleter -Native -CommandName 'rsc' -ScriptBlock {
             [CompletionResult]::new('--zipkinUrl', 'zipkinUrl', [CompletionResultType]::ParameterName, 'Zipkin URL to send a span (e.g. http://localhost:9411). Ignored unless --trace is set.')
             [CompletionResult]::new('--channel', 'channel', [CompletionResultType]::ParameterName, 'Shortcut of --im REQUEST_CHANNEL')
             [CompletionResult]::new('--debug', 'debug', [CompletionResultType]::ParameterName, 'Enable FrameLogger')
+            [CompletionResult]::new('--dumpArgs', 'dumpArgs', [CompletionResultType]::ParameterName, 'Dump args as a file that can be loaded by --argsFile option')
             [CompletionResult]::new('--fnf', 'fnf', [CompletionResultType]::ParameterName, 'Shortcut of --im FIRE_AND_FORGET')
             [CompletionResult]::new('--printB3', 'printB3', [CompletionResultType]::ParameterName, 'Print B3 propagation info. Ignored unless --trace is set.')
             [CompletionResult]::new('-q', 'q', [CompletionResultType]::ParameterName, 'Disable the output on next')

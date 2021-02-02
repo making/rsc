@@ -16,6 +16,7 @@ _rsc() {
     local context curcontext="$curcontext" state line
     _arguments "${_arguments_options[@]}" \
 '--authBearer=[Enable Authentication Metadata Extension (Bearer).]' \
+'--argsFile=[Configure arguments from a YAML file (e.g. ./args.yaml, /tmp/args.yaml, https://example.com/args.yaml)]' \
 '--authBasic=[\[DEPRECATED\] Enable Authentication Metadata Extension (Basic). This Metadata exists only for the backward compatibility with Spring Security 5.2]' \
 '--completion=[Output shell completion code for the specified shell (bash, zsh, fish, powershell)]: :(bash zsh fish powershell)' \
 '-d+[Data. Use '\''-'\'' to read data from standard input.]' \
@@ -48,6 +49,7 @@ _rsc() {
 '--zipkinUrl=[Zipkin URL to send a span (e.g. http://localhost:9411). Ignored unless --trace is set.]' \
 '--channel[Shortcut of --im REQUEST_CHANNEL]' \
 '--debug[Enable FrameLogger]' \
+'--dumpArgs[Dump args as a file that can be loaded by --argsFile option]' \
 '--fnf[Shortcut of --im FIRE_AND_FORGET]' \
 '--printB3[Print B3 propagation info. Ignored unless --trace is set.]' \
 '-q[Disable the output on next]' \
