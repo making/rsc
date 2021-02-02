@@ -751,6 +751,7 @@ public class Args {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private Optional<List<String>> argsFile() {
 		if (this.options.has(this.optsFile)) {
 			final String optsFile = this.options.valueOf(this.optsFile);
@@ -763,10 +764,20 @@ public class Args {
 				final List<String> options = new ArrayList<>();
 				for (Map.Entry<?, ?> entry : yaml.entrySet()) {
 					final String optionName = (String) entry.getKey();
-					final String optionValue = (String) entry.getValue();
-					options.add((optionName.length() == 1 ? "-" : "--") + optionName);
-					if (optionValue != null) {
-						options.add(optionValue);
+					final Object value = entry.getValue();
+					if (value instanceof List) {
+						final List<String> optionValue = (List<String>) value;
+						for (String v : optionValue) {
+							options.add(prependHyphensOptionName(optionName));
+							options.add(v);
+						}
+					}
+					else {
+						final String optionValue = (String) value;
+						options.add(prependHyphensOptionName(optionName));
+						if (optionValue != null) {
+							options.add(optionValue);
+						}
 					}
 				}
 				return Optional.of(options);
@@ -784,9 +795,10 @@ public class Args {
 		return this.options.has(this.dumpOpts);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void dumpOpts(PrintStream stream) {
 		String lastOptionName = null;
-		final Map<String, String> optionMap = new TreeMap<>();
+		final Map<String, Object> optionMap = new TreeMap<>();
 		final List<String> options = new ArrayList<>();
 		for (String s : this.args) {
 			if (s.matches("^-{1,2}.+=.*")) {
@@ -802,23 +814,46 @@ public class Args {
 			if (s.startsWith("-")) {
 				// name
 				if (lastOptionName != null) {
-					optionMap.put(lastOptionName.replaceAll("^-{1,2}", ""), null);
+					optionMap.put(removeHyphensOptionName(lastOptionName), null);
 				}
 				lastOptionName = s;
 			}
 			else if (lastOptionName != null) {
 				// value
-				optionMap.put(lastOptionName.replaceAll("^-{1,2}", ""), s);
+				final String optionName = removeHyphensOptionName(lastOptionName);
+				if (optionMap.containsKey(optionName)) {
+					final Object value = optionMap.get(optionName);
+					if (value instanceof List) {
+						((List<String>) value).add(s);
+					}
+					else {
+						final List<String> list = new ArrayList<>();
+						list.add((String) value);
+						list.add(s);
+						optionMap.put(optionName, list);
+					}
+				}
+				else {
+					optionMap.put(optionName, s);
+				}
 				lastOptionName = null;
 			}
-			if (lastOptionName != null) {
-				optionMap.put(lastOptionName.replaceAll("^-{1,2}", ""), null);
-			}
+		}
+		if (lastOptionName != null) {
+			optionMap.put(removeHyphensOptionName(lastOptionName), null);
 		}
 		optionMap.remove("optsFile");
 		optionMap.remove("dumpOpts");
 		final DumperOptions dumperOptions = new DumperOptions();
 		dumperOptions.setDefaultFlowStyle(FlowStyle.BLOCK);
 		stream.println(new Yaml(dumperOptions).dump(optionMap));
+	}
+
+	private static String removeHyphensOptionName(String optionName) {
+		return optionName.replaceAll("^-{1,2}", "");
+	}
+
+	private static String prependHyphensOptionName(String optionName) {
+		return (optionName.length() == 1 ? "-" : "--") + optionName;
 	}
 }
