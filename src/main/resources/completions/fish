@@ -1,5 +1,4 @@
 complete -c rsc -n "__fish_use_subcommand" -l authBearer -d 'Enable Authentication Metadata Extension (Bearer).' -r
-complete -c rsc -n "__fish_use_subcommand" -l argsFile -d 'Configure arguments from a YAML file (e.g. ./args.yaml, /tmp/args.yaml, https://example.com/args.yaml)' -r
 complete -c rsc -n "__fish_use_subcommand" -l authBasic -d '[DEPRECATED] Enable Authentication Metadata Extension (Basic). This Metadata exists only for the backward compatibility with Spring Security 5.2' -r
 complete -c rsc -n "__fish_use_subcommand" -l completion -d 'Output shell completion code for the specified shell (bash, zsh, fish, powershell)' -r -f -a "bash zsh fish powershell"
 complete -c rsc -n "__fish_use_subcommand" -s d -l data -d 'Data. Use \'-\' to read data from standard input.' -r
@@ -12,6 +11,7 @@ complete -c rsc -n "__fish_use_subcommand" -l limitRate -d 'Enable limitRate(rat
 complete -c rsc -n "__fish_use_subcommand" -l log -d 'Enable log()' -r
 complete -c rsc -n "__fish_use_subcommand" -s m -l metadata -d 'Metadata (default: )' -r
 complete -c rsc -n "__fish_use_subcommand" -l metadataMimeType -d 'MimeType for metadata (default: application/json)' -r -f -a "application/avro application/cbor application/graphql application/gzip application/javascript application/json application/octet-stream application/pdf application/vnd.apache.thrift.binary application/vnd.google.protobuf application/xml application/zip audio/aac audio/mp3 audio/mp4 audio/mpeg3 audio/mpeg audio/ogg audio/opus audio/vorbis image/bmp image/gif image/heic-sequence image/heic image/heif-sequence image/heif image/jpeg image/png image/tiff multipart/mixed text/css text/csv text/html text/plain text/xml video/H264 video/H265 video/VP8 application/x-hessian application/x-java-object application/cloudevents+json message/x.rsocket.mime-type.v0 message/x.rsocket.accept-mime-types.v0 message/x.rsocket.authentication.v0 message/x.rsocket.tracing-zipkin.v0 message/x.rsocket.routing.v0 message/x.rsocket.composite-metadata.v0"
+complete -c rsc -n "__fish_use_subcommand" -l optsFile -d 'Configure options from a YAML file (e.g. ./opts.yaml, /tmp/opts.yaml, https://example.com/opts.yaml)' -r
 complete -c rsc -n "__fish_use_subcommand" -s r -l route -d 'Enable Routing Metadata Extension' -r
 complete -c rsc -n "__fish_use_subcommand" -l resume -d 'Enable resume. Resume session duration can be configured in seconds.' -r
 complete -c rsc -n "__fish_use_subcommand" -l retry -d 'Enable retry. Retry every 1 second with the given max attempts.' -r
@@ -26,7 +26,7 @@ complete -c rsc -n "__fish_use_subcommand" -l wsHeader -d 'Header for web socket
 complete -c rsc -n "__fish_use_subcommand" -l zipkinUrl -d 'Zipkin URL to send a span (e.g. http://localhost:9411). Ignored unless --trace is set.' -r
 complete -c rsc -n "__fish_use_subcommand" -l channel -d 'Shortcut of --im REQUEST_CHANNEL'
 complete -c rsc -n "__fish_use_subcommand" -l debug -d 'Enable FrameLogger'
-complete -c rsc -n "__fish_use_subcommand" -l dumpArgs -d 'Dump args as a file that can be loaded by --argsFile option'
+complete -c rsc -n "__fish_use_subcommand" -l dumpOpts -d 'Dump options as a file that can be loaded by --optsFile option'
 complete -c rsc -n "__fish_use_subcommand" -l fnf -d 'Shortcut of --im FIRE_AND_FORGET'
 complete -c rsc -n "__fish_use_subcommand" -l printB3 -d 'Print B3 propagation info. Ignored unless --trace is set.'
 complete -c rsc -n "__fish_use_subcommand" -s q -l quiet -d 'Disable the output on next'
