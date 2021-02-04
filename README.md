@@ -79,6 +79,8 @@ Option                                Description
 
 Download an executable jar or native binary from [Releases](https://github.com/making/rsc/releases).
 
+To get `rsc` binary working on Windows, you will need to install [Visual C++ Redistributable Packages](https://www.microsoft.com/en-us/download/details.aspx?id=48145) in advance.
+
 ### Install via Homebrew (Max / Linux)
 [![Homebrew](https://github.com/making/rsc/workflows/Homebrew/badge.svg)](https://github.com/making/rsc/actions?query=workflow%3AHomebrew)
 
