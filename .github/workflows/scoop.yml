@@ -1,0 +1,30 @@
+name: Scoop
+on:
+  schedule:
+  - cron: 0 3 * * *
+  push:
+    branches:
+    - master
+    paths:
+    - .github/workflows/scoop.yml
+  pull_request:
+    branches:
+    - master
+    paths:
+    - .github/workflows/scoop.yml
+  workflow_dispatch: { }
+jobs:
+  install:
+    name: scoop install
+    runs-on: windows-latest
+    steps:
+    - name: check cli
+      run: |
+        Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
+        scoop bucket add rsc https://github.com/making/rsc-bucket.git
+        scoop update
+        scoop install rsc
+
+        rsc --version
+        rsc --showSystemProperties
+        rsc wss://rsocket-demo.herokuapp.com/rsocket --route searchTweets --stream -d Trump --take 3 --retry 3 --debug

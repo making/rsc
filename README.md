@@ -90,6 +90,15 @@ You can install native binary via Homebrew.
 brew install making/tap/rsc
 ```
 
+### Install via Scoop (Windows)
+[![Scoop](https://github.com/making/rsc/workflows/Homebrew/badge.svg)](https://github.com/making/rsc/actions?query=workflow%3AScoop)
+
+```
+scoop bucket add rsc https://github.com/making/rsc-bucket.git
+scoop update
+scoop install rsc
+```
+
 ### Install via Coursier (Max / Linux / Windows)
 [![Coursier](https://github.com/making/rsc/workflows/Coursier/badge.svg)](https://github.com/making/rsc/actions?query=workflow%3ACoursier)
 
