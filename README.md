@@ -91,7 +91,7 @@ brew install making/tap/rsc
 ```
 
 ### Install via Scoop (Windows)
-[![Scoop](https://github.com/making/rsc/workflows/Homebrew/badge.svg)](https://github.com/making/rsc/actions?query=workflow%3AScoop)
+[![Scoop](https://github.com/making/rsc/workflows/Scoop/badge.svg)](https://github.com/making/rsc/actions?query=workflow%3AScoop)
 
 ```
 scoop bucket add rsc https://github.com/making/rsc-bucket.git
