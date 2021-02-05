@@ -21,7 +21,7 @@ jobs:
     - name: check cli
       run: |
         Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
-        scoop bucket add rsc https://github.com/making/rsc-bucket.git
+        scoop bucket add making https://github.com/making/scoop-bucket.git
         scoop update
         scoop install rsc
 

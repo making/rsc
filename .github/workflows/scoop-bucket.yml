@@ -19,7 +19,7 @@ jobs:
         token: ${{ secrets.ACCESS_TOKEN }}
     - name: send a pull request
       env:
-        REPOSITORY: making/rsc-bucket
+        REPOSITORY: making/scoop-bucket
         VERSION: ${{ steps.download-windows-binaries.outputs.version }}
         GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
         GIT_NAME: ${{ secrets.GIT_NAME }}

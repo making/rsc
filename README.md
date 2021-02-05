@@ -96,7 +96,7 @@ brew install making/tap/rsc
 You can install native binary for Windows via [Scoop](https://scoop.sh/).
 
 ```
-scoop bucket add rsc https://github.com/making/rsc-bucket.git
+scoop bucket add making https://github.com/making/scoop-bucket.git
 scoop update
 scoop install rsc
 ```
