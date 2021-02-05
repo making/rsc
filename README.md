@@ -81,10 +81,10 @@ Download an executable jar or native binary from [Releases](https://github.com/m
 
 To get `rsc` binary working on Windows, you will need to install [Visual C++ Redistributable Packages](https://www.microsoft.com/en-us/download/details.aspx?id=48145) in advance.
 
-### Install via Homebrew (Max / Linux)
+### Install via Homebrew (Mac / Linux)
 [![Homebrew](https://github.com/making/rsc/workflows/Homebrew/badge.svg)](https://github.com/making/rsc/actions?query=workflow%3AHomebrew)
 
-You can install native binary via Homebrew.
+You can install native binary for Mac or Linux via [Homebrew](https://brew.sh/).
 
 ```
 brew install making/tap/rsc
@@ -93,13 +93,15 @@ brew install making/tap/rsc
 ### Install via Scoop (Windows)
 [![Scoop](https://github.com/making/rsc/workflows/Scoop/badge.svg)](https://github.com/making/rsc/actions?query=workflow%3AScoop)
 
+You can install native binary for Windows via [Scoop](https://scoop.sh/).
+
 ```
 scoop bucket add rsc https://github.com/making/rsc-bucket.git
 scoop update
 scoop install rsc
 ```
 
-### Install via Coursier (Max / Linux / Windows)
+### Install via Coursier (Mac / Linux / Windows)
 [![Coursier](https://github.com/making/rsc/workflows/Coursier/badge.svg)](https://github.com/making/rsc/actions?query=workflow%3ACoursier)
 
 If you do not already have [couriser](https://get-coursier.io) installed on your machine, install it following steps given here: https://get-coursier.io/docs/cli-installation. 
