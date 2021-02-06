@@ -121,23 +121,23 @@ cs install rscj --contrib
 ## Example usages
 
 ```
-rsc tcp://localhost:8080 --request --route hello -d Foo --debug
+rsc --request --route=uppercase --data=Foo --debug tcp://localhost:7001
 ```
 
 ```
-rsc ws://localhost:8080/rsocket --stream --route hello --debug --take 30
+rsc --stream --route=hello --debug --take=30 ws://localhost:8080/rsocket
 ```
 
 ```
-rsc wss://rsocket-demo.herokuapp.com/rsocket --stream --route searchTweets -d Trump
+rsc --stream --route=searchTweets --data=Trump wss://rsocket-demo.herokuapp.com/rsocket
 ```
 
 You can also send data via a file or URL using `-l`/`--load` option instead of `-d`/`--data` as follows
 
 ```
-rsc tcp://localhost:8080 --request --route hello -l ./hello.txt --debug
-rsc tcp://localhost:8080 --request --route hello -l file:///tmp/hello.txt --debug
-rsc tcp://localhost:8080 --request --route hello -l https://example.com --debug
+rsc --request --route=hello --load=./hello.txt --debug tcp://localhost:8080
+rsc --request --route=hello --load=/tmp/hello.txt --debug tcp://localhost:8080
+rsc --request --route=hello --load=https://example.com --debug tcp://localhost:8080
 ```
 
 ## Enable shell autocompletion 
@@ -232,8 +232,8 @@ rsc --completion powershell | Out-String | Invoke-Expression
 By default, the data of the payload will be output (since 0.2.0).
 
 ```
-$ rsc tcp://localhost:7000 -r greeting.foo 
-{"id":1,"content":"Hello, foo!"}
+$ rsc --route=add --data='{"x":10, "y":20}' tcp://localhost:7001
+{"result":30}
 ```
 
 ### Enable Reactor's log() operator
@@ -241,11 +241,11 @@ $ rsc tcp://localhost:7000 -r greeting.foo
 `--log` option enables Reactive Stream Level log. `--quiet`/`-q` option disables the default output.
 
 ```
-$ rsc tcp://localhost:7000 -r greeting.foo --log -q
-2019-11-28 13:01:32.981  INFO --- [actor-tcp-nio-1] rsc             : onSubscribe(FluxMap.MapSubscriber)
-2019-11-28 13:01:32.983  INFO --- [actor-tcp-nio-1] rsc             : request(unbounded)
-2019-11-28 13:01:32.994  INFO --- [actor-tcp-nio-1] rsc             : onNext({"id":2,"content":"Hello, foo!"})
-2019-11-28 13:01:32.994  INFO --- [actor-tcp-nio-1] rsc             : onComplete()
+$ rsc --route=add --data='{"x":10, "y":20}' --log --quiet tcp://localhost:7001 
+2021-02-06 17:50:15.809  INFO 95810 --- [actor-tcp-nio-2] rsc                                      : onSubscribe(FluxMap.MapSubscriber)
+2021-02-06 17:50:15.809  INFO 95810 --- [actor-tcp-nio-2] rsc                                      : request(unbounded)
+2021-02-06 17:50:15.820  INFO 95810 --- [actor-tcp-nio-2] rsc                                      : onNext({"result":30})
+2021-02-06 17:50:15.820  INFO 95810 --- [actor-tcp-nio-2] rsc                                      : onComplete()
 ```
 
 ### Enable FrameLogger
@@ -253,25 +253,32 @@ $ rsc tcp://localhost:7000 -r greeting.foo --log -q
 `--debug` option enables RSocket Level log.
 
 ```
-$ rsc tcp://localhost:7000 -r greeting.foo --debug -q
-2019-11-28 13:02:07.139 DEBUG --- [actor-tcp-nio-1] i.r.FrameLogger : sending -> 
-Frame => Stream ID: 1 Type: REQUEST_RESPONSE Flags: 0b100000000 Length: 22
+$ rsc --route=add --data='{"x":10, "y":20}' --debug --quiet tcp://localhost:7001
+2021-02-06 17:50:32.560 DEBUG 95820 --- [actor-tcp-nio-2] io.rsocket.FrameLogger                   : sending -> 
+Frame => Stream ID: 0 Type: SETUP Flags: 0b0 Length: 75
+Data:
+
+2021-02-06 17:50:32.560 DEBUG 95820 --- [actor-tcp-nio-2] io.rsocket.FrameLogger                   : sending -> 
+Frame => Stream ID: 1 Type: REQUEST_RESPONSE Flags: 0b100000000 Length: 33
 Metadata:
          +-------------------------------------------------+
          |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
 +--------+-------------------------------------------------+----------------+
-|00000000| 0c 67 72 65 65 74 69 6e 67 2e 66 6f 6f          |.greeting.foo   |
+|00000000| fe 00 00 04 03 61 64 64                         |.....add        |
 +--------+-------------------------------------------------+----------------+
-Data:
-
-2019-11-28 13:02:07.153 DEBUG --- [actor-tcp-nio-1] i.r.FrameLogger : receiving -> 
-Frame => Stream ID: 1 Type: NEXT_COMPLETE Flags: 0b1100000 Length: 38
 Data:
          +-------------------------------------------------+
          |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
 +--------+-------------------------------------------------+----------------+
-|00000000| 7b 22 69 64 22 3a 33 2c 22 63 6f 6e 74 65 6e 74 |{"id":3,"content|
-|00000010| 22 3a 22 48 65 6c 6c 6f 2c 20 66 6f 6f 21 22 7d |":"Hello, foo!"}|
+|00000000| 7b 22 78 22 3a 31 30 2c 20 22 79 22 3a 32 30 7d |{"x":10, "y":20}|
++--------+-------------------------------------------------+----------------+
+2021-02-06 17:50:32.571 DEBUG 95820 --- [actor-tcp-nio-2] io.rsocket.FrameLogger                   : receiving -> 
+Frame => Stream ID: 1 Type: NEXT_COMPLETE Flags: 0b1100000 Length: 19
+Data:
+         +-------------------------------------------------+
+         |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
++--------+-------------------------------------------------+----------------+
+|00000000| 7b 22 72 65 73 75 6c 74 22 3a 33 30 7d          |{"result":30}   |
 +--------+-------------------------------------------------+----------------+
 ```
 
@@ -281,38 +288,37 @@ Data:
 
 
 ```
-$ rsc tcp://localhost:7000 -r greeting.foo --wiretap -q
-2019-11-28 13:02:28.347 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xa0202801] REGISTERED
-2019-11-28 13:02:28.348 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xa0202801] CONNECT: localhost/127.0.0.1:7000
-2019-11-28 13:02:28.348 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xa0202801, L:/127.0.0.1:54245 - R:localhost/127.0.0.1:7000] ACTIVE
-2019-11-28 13:02:28.361 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xa0202801, L:/127.0.0.1:54245 - R:localhost/127.0.0.1:7000] WRITE: 67B
+$ rsc --route=add --data='{"x":10, "y":20}' --wiretap --quiet tcp://localhost:7001
+2021-02-06 17:51:20.140 DEBUG 95837 --- [actor-tcp-nio-2] reactor.netty.tcp.TcpClient              : [id: 0x39d9fefe] REGISTERED
+2021-02-06 17:51:20.141 DEBUG 95837 --- [actor-tcp-nio-2] reactor.netty.tcp.TcpClient              : [id: 0x39d9fefe] CONNECT: localhost/127.0.0.1:7001
+2021-02-06 17:51:20.141 DEBUG 95837 --- [actor-tcp-nio-2] reactor.netty.tcp.TcpClient              : [id: 0x39d9fefe, L:/127.0.0.1:62801 - R:localhost/127.0.0.1:7001] ACTIVE
+2021-02-06 17:51:20.141 DEBUG 95837 --- [actor-tcp-nio-2] reactor.netty.tcp.TcpClient              : [id: 0x39d9fefe, L:/127.0.0.1:62801 - R:localhost/127.0.0.1:7001] WRITE: 78B
          +-------------------------------------------------+
          |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
 +--------+-------------------------------------------------+----------------+
-|00000000| 00 00 40 00 00 00 00 04 00 00 01 00 00 00 00 4e |..@............N|
-|00000010| 20 00 01 5f 90 1c 6d 65 73 73 61 67 65 2f 78 2e | .._..message/x.|
-|00000020| 72 73 6f 63 6b 65 74 2e 72 6f 75 74 69 6e 67 2e |rsocket.routing.|
-|00000030| 76 30 10 61 70 70 6c 69 63 61 74 69 6f 6e 2f 6a |v0.application/j|
-|00000040| 73 6f 6e                                        |son             |
+|00000000| 00 00 4b 00 00 00 00 04 00 00 01 00 00 00 00 4e |..K............N|
+|00000010| 20 00 01 5f 90 27 6d 65 73 73 61 67 65 2f 78 2e | .._.'message/x.|
+|00000020| 72 73 6f 63 6b 65 74 2e 63 6f 6d 70 6f 73 69 74 |rsocket.composit|
+|00000030| 65 2d 6d 65 74 61 64 61 74 61 2e 76 30 10 61 70 |e-metadata.v0.ap|
+|00000040| 70 6c 69 63 61 74 69 6f 6e 2f 6a 73 6f 6e       |plication/json  |
 +--------+-------------------------------------------------+----------------+
-2019-11-28 13:02:28.372 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xa0202801, L:/127.0.0.1:54245 - R:localhost/127.0.0.1:7000] FLUSH
-2019-11-28 13:02:28.373 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xa0202801, L:/127.0.0.1:54245 - R:localhost/127.0.0.1:7000] WRITE: 25B
+2021-02-06 17:51:20.142 DEBUG 95837 --- [actor-tcp-nio-2] reactor.netty.tcp.TcpClient              : [id: 0x39d9fefe, L:/127.0.0.1:62801 - R:localhost/127.0.0.1:7001] WRITE: 36B
          +-------------------------------------------------+
          |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
 +--------+-------------------------------------------------+----------------+
-|00000000| 00 00 16 00 00 00 01 11 00 00 00 0d 0c 67 72 65 |.............gre|
-|00000010| 65 74 69 6e 67 2e 66 6f 6f                      |eting.foo       |
+|00000000| 00 00 21 00 00 00 01 11 00 00 00 08 fe 00 00 04 |..!.............|
+|00000010| 03 61 64 64 7b 22 78 22 3a 31 30 2c 20 22 79 22 |.add{"x":10, "y"|
+|00000020| 3a 32 30 7d                                     |:20}            |
 +--------+-------------------------------------------------+----------------+
-2019-11-28 13:02:28.374 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xa0202801, L:/127.0.0.1:54245 - R:localhost/127.0.0.1:7000] FLUSH
-2019-11-28 13:02:28.387 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xa0202801, L:/127.0.0.1:54245 - R:localhost/127.0.0.1:7000] READ: 41B
+2021-02-06 17:51:20.142 DEBUG 95837 --- [actor-tcp-nio-2] reactor.netty.tcp.TcpClient              : [id: 0x39d9fefe, L:/127.0.0.1:62801 - R:localhost/127.0.0.1:7001] FLUSH
+2021-02-06 17:51:20.152 DEBUG 95837 --- [actor-tcp-nio-2] reactor.netty.tcp.TcpClient              : [id: 0x39d9fefe, L:/127.0.0.1:62801 - R:localhost/127.0.0.1:7001] READ: 22B
          +-------------------------------------------------+
          |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
 +--------+-------------------------------------------------+----------------+
-|00000000| 00 00 26 00 00 00 01 28 60 7b 22 69 64 22 3a 34 |..&....(`{"id":4|
-|00000010| 2c 22 63 6f 6e 74 65 6e 74 22 3a 22 48 65 6c 6c |,"content":"Hell|
-|00000020| 6f 2c 20 66 6f 6f 21 22 7d                      |o, foo!"}       |
+|00000000| 00 00 13 00 00 00 01 28 60 7b 22 72 65 73 75 6c |.......(`{"resul|
+|00000010| 74 22 3a 33 30 7d                               |t":30}          |
 +--------+-------------------------------------------------+----------------+
-2019-11-28 13:02:28.387 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xa0202801, L:/127.0.0.1:54245 - R:localhost/127.0.0.1:7000] READ COMPLETE
+2021-02-06 17:51:20.152 DEBUG 95837 --- [actor-tcp-nio-2] reactor.netty.tcp.TcpClient              : [id: 0x39d9fefe, L:/127.0.0.1:62801 - R:localhost/127.0.0.1:7001] READ COMPLETE
 ```
 
 ## Setup payload
@@ -323,7 +329,7 @@ Also the MIME type of the setup metadata can be specified by `--setupMetadataMim
 For example:
 
 ```
-rsc tcp://localhost:9999 --sd hello --sm '{"value":"A metadata"}' --smmt 'application/json'
+rsc --setupData=foo --setupMetadata='{"value":"metadata"}' --setupMetadataMimeType=application/json --route=add --data='{"x":10, "y":20}' tcp://localhost:7001
 ```
 
 As of 0.6.0, the following MIME types are supported.
@@ -344,16 +350,15 @@ Accordingly, enum name of [`SetupMetadataMimeType`](https://github.com/making/rs
 
 ## Composite Metadata
 
-`rsc` supports [Composite Metadata Extension](https://github.com/rsocket/rsocket/blob/master/Extensions/CompositeMetadata.md) since 0.3.0.
-
+`rsc` always uses [Composite Metadata Extension](https://github.com/rsocket/rsocket/blob/master/Extensions/CompositeMetadata.md).
 If multiple metadataMimeTypes are specified, they are automatically composed (the order matters).
 
 ```
-$ rsc tcp://localhost:7000 --metadataMimeType text/plain -m hello --metadataMimeType text/json -m '{"hello":"world"}' --wiretap
-2019-11-29 13:39:54.696 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76] REGISTERED
-2019-11-29 13:39:54.696 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76] CONNECT: localhost/127.0.0.1:7000
-2019-11-29 13:39:54.697 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76, L:/127.0.0.1:62738 - R:localhost/127.0.0.1:7000] ACTIVE
-2019-11-29 13:39:54.706 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76, L:/127.0.0.1:62738 - R:localhost/127.0.0.1:7000] WRITE: 78B
+$ rsc --metadataMimeType=text/plain --metadata=hello --metadataMimeType=application/json --metadata='{"hello":"world"}' --data='{"x":10, "y":20}' --wiretap --quiet tcp://localhost:7001
+2021-02-06 18:00:29.100 DEBUG 95998 --- [actor-tcp-nio-2] reactor.netty.tcp.TcpClient              : [id: 0x9c1425b3] REGISTERED
+2021-02-06 18:00:29.101 DEBUG 95998 --- [actor-tcp-nio-2] reactor.netty.tcp.TcpClient              : [id: 0x9c1425b3] CONNECT: localhost/127.0.0.1:7001
+2021-02-06 18:00:29.101 DEBUG 95998 --- [actor-tcp-nio-2] reactor.netty.tcp.TcpClient              : [id: 0x9c1425b3, L:/127.0.0.1:62844 - R:localhost/127.0.0.1:7001] ACTIVE
+2021-02-06 18:00:29.102 DEBUG 95998 --- [actor-tcp-nio-2] reactor.netty.tcp.TcpClient              : [id: 0x9c1425b3, L:/127.0.0.1:62844 - R:localhost/127.0.0.1:7001] WRITE: 78B
          +-------------------------------------------------+
          |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
 +--------+-------------------------------------------------+----------------+
@@ -363,28 +368,27 @@ $ rsc tcp://localhost:7000 --metadataMimeType text/plain -m hello --metadataMime
 |00000030| 65 2d 6d 65 74 61 64 61 74 61 2e 76 30 10 61 70 |e-metadata.v0.ap|
 |00000040| 70 6c 69 63 61 74 69 6f 6e 2f 6a 73 6f 6e       |plication/json  |
 +--------+-------------------------------------------------+----------------+
-2019-11-29 13:39:54.715 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76, L:/127.0.0.1:62738 - R:localhost/127.0.0.1:7000] FLUSH
-2019-11-29 13:39:54.715 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76, L:/127.0.0.1:62738 - R:localhost/127.0.0.1:7000] WRITE: 51B
+2021-02-06 18:00:29.102 DEBUG 95998 --- [actor-tcp-nio-2] reactor.netty.tcp.TcpClient              : [id: 0x9c1425b3, L:/127.0.0.1:62844 - R:localhost/127.0.0.1:7001] WRITE: 58B
          +-------------------------------------------------+
          |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
 +--------+-------------------------------------------------+----------------+
-|00000000| 00 00 30 00 00 00 01 11 00 00 00 27 a1 00 00 05 |..0........'....|
-|00000010| 68 65 6c 6c 6f 08 74 65 78 74 2f 6a 73 6f 6e 00 |hello.text/json.|
-|00000020| 00 11 7b 22 68 65 6c 6c 6f 22 3a 22 77 6f 72 6c |..{"hello":"worl|
-|00000030| 64 22 7d                                        |d"}             |
+|00000000| 00 00 37 00 00 00 01 11 00 00 00 1e a1 00 00 05 |..7.............|
+|00000010| 68 65 6c 6c 6f 85 00 00 11 7b 22 68 65 6c 6c 6f |hello....{"hello|
+|00000020| 22 3a 22 77 6f 72 6c 64 22 7d 7b 22 78 22 3a 31 |":"world"}{"x":1|
+|00000030| 30 2c 20 22 79 22 3a 32 30 7d                   |0, "y":20}      |
 +--------+-------------------------------------------------+----------------+
-2019-11-29 13:39:54.716 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76, L:/127.0.0.1:62738 - R:localhost/127.0.0.1:7000] FLUSH
+2021-02-06 18:00:29.102 DEBUG 95998 --- [actor-tcp-nio-2] reactor.netty.tcp.TcpClient              : [id: 0x9c1425b3, L:/127.0.0.1:62844 - R:localhost/127.0.0.1:7001] FLUSH
 ...
 ```
 
 `--route` option is still respected.
 
 ```
-$ rsc tcp://localhost:7000 --metadataMimeType text/plain -m hello --route greeting.foo --wiretap
-2019-11-29 13:41:54.916 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76] REGISTERED
-2019-11-29 13:41:54.917 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76] CONNECT: localhost/127.0.0.1:7000
-2019-11-29 13:41:54.917 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76, L:/127.0.0.1:62751 - R:localhost/127.0.0.1:7000] ACTIVE
-2019-11-29 13:41:54.928 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76, L:/127.0.0.1:62751 - R:localhost/127.0.0.1:7000] WRITE: 78B
+$ rsc --metadataMimeType=text/plain --metadata=hello --metadataMimeType=application/json --metadata='{"hello":"world"}' --route=add --data='{"x":10, "y":20}' --wiretap --quiet tcp://localhost:7001
+2021-02-06 18:01:28.434 DEBUG 96015 --- [actor-tcp-nio-2] reactor.netty.tcp.TcpClient              : [id: 0xf49f4cd5] REGISTERED
+2021-02-06 18:01:28.435 DEBUG 96015 --- [actor-tcp-nio-2] reactor.netty.tcp.TcpClient              : [id: 0xf49f4cd5] CONNECT: localhost/127.0.0.1:7001
+2021-02-06 18:01:28.435 DEBUG 96015 --- [actor-tcp-nio-2] reactor.netty.tcp.TcpClient              : [id: 0xf49f4cd5, L:/127.0.0.1:62848 - R:localhost/127.0.0.1:7001] ACTIVE
+2021-02-06 18:01:28.436 DEBUG 96015 --- [actor-tcp-nio-2] reactor.netty.tcp.TcpClient              : [id: 0xf49f4cd5, L:/127.0.0.1:62848 - R:localhost/127.0.0.1:7001] WRITE: 78B
          +-------------------------------------------------+
          |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
 +--------+-------------------------------------------------+----------------+
@@ -394,16 +398,17 @@ $ rsc tcp://localhost:7000 --metadataMimeType text/plain -m hello --route greeti
 |00000030| 65 2d 6d 65 74 61 64 61 74 61 2e 76 30 10 61 70 |e-metadata.v0.ap|
 |00000040| 70 6c 69 63 61 74 69 6f 6e 2f 6a 73 6f 6e       |plication/json  |
 +--------+-------------------------------------------------+----------------+
-2019-11-29 13:41:54.938 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76, L:/127.0.0.1:62751 - R:localhost/127.0.0.1:7000] FLUSH
-2019-11-29 13:41:54.938 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76, L:/127.0.0.1:62751 - R:localhost/127.0.0.1:7000] WRITE: 38B
+2021-02-06 18:01:28.436 DEBUG 96015 --- [actor-tcp-nio-2] reactor.netty.tcp.TcpClient              : [id: 0xf49f4cd5, L:/127.0.0.1:62848 - R:localhost/127.0.0.1:7001] WRITE: 66B
          +-------------------------------------------------+
          |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
 +--------+-------------------------------------------------+----------------+
-|00000000| 00 00 23 00 00 00 01 11 00 00 00 1a fe 00 00 0d |..#.............|
-|00000010| 0c 67 72 65 65 74 69 6e 67 2e 66 6f 6f a1 00 00 |.greeting.foo...|
-|00000020| 05 68 65 6c 6c 6f                               |.hello          |
+|00000000| 00 00 3f 00 00 00 01 11 00 00 00 26 fe 00 00 04 |..?........&....|
+|00000010| 03 61 64 64 a1 00 00 05 68 65 6c 6c 6f 85 00 00 |.add....hello...|
+|00000020| 11 7b 22 68 65 6c 6c 6f 22 3a 22 77 6f 72 6c 64 |.{"hello":"world|
+|00000030| 22 7d 7b 22 78 22 3a 31 30 2c 20 22 79 22 3a 32 |"}{"x":10, "y":2|
+|00000040| 30 7d                                           |0}              |
 +--------+-------------------------------------------------+----------------+
-2019-11-29 13:41:54.938 DEBUG --- [actor-tcp-nio-1] r.n.t.TcpClient : [id: 0xfd779f76, L:/127.0.0.1:62751 - R:localhost/127.0.0.1:7000] FLUSH
+2021-02-06 18:01:28.437 DEBUG 96015 --- [actor-tcp-nio-2] reactor.netty.tcp.TcpClient              : [id: 0xf49f4cd5, L:/127.0.0.1:62848 - R:localhost/127.0.0.1:7001] FLUSH
 ...
 ```
 
@@ -412,7 +417,7 @@ If you use `--route/-r` option, you need to specify to `--metadataMimeType/--mmt
 For example:
 
 ```
-rsc tcp://localhost:8080 -r functionRouter --mmt application/json -m '{"function":"uppercase"}' -d 'RSocket'
+rsc -r functionRouter --mmt application/json -m '{"function":"uppercase"}' -d 'RSocket' tcp://localhost:8080
 ``` 
 
 ## Backpressure
@@ -420,111 +425,119 @@ rsc tcp://localhost:8080 -r functionRouter --mmt application/json -m '{"function
 The `onNext` output can be delayed with the `--delayElements` (milli seconds) option.　Accordingly, the number of `request` will be automatically adjusted.
 
 ```
-$ rsc tcp://localhost:8765 --stream --delayElements 100 --log
-2019-11-28 14:17:25.479  INFO --- [actor-tcp-nio-1] rsc             : onSubscribe(FluxMap.MapSubscriber)
-2019-11-28 14:17:25.479  INFO --- [actor-tcp-nio-1] rsc             : request(32)
-2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(A)
-2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(a)
-2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(aa)
-2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(aal)
-2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(aalii)
-2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(aam)
-2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aani)
-2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(aardvark)
-2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(aardwolf)
-2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaron)
-2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaronic)
-2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaronical)
-2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaronite)
-2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaronitic)
-2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaru)
-2019-11-28 14:17:25.483  INFO --- [actor-tcp-nio-1] rsc             : onNext(Ab)
-2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(aba)
-2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(Ababdeh)
-2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(Ababua)
-2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abac)
-2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abaca)
-2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abacate)
-2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abacay)
-2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abacinate)
-2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abacination)
-2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abaciscus)
-2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abacist)
-2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(aback)
-2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abactinal)
-2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abactinally)
-2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abaction)
-2019-11-28 14:17:25.484  INFO --- [actor-tcp-nio-1] rsc             : onNext(abactor)
-A
-a
-aa
-aal
-aalii
-aam
-Aani
-aardvark
-aardwolf
-Aaron
-Aaronic
-Aaronical
-Aaronite
-Aaronitic
-Aaru
-Ab
-aba
-Ababdeh
-Ababua
-abac
-abaca
-abacate
-abacay
-2019-11-28 14:17:27.841  INFO --- [     parallel-8] rsc             : request(24)
-2019-11-28 14:17:27.856  INFO --- [actor-tcp-nio-1] rsc             : onNext(abaculus)
+$ rsc --stream --delayElements=100 --log --route=uppercase.stream --data=rsocket tcp://localhost:7001     
+2021-02-06 18:14:18.230  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onSubscribe(FluxMap.MapSubscriber)
+2021-02-06 18:14:18.230  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : request(32)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.235  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.236  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.236  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.236  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.236  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.236  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.236  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.236  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.236  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.236  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:18.236  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+2021-02-06 18:14:20.595  INFO 96438 --- [     parallel-8] rsc                                      : request(24)
+2021-02-06 18:14:20.598  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:14:20.598  INFO 96438 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
 ...
 ```
 
 You can also limit the number of `request` with `--limitRate` option.
 
 ```
-$ rsc tcp://localhost:8765 --stream --delayElements 100 --limitRate 8 --log
-2019-11-28 14:21:35.175  INFO --- [actor-tcp-nio-1] rsc             : onSubscribe(FluxMap.MapSubscriber)
-2019-11-28 14:21:35.175  INFO --- [actor-tcp-nio-1] rsc             : request(8)
-2019-11-28 14:21:35.187  INFO --- [actor-tcp-nio-1] rsc             : onNext(A)
-2019-11-28 14:21:35.188  INFO --- [actor-tcp-nio-1] rsc             : onNext(a)
-2019-11-28 14:21:35.188  INFO --- [actor-tcp-nio-1] rsc             : onNext(aa)
-2019-11-28 14:21:35.188  INFO --- [actor-tcp-nio-1] rsc             : onNext(aal)
-2019-11-28 14:21:35.188  INFO --- [actor-tcp-nio-1] rsc             : onNext(aalii)
-2019-11-28 14:21:35.188  INFO --- [actor-tcp-nio-1] rsc             : onNext(aam)
-2019-11-28 14:21:35.188  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aani)
-2019-11-28 14:21:35.188  INFO --- [actor-tcp-nio-1] rsc             : onNext(aardvark)
-A
-a
-aa
-aal
-aalii
-2019-11-28 14:21:35.702  INFO --- [     parallel-6] rsc             : request(6)
-2019-11-28 14:21:35.714  INFO --- [actor-tcp-nio-1] rsc             : onNext(aardwolf)
-2019-11-28 14:21:35.714  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaron)
-2019-11-28 14:21:35.714  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaronic)
-2019-11-28 14:21:35.714  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaronical)
-2019-11-28 14:21:35.714  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaronite)
-2019-11-28 14:21:35.714  INFO --- [actor-tcp-nio-1] rsc             : onNext(Aaronitic)
-aam
-Aani
-aardvark
-aardwolf
-Aaron
-Aaronic
-2019-11-28 14:21:36.326  INFO --- [     parallel-4] rsc             : request(6)
+$ rsc --stream --delayElements=100 --limitRate=8 --log --route=uppercase.stream --data=rsocket tcp://localhost:7001
+2021-02-06 18:06:04.919  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onSubscribe(FluxMap.MapSubscriber)
+2021-02-06 18:06:04.919  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : request(8)
+2021-02-06 18:06:04.922  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:06:04.922  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:06:04.922  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:06:04.922  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:06:04.922  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:06:04.922  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:06:04.922  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:06:04.922  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+2021-02-06 18:06:05.435  INFO 96118 --- [     parallel-6] rsc                                      : request(6)
+2021-02-06 18:06:05.439  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:06:05.439  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:06:05.439  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:06:05.439  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:06:05.439  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:06:05.439  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+2021-02-06 18:06:06.048  INFO 96118 --- [    parallel-12] rsc                                      : request(6)
+2021-02-06 18:06:06.050  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:06:06.050  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:06:06.050  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:06:06.050  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:06:06.050  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+2021-02-06 18:06:06.050  INFO 96118 --- [actor-tcp-nio-2] rsc                                      : onNext(RSOCKET)
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
+RSOCKET
 ...
 ```
 
 **Tip**: Using `--limitRate 1 --delayElements 1000 --debug` is a convenient way to trace a stream.
-
-> The sample server application can be started with the following command:
-> ```
-> rsocket-cli --debug -i=@/usr/share/dict/words --server tcp://localhost:8765
-> ```
 
 ## Authentication
 
@@ -635,10 +648,7 @@ b3=5f035ed7dd21129b105564ef64c90731-105564ef64c90731-d
 - [x] Input from a file (0.8.0)
 - [x] Input from STDIN (0.4.0)
 - [ ] RSocket Routing Broker
-
-## Known issues
-
-* Client side responder will not be supported.
+- [ ] Client side responder
 
 ## Build
 
