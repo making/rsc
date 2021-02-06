@@ -221,10 +221,8 @@ rsc --completion fish
 
 ### Powershell
 
-TBD (help wanted)
-
 ```
-rsc --completion powershell
+rsc --completion powershell | Out-String | Invoke-Expression
 ```
 
 ## Log options
