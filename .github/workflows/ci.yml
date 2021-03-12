@@ -47,7 +47,7 @@ jobs:
     - uses: ayltai/setup-graalvm@v1
       with:
         java-version: 8
-        graalvm-version: 20.3.1
+        graalvm-version: 21.0.0.2
         native-image: true
     - uses: ilammy/msvc-dev-cmd@v1.5.0
       if: runner.os == 'Windows'

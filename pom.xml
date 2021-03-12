@@ -17,13 +17,11 @@
 
 	<properties>
 		<java.version>1.8</java.version>
+		<spring-native.version>0.9.0</spring-native.version>
 		<version-generate-skip>false</version-generate-skip>
 		<native-build.args>
 			--enable-all-security-services
 			--enable-https
-			-Dspring.native.remove-yaml-support=true
-			-Dspring.spel.ignore=true
-			-Dspring.xml.ignore=true
 			-Dfile.encoding=UTF-8
 			-H:IncludeResourceBundles=joptsimple.HelpFormatterMessages
 			-H:IncludeResourceBundles=joptsimple.ExceptionMessages
@@ -34,8 +32,8 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.experimental</groupId>
-			<artifactId>spring-graalvm-native</artifactId>
-			<version>0.8.5</version>
+			<artifactId>spring-native</artifactId>
+			<version>${spring-native.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -156,10 +154,34 @@
 						<builder>paketobuildpacks/builder:tiny</builder>
 						<env>
 							<BP_BOOT_NATIVE_IMAGE>true</BP_BOOT_NATIVE_IMAGE>
-							<BP_BOOT_NATIVE_IMAGE_BUILD_ARGUMENTS>${native-build.args}</BP_BOOT_NATIVE_IMAGE_BUILD_ARGUMENTS>
+							<BP_BOOT_NATIVE_IMAGE_BUILD_ARGUMENTS>${native-build.args}
+							</BP_BOOT_NATIVE_IMAGE_BUILD_ARGUMENTS>
 						</env>
 					</image>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.experimental</groupId>
+				<artifactId>spring-aot-maven-plugin</artifactId>
+				<version>${spring-native.version}</version>
+				<configuration>
+					<removeSpelSupport>true</removeSpelSupport>
+					<removeYamlSupport>true</removeYamlSupport>
+				</configuration>
+				<executions>
+					<execution>
+						<id>test-generate</id>
+						<goals>
+							<goal>test-generate</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>generate</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
@@ -175,8 +197,10 @@
 						<configuration>
 							<mainClass>am.ik.rsocket.RscApplication</mainClass>
 							<buildArgs>${native-build.args}</buildArgs>
-							<imageName>${project.artifactId}-${os.detected.classifier}</imageName>
-							<outputDirectory>${basedir}/target/classes</outputDirectory>						</configuration>
+							<imageName>${project.artifactId}-${os.detected.classifier}
+							</imageName>
+							<outputDirectory>${basedir}/target/classes</outputDirectory>
+						</configuration>
 						<executions>
 							<execution>
 								<goals>
