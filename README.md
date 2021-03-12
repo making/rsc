@@ -4,75 +4,82 @@
 > Aiming to be a curl for RSocket
 
 ```
-usage: rsc Uri [Options]
+usage: rsc [options] uri
 
 Non-option arguments:
-[String: Uri]        
+[String: uri]        
 
-Option                                Description                           
-------                                -----------                           
---ab, --authBearer [String]           Enable Authentication Metadata        
-                                        Extension (Bearer).                 
---authBasic [String]                  [DEPRECATED] Enable Authentication    
-                                        Metadata Extension (Basic). This    
-                                        Metadata exists only for the        
-                                        backward compatibility with Spring  
-                                        Security 5.2                        
---channel                             Shortcut of --im REQUEST_CHANNEL      
---completion [ShellType]              Output shell completion code for the  
-                                        specified shell (bash, zsh, fish,   
-                                        powershell)                         
--d, --data [String]                   Data. Use '-' to read data from       
-                                        standard input. (default: )         
---dataMimeType, --dmt [String]        MimeType for data (default:           
-                                        application/json)                   
---debug                               Enable FrameLogger                    
---delayElements [Long]                Enable delayElements(delay) in milli  
-                                        seconds                             
---fnf                                 Shortcut of --im FIRE_AND_FORGET      
--h, --help [String]                   Print help                            
---im, --interactionModel              InteractionModel (default:            
-  [InteractionModel]                    REQUEST_RESPONSE)                   
--l, --load [String]                   Load a file as Data. (e.g. ./foo.txt, 
-                                        /tmp/foo.txt, file:///tmp/foo.txt,  
-                                        https://example.com)                
---limitRate [Integer]                 Enable limitRate(rate)                
---log [String]                        Enable log()                          
--m, --metadata [String]               Metadata (default: )                  
---metadataMimeType, --mmt [String]    MimeType for metadata (default:       
-                                        application/json)                   
---printB3                             Print B3 propagation info. Ignored    
-                                        unless --trace is set.              
--q, --quiet                           Disable the output on next            
--r, --route [String]                  Enable Routing Metadata Extension     
---request                             Shortcut of --im REQUEST_RESPONSE     
---resume [Integer]                    Enable resume. Resume session duration
-                                        can be configured in seconds.       
---retry [Integer]                     Enable retry. Retry every 1 second    
-                                        with the given max attempts.        
---sd, --setupData [String]            Data for Setup payload                
---setupMetadata, --sm [String]        Metadata for Setup payload            
---setupMetadataMimeType, --smmt       Metadata MimeType for Setup payload   
-  [String]                              (default: application/json)         
---showSystemProperties                Show SystemProperties for troubleshoot
---stacktrace                          Show Stacktrace when an exception     
-                                        happens                             
---stream                              Shortcut of --im REQUEST_STREAM       
---take [Integer]                      Enable take(n)                        
---trace [TracingMetadataCodec$Flags]  Enable Tracing (Zipkin) Metadata      
-                                        Extension. Unless sampling state    
-                                        (UNDECIDED, NOT_SAMPLE, SAMPLE,     
-                                        DEBUG) is specified, DEBUG is used  
-                                        if no state is specified.           
--u, --as, --authSimple [String]       Enable Authentication Metadata        
-                                        Extension (Simple). The format must 
-                                        be 'username:password'.             
--v, --version                         Print version                         
--w, --wiretap                         Enable wiretap                        
---wsHeader, --wsh [String]            Header for web socket connection      
---zipkinUrl [String]                  Zipkin URL to send a span (e.g. http: 
-                                        //localhost:9411). Ignored unless --
-                                        trace is set.                                                 
+Option                                Description                            
+------                                -----------                            
+--ab, --authBearer [String]           Enable Authentication Metadata         
+                                        Extension (Bearer).                  
+--authBasic [String]                  [DEPRECATED] Enable Authentication     
+                                        Metadata Extension (Basic). This     
+                                        Metadata exists only for the         
+                                        backward compatibility with Spring   
+                                        Security 5.2                         
+--channel                             Shortcut of --im REQUEST_CHANNEL       
+--completion [ShellType]              Output shell completion code for the   
+                                        specified shell (bash, zsh, fish,    
+                                        powershell)                          
+-d, --data [String]                   Data. Use '-' to read data from        
+                                        standard input. (default: )          
+--dataMimeType, --dmt [String]        MimeType for data (default:            
+                                        application/json)                    
+--debug                               Enable FrameLogger                     
+--delayElements [Long]                Enable delayElements(delay) in milli   
+                                        seconds                              
+--dumpOpts                            Dump options as a file that can be     
+                                        loaded by --optsFile option          
+--fnf                                 Shortcut of --im FIRE_AND_FORGET       
+-h, --help [String]                   Print help                             
+--im, --interactionModel              InteractionModel (default:             
+  [InteractionModel]                    REQUEST_RESPONSE)                    
+-l, --load [String]                   Load a file as Data. (e.g. ./foo.txt,  
+                                        /tmp/foo.txt, https://example.com)   
+--limitRate [Integer]                 Enable limitRate(rate)                 
+--log [String]                        Enable log()                           
+-m, --metadata [String]               Metadata (default: )                   
+--metadataMimeType, --mmt [String]    MimeType for metadata (default:        
+                                        application/json)                    
+--optsFile [String]                   Configure options from a YAML file (e. 
+                                        g. ./opts.yaml, /tmp/opts.yaml,      
+                                        https://example.com/opts.yaml)       
+--printB3                             Print B3 propagation info. Ignored     
+                                        unless --trace is set.               
+-q, --quiet                           Disable the output on next             
+-r, --route [String]                  Enable Routing Metadata Extension      
+--request                             Shortcut of --im REQUEST_RESPONSE      
+--resume [Integer]                    Enable resume. Resume session duration 
+                                        can be configured in seconds.        
+--retry [Integer]                     Enable retry. Retry every 1 second     
+                                        with the given max attempts.         
+--sd, --setupData [String]            Data for Setup payload                 
+--setupMetadata, --sm [String]        Metadata for Setup payload             
+--setupMetadataMimeType, --smmt       Metadata MimeType for Setup payload    
+  [String]                              (default: application/json)          
+--showSystemProperties                Show SystemProperties for troubleshoot 
+--stacktrace                          Show Stacktrace when an exception      
+                                        happens                              
+--stream                              Shortcut of --im REQUEST_STREAM        
+--take [Integer]                      Enable take(n)                         
+--trace [TracingMetadataCodec$Flags]  Enable Tracing (Zipkin) Metadata       
+                                        Extension. Unless sampling state     
+                                        (UNDECIDED, NOT_SAMPLE, SAMPLE,      
+                                        DEBUG) is specified, DEBUG is used   
+                                        if no state is specified.            
+--trustCert [String]                  PEM file for a trusted certificate. (e.
+                                        g. ./foo.crt, /tmp/foo.crt, https:   
+                                        //example.com/foo.crt)               
+-u, --as, --authSimple [String]       Enable Authentication Metadata         
+                                        Extension (Simple). The format must  
+                                        be 'username:password'.              
+-v, --version                         Print version                          
+-w, --wiretap                         Enable wiretap                         
+--wsHeader, --wsh [String]            Header for web socket connection       
+--zipkinUrl [String]                  Zipkin URL to send a span (e.g. http:  
+                                        //localhost:9411). Ignored unless -- 
+                                        trace is set.                                                                   
 ```
 
 ## Install
