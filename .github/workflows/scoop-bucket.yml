@@ -42,7 +42,7 @@ jobs:
         git config --global user.email "${GIT_EMAIL}"
         git config --global user.name "${GIT_NAME}"
         git clone git@github.com:${REPOSITORY}.git
-        cd rsc-bucket
+        cd scoop-bucket
         git checkout -b ${BRANCH_NAME}
 
         cat <<EOF > rsc.json
