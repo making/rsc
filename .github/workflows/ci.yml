@@ -76,7 +76,7 @@ jobs:
         RSC_OIDCUSERNAME: ${{ secrets.RSC_OIDCUSERNAME }}
         RSC_OIDCPASSWORD: ${{ secrets.RSC_OIDCPASSWORD }}
       run: |
-        git clone https://github.com/making/rsc-e2e -b tls
+        git clone https://github.com/making/rsc-e2e
         mvn test -f rsc-e2e
     - name: e2e-test-uber-jar
       if: runner.os == 'Linux'
