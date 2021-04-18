@@ -27,4 +27,4 @@ jobs:
 
         rsc --version
         rsc --showSystemProperties
-        rsc wss://demo.rsocket.io/rsocket --route searchTweets --stream -d Trump --take 3 --retry 3 --debug
+        rsc wss://rsocket-demo-1.appspot.com/rsocket --route searchTweets --stream -d Trump --take 3 --retry 3 --debug

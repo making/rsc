@@ -136,7 +136,7 @@ rsc --stream --route=hello --debug --take=30 ws://localhost:8080/rsocket
 ```
 
 ```
-rsc --stream --route=searchTweets --data=Trump wss://demo.rsocket.io/rsocket
+rsc --stream --route=searchTweets --data=Trump wss://rsocket-demo-1.appspot.com/rsocket
 ```
 
 You can also send data via a file or URL using `-l`/`--load` option instead of `-d`/`--data` as follows
