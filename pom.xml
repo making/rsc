@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.4.5</version>
+		<version>2.5.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>am.ik.rsocket</groupId>
@@ -17,11 +17,13 @@
 
 	<properties>
 		<java.version>1.8</java.version>
-		<spring-native.version>0.9.2</spring-native.version>
+		<spring-native.version>0.10.0</spring-native.version>
+		<repackage.classifier/>
 		<version-generate-skip>false</version-generate-skip>
 		<native-build.args>
 			--enable-all-security-services
 			--enable-https
+			--enable-http
 			-Dfile.encoding=UTF-8
 			-H:IncludeResourceBundles=joptsimple.HelpFormatterMessages
 			-H:IncludeResourceBundles=joptsimple.ExceptionMessages
@@ -150,6 +152,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+					<classifier>${repackage.classifier}</classifier>
 					<image>
 						<builder>paketobuildpacks/builder:tiny</builder>
 						<env>
@@ -188,12 +191,24 @@
 	<profiles>
 		<profile>
 			<id>native</id>
+			<properties>
+				<repackage.classifier>exec</repackage.classifier>
+				<native-buildtools.version>0.9.0</native-buildtools.version>
+			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>org.graalvm.buildtools</groupId>
+					<artifactId>junit-platform-native</artifactId>
+					<version>${native-buildtools.version}</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.graalvm.nativeimage</groupId>
-						<artifactId>native-image-maven-plugin</artifactId>
-						<version>21.0.0.2</version>
+						<groupId>org.graalvm.buildtools</groupId>
+						<artifactId>native-maven-plugin</artifactId>
+						<version>${native-buildtools.version}</version>
 						<configuration>
 							<mainClass>am.ik.rsocket.RscApplication</mainClass>
 							<buildArgs>${native-build.args}</buildArgs>
@@ -203,16 +218,20 @@
 						</configuration>
 						<executions>
 							<execution>
+								<id>test-native</id>
+								<phase>test</phase>
 								<goals>
-									<goal>native-image</goal>
+									<goal>test</goal>
 								</goals>
+							</execution>
+							<execution>
+								<id>build-native</id>
 								<phase>package</phase>
+								<goals>
+									<goal>build</goal>
+								</goals>
 							</execution>
 						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.springframework.boot</groupId>
-						<artifactId>spring-boot-maven-plugin</artifactId>
 					</plugin>
 				</plugins>
 			</build>
