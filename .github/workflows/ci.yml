@@ -64,7 +64,7 @@ jobs:
         mkdir dist
         mvn package -DskipTests
         ${{ matrix.copy }} target${{ matrix.separator }}rsc*.jar dist${{ matrix.separator }}
-        mvn package -Dversion-generate-skip=true -Pnative
+        mvn package -Dversion-generate-skip=true -Pnative -DskipTests
         ${{ matrix.move }} target${{ matrix.separator }}classes${{ matrix.separator }}rsc-${{ matrix.classifier }}${{ matrix.extension }} dist${{ matrix.separator }}rsc-${{ matrix.platform }}${{ matrix.extension }}
     - name: chmod
       if: runner.os != 'Windows'
