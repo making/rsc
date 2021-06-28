@@ -59,6 +59,10 @@ jobs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
+    - name: tweak-for-windows
+      if: runner.os == 'Windows'
+      run: |
+        xcopy /E /Y C:\hostedtoolcache\windows\GraalVM\java8-windows-amd64-21.0.0.2\x64\jre\lib C:\hostedtoolcache\windows\GraalVM\java8-windows-amd64-21.0.0.2\x64\lib
     - name: native-image
       run: |
         mkdir dist
