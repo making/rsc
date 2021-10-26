@@ -193,7 +193,7 @@
 			<id>native</id>
 			<properties>
 				<repackage.classifier>exec</repackage.classifier>
-				<native-buildtools.version>0.9.1</native-buildtools.version>
+				<native-buildtools.version>0.9.7</native-buildtools.version>
 			</properties>
 <!--			<dependencies>-->
 <!--				<dependency>-->
