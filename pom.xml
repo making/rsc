@@ -17,7 +17,7 @@
 
 	<properties>
 		<java.version>1.8</java.version>
-		<spring-native.version>0.10.1</spring-native.version>
+		<spring-native.version>0.11.5</spring-native.version>
 		<repackage.classifier/>
 		<version-generate-skip>false</version-generate-skip>
 		<native-build.args>
