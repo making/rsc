@@ -21,6 +21,8 @@ import java.io.PrintStream;
 import java.io.UncheckedIOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -195,6 +197,10 @@ public class Args {
 			.acceptsAll(Arrays.asList("optsFile"), "Configure options from a YAML file (e.g. ./opts.yaml, /tmp/opts.yaml, https://example.com/opts.yaml)").withOptionalArg();
 
 	private final OptionSpec<Void> dumpOpts = parser.acceptsAll(Arrays.asList("dumpOpts"), "Dump options as a file that can be loaded by --optsFile option");
+
+	private final OptionSpec<String> outputFile = parser
+			.acceptsAll(Arrays.asList("o", "output"), "Write output to file specified")
+			.withOptionalArg();
 
 	private OptionSet options;
 
@@ -793,6 +799,11 @@ public class Args {
 
 	public boolean isDumpOpts() {
 		return this.options.has(this.dumpOpts);
+	}
+
+	public Optional<Path> outputFile() {
+		return Optional.ofNullable(this.options.valueOf(this.outputFile))
+				.map(Paths::get);
 	}
 
 	@SuppressWarnings("unchecked")

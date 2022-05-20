@@ -15,6 +15,8 @@
  */
 package am.ik.rsocket;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
@@ -397,5 +399,21 @@ class ArgsTest {
 		final Optional<Flags> trace = args.trace();
 		assertThat(trace.isPresent()).isTrue();
 		assertThat(trace.get()).isEqualTo(Flags.SAMPLE);
+	}
+
+	@Test
+	void output_fullArgument() {
+		final Args args = new Args(new String[] { "tcp://localhost:8080", "--output", "/tmp/some_file" });
+		final Optional<Path> path = args.outputFile();
+		assertThat(path.isPresent()).isTrue();
+		assertThat(path.get()).isEqualTo(Paths.get("/tmp/some_file"));
+	}
+
+	@Test
+	void output_shortArgument() {
+		final Args args = new Args(new String[] { "tcp://localhost:8080", "-o", "/tmp/some_file" });
+		final Optional<Path> path = args.outputFile();
+		assertThat(path.isPresent()).isTrue();
+		assertThat(path.get()).isEqualTo(Paths.get("/tmp/some_file"));
 	}
 }
